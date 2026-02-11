@@ -3,7 +3,6 @@ from .labels import LABELS, Label, Topic, AggTopic, AggAggTopic, Group, LABELS_I
 
 __all__ = [
     'query',
-
     'LABELS',
     'LABELS_MAJOR',
     'LABELS_IMPACTS',

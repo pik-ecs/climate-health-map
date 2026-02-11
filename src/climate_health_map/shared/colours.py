@@ -1,5 +1,4 @@
-from colorsys import hsv_to_rgb, rgb_to_hls
-
+from colorsys import hsv_to_rgb
 
 # HSV (hue: 0–360°, saturation: 0–100%, value: 0–100%; aka HSB: brightness)
 # HSL (hue: 0–360°, saturation: 0–100%, lightness: 0–100%)

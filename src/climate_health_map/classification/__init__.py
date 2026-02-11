@@ -19,7 +19,7 @@ logger = logging.getLogger('classify')
 app = typer.Typer()
 
 
-def it_models(
+def it_models(  # noqa: C901
     dataset: pd.DataFrame,
     models: list[str] | None = None,
     n_tuning_trials: int | None = None,
@@ -207,7 +207,7 @@ def predict_all(
         except Exception as e:
             logger.error(f'Issue training for {row["label"]}  -> {e}')
             logger.exception(e)
-            logger.warning(f'  -> Ignoring and continuing.')
+            logger.warning('  -> Ignoring and continuing.')
 
 
 @app.command('single')

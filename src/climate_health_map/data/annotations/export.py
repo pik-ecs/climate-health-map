@@ -5,7 +5,6 @@ from typing import Annotated
 import numpy as np
 import pandas as pd
 import typer
-from alembic.ddl.base import drop_column
 from sqlalchemy import text
 
 from climate_health_map.shared import essentials
@@ -23,7 +22,7 @@ def label_select(group: Group) -> list[str]:
     if group.type == 'multi':
         return [
             f'''
-            LEAST(1, COUNT(1) 
+            LEAST(1, COUNT(1)
               FILTER (
                 WHERE ann.key = '{group.nacsos_key}' AND ann.multi_int @> array [{label.value}]
               )
@@ -58,7 +57,7 @@ def dump(
     logger.info('Constructing query...')
     query = text(
         f"""
-       WITH 
+       WITH
            data_impacts_human as (
               SELECT ass.item_id                                                                                        as label_item_id,
                      --COUNT(1) as                                                             cnt,
@@ -131,7 +130,7 @@ def dump(
                       {', '.join(columns_impacts)},
                       (coalesce(bm.scope_ids, array[]::text[]) || coalesce(bi.scope_ids, array[]::text[])) as scope_ids
                FROM data_impacts bi
-                    FULL OUTER JOIN data_major bm ON bi.label_item_id = bm.item_id 
+                    FULL OUTER JOIN data_major bm ON bi.label_item_id = bm.item_id
            )
            SELECT lab.*,
                   ai.publication_year as py,
@@ -170,15 +169,13 @@ def dump(
     df['meta_str'] = df['meta'].apply(lambda v: json.dumps(v))
     df['authors_str'] = df['authors'].apply(lambda v: json.dumps(v))
 
-    for grp in LABELS_IMPACTS+LABELS_MAJOR:
+    for grp in LABELS_IMPACTS + LABELS_MAJOR:
         for label in LABELS[grp].labels:
             df[label.column] = df[label.column].astype('Int8')
 
     logger.info(f'Writing DataFrame to {target}')
     (
-        df
-        .drop(columns=['meta', 'authors'])
-        .to_csv(
+        df.drop(columns=['meta', 'authors']).to_csv(
             target,
             index=False,
         )
