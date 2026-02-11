@@ -7,6 +7,7 @@
 * `climate_health_map.data.annotations.scopes` clearly defines which labels are safe to use (needs updating sometimes)
 * human annotations used to train and eval ML model
 * pipeline default expects export at `data/exports/annotations.csv` 
+* originally in https://github.com/destiny-evidence/nacsos2eppi/tree/main/projects/lancet
 
 ```bash
 # if necessary, tunnel port to database
