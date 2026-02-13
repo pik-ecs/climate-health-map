@@ -1,8 +1,48 @@
 import re
 import logging
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 from sklearn.metrics import precision_score, recall_score, f1_score
+
+MODELS_TRAD = {
+    'SVM',
+    'REG',
+    'SGD',
+    'LGBM',
+    'NB',
+    'ISOFOREST',
+}
+MODELS_TRANS = {
+    'CLIMATEBERT': 'climatebert/distilroberta-base-climate-f',
+    'SCIBERT': 'allenai/scibert_scivocab_uncased',
+    'TINYBERT': 'prajjwal1/bert-tiny',
+}
+
+
+def ensure_offline_transformers(model_data_path: Path, logger: logging.Logger) -> None:
+    from huggingface_hub import snapshot_download
+
+    for key, name in MODELS_TRANS.items():
+        logger.info(f'Downloading model: {key} ({name}) so it is available offline in {model_data_path}')
+        snapshot_download(
+            repo_id=name,
+            repo_type='model',
+            cache_dir=model_data_path,
+            force_download=False,
+        )
+
+
+def ensure_offline_nltk(logger: logging.Logger) -> None:
+    logger.debug('Loading NLTK data...')
+    from nltk import download
+
+    download('stopwords')
+    download('punkt')
+    download('punkt_tab')
+    download('wordnet')
+    download('averaged_perceptron_tagger_eng')
 
 
 def text_utils():
@@ -32,17 +72,6 @@ def text_utils():
         return ' '.join([tok for tok in word_tokenize(text) if tok not in stopwords])
 
     return lemmatize, process_text_aggressive, process_text_light
-
-
-def prepare_nltk(logger: logging.Logger) -> None:
-    logger.debug('Loading NLTK data...')
-    from nltk import download
-
-    download('stopwords')
-    download('punkt')
-    download('punkt_tab')
-    download('wordnet')
-    download('averaged_perceptron_tagger_eng')
 
 
 def downsampling_mask(y: np.ndarray, sampling: float) -> np.ndarray:

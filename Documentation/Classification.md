@@ -1,3 +1,46 @@
+# Instructions for classification
+
+Classification has three steps
+1) Tuning (run all sorts of models for all labels repeatedly with hyper-parameter tuning); this writes info files with the best model parameters for each model/label/repeat combo.
+2) Training (using best model config from above per label and train+store a model)
+3) Application (point to a file, and this will apply trained classifiers)
+
+
+
+# Hyper-parameter tuning
+```bash
+ssh foote
+cd /data/rd5/ecs/Data/LancetCountdown/LivingPipeline/
+git clone git@gitlab.pik-potsdam.de:mcc-apsis/living-evidence-maps/climate-health-map.git
+uv sync --no-sources --extra classify
+
+```
+
+# Classifier quality summary
+TODO: script after tuning that creates pretty output to check into repository for reference
+
+# Training
+TODO: prepare ready-to-use easy-to-load models and store them using best setup
+
+# Classification
+TODO: NACSOS missing classification exporter
+TODO: run classification
+
+# SLURM
+TODO: notes on slurm
+
+# Persisting predictions to NACSOS
+TODO: push classifications upstream to platform
+
+
+
+# Below is deprecated!!!
+# Below is deprecated!!!
+# Below is deprecated!!!
+# Below is deprecated!!!
+# Below is deprecated!!!
+# Below is deprecated!!!
+# Below is deprecated!!!
 ```bash
 
 export PYTHONPATH=.:$PYTHONPATH && python S02_Classify/classify.py --help

@@ -17,5 +17,5 @@ ssh -N -L 5433:localhost:5432 se164
 uv run healthmap export_annotations --help
 
 # fetch latest annotations
-uv run healthmap export_annotations --config=config/secret.env --target=data/exports/annotations.csv --loglevel=INFO --no-overwrite
+uv run healthmap export_annotations --config=config/secret.env --target=data/exports/annotations_20260213.csv --loglevel=INFO --no-overwrite
 ```
