@@ -274,7 +274,7 @@ def prepare_tuning_slurm(
         schema=schema,
     )
 
-    fn_slurm_trad = 'tune-trans.slurm'
+    fn_slurm_trad = 'tune-trad.slurm'
     logger.info(f'Writing transformer tuning script as `{fn_slurm_trad}`')
     with open(fn_slurm_trad, 'w') as slurm_file:
         slurm_file.write(sbatch_trad)
