@@ -51,7 +51,7 @@ set -o xtrace
 # Set up python environment
 module load anaconda/2025
 module load cuda
-source "{venv_path}/bin/activate"
+source "{venv_path.resolve()}/bin/activate"
 
 # Python env vars
 export PYTHONPATH=$PYTHONPATH:{os.getcwd()}
@@ -61,7 +61,8 @@ export PYTHONUNBUFFERED=1
 export OPENBLAS_NUM_THREADS=1
 export TRANSFORMERS_OFFLINE=1
 export HF_HUB_OFFLINE=1
-export OFFLINE_MODEL_PATH={models_path}
+export OFFLINE_MODEL_PATH={models_path.resolve()}
+export NLTK_DATA={models_path.resolve()}/nltk_data
 
 echo "Using python from $(which python)"
 echo "Python version is $(python --version)"
@@ -208,7 +209,7 @@ def prepare_tuning_slurm(
         ensure_offline_transformers(model_data_path=models_path, logger=logger)
 
         logger.info('Making sure NLTK is available offline!')
-        ensure_offline_nltk(logger=logger)
+        ensure_offline_nltk(target_dir=models_path/'nltk_data',logger=logger)
 
     logger.info('Preparing basic script parameters...')
     sbatch_args, script_args = _base_args(

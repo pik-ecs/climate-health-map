@@ -34,15 +34,21 @@ def ensure_offline_transformers(model_data_path: Path, logger: logging.Logger) -
         )
 
 
-def ensure_offline_nltk(logger: logging.Logger) -> None:
+def ensure_offline_nltk(logger: logging.Logger, target_dir:Path|None=None) -> None:
     logger.debug('Loading NLTK data...')
     from nltk import download
-
-    download('stopwords')
-    download('punkt')
-    download('punkt_tab')
-    download('wordnet')
-    download('averaged_perceptron_tagger_eng')
+    import ssl
+    try:
+        _create_unverified_https_context = ssl._create_unverified_context
+    except AttributeError:
+        pass
+    else:
+        ssl._create_default_https_context = _create_unverified_https_context
+    download('stopwords', download_dir=str(target_dir))
+    download('punkt', download_dir=str(target_dir))
+    download('punkt_tab', download_dir=str(target_dir))
+    download('wordnet', download_dir=str(target_dir))
+    download('averaged_perceptron_tagger_eng', download_dir=str(target_dir))
 
 
 def text_utils():

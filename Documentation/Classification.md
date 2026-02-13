@@ -15,14 +15,30 @@ cd /data/rd5/ecs/Data/LancetCountdown/LivingPipeline/
 git clone git@gitlab.pik-potsdam.de:mcc-apsis/living-evidence-maps/climate-health-map.git
 cd climate-health-map
 
-# make python available
+# make python and uv available
 module load anaconda/2025
-
-# install uv (may need to open fresh shell so that env is set)
 curl -LsSf https://astral.sh/uv/install.sh | sh
+cp ~/.local/bin/uv* .
 
-uv sync --active --no-sources --extra classify
-
+python -m venv venv
+source venv/bin/activate
+pip install uv
+# ignore the warning, we want a separate environment!
+uv sync --no-sources --extra classify --prerelease=allow 
+source .venv/bin/activate
+uv run --no-sources --extra classify --prerelease=allow healthmap slurm-tune-scripts \
+    --training-data="../data/exports/annotations_20260213.csv" \
+    --target-dir="../data/tuning" \
+    --models-path="../data/offline_models" \
+    --venv-path=".venv/" \
+    --log-path="../data/logs/tune/" \
+    --slurm-user="timrepke@pik-potsdam.de" \
+    --num-repeats=3 \
+    --train-proportion=0.66 \
+    --min-minor-class=20 \
+    --slurm-hours=24 \
+    --tuning-trials=20 \
+    --ensure-models-offline
 ```
 
 # Classifier quality summary
