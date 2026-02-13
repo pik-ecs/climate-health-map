@@ -12,7 +12,7 @@ def is_label_eligible(df: pd.DataFrame, label: Label, min_minor_class: int = 10,
         logger.debug(f'{label.column} not in columns')
         return False
     column_stats = df[df[label.column].notna()][label.column].value_counts()
-    logger.debug(f'Class balance: {column_stats}')
+    logger.debug(f'Class balance: {column_stats.to_dict()}')
     if len(column_stats) != 2:
         return False
     return min(column_stats) >= min_minor_class

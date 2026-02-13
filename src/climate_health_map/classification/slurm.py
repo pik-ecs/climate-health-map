@@ -102,7 +102,7 @@ def _compile_tuning_sbatch_script(
     models_path: Path,
 ):
     array = [
-        f'"{label.name}____{model}____{repeat}"'
+        f'"{label.column}____{model}____{repeat}"'
         for group in schema.values()
         for label in group.labels
         for model in models
