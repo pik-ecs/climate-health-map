@@ -1,5 +1,6 @@
 from colorsys import hsv_to_rgb
 
+
 # HSV (hue: 0–360°, saturation: 0–100%, value: 0–100%; aka HSB: brightness)
 # HSL (hue: 0–360°, saturation: 0–100%, lightness: 0–100%)
 # RGB (red: 0–255, green: 0–255, blue: 0–255)
@@ -22,4 +23,5 @@ def hex_to_rgb(v: str) -> tuple[float, float, float]:
 
 
 def rgb_to_hex(v: tuple[float, float, float]) -> str:
-    return '#' + ''.join([f'{int(vi * 255):02x}'[-2:] for vi in v])
+    scale = 255 if all(vi < 1 for vi in v) else 1  # if all values <1, assume the input is using the normalised 0–1 scale and extend the range to 0–255
+    return '#' + ''.join([f'{int(vi * scale):02x}'[-2:] for vi in v])

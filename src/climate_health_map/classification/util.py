@@ -1,0 +1,81 @@
+import re
+import logging
+import numpy as np
+import pandas as pd
+from sklearn.metrics import precision_score, recall_score, f1_score
+
+
+def text_utils():
+    from nltk import WordNetLemmatizer, pos_tag, wordpunct_tokenize, sent_tokenize, word_tokenize
+    from nltk.corpus import stopwords as sw
+    from nltk.corpus import wordnet as wn
+
+    lemmatizer = WordNetLemmatizer()
+    stopwords = sw.words('english')
+    NOALPH = re.compile(r'[^A-Za-z]+')
+
+    def lemmatize(token, tag):
+        tag = {'N': wn.NOUN, 'V': wn.VERB, 'R': wn.ADV, 'J': wn.ADJ}.get(tag[0], wn.NOUN)
+        return lemmatizer.lemmatize(token, tag)
+
+    def process_text_aggressive(text: str):
+        return ' '.join(
+            [
+                lemmatize(tok, tag)
+                for sentence in sent_tokenize(text)
+                for tok, tag in pos_tag(wordpunct_tokenize(sentence))
+                if tok not in stopwords and len(NOALPH.sub('', tok)) >= 3
+            ],
+        )
+
+    def process_text_light(text: str):
+        return ' '.join([tok for tok in word_tokenize(text) if tok not in stopwords])
+
+    return lemmatize, process_text_aggressive, process_text_light
+
+
+def prepare_nltk(logger: logging.Logger) -> None:
+    logger.debug('Loading NLTK data...')
+    from nltk import download
+
+    download('stopwords')
+    download('punkt')
+    download('punkt_tab')
+    download('wordnet')
+    download('averaged_perceptron_tagger_eng')
+
+
+def downsampling_mask(y: np.ndarray, sampling: float) -> np.ndarray:
+    if sampling < 0.05:
+        return np.ones(len(y), dtype=bool)
+
+    sample = np.zeros(len(y), dtype=int)
+    sample[: int((1 - sampling) * len(y))] = 1
+    np.random.shuffle(sample)
+    sample = sample.astype(bool)
+    return (y == 1) | sample
+
+
+def get_prediction_stats(dataset: pd.DataFrame, y_pred: np.ndarray, test_idxs: list[int], train_idxs: list[int]) -> tuple[pd.DataFrame, dict[str, float]]:
+    ds = dataset.copy().drop(columns=['text'])
+    ds['score'] = y_pred
+
+    y_test_true = ds.loc[test_idxs, 'label']
+    y_test_pred = ds.loc[test_idxs, 'score'] > 0.5
+    y_train_true = ds.loc[train_idxs, 'label']
+    y_train_pred = ds.loc[train_idxs, 'score'] > 0.5
+
+    stats = {
+        'precision_test': precision_score(y_test_true, y_test_pred, zero_division=0),
+        'recall_test': recall_score(y_test_true, y_test_pred, zero_division=0),
+        'f1_test': f1_score(y_test_true, y_test_pred, zero_division=0),
+        'precision_train': precision_score(y_train_true, y_train_pred, zero_division=0),
+        'recall_train': recall_score(y_train_true, y_train_pred, zero_division=0),
+        'f1_train': f1_score(y_train_true, y_train_pred, zero_division=0),
+        'n_train': len(train_idxs),
+        'n_test': len(test_idxs),
+        'balance_train': [len(train_idxs) - y_train_pred.sum(), y_train_pred.sum()],
+        'balance_test': [len(test_idxs) - y_test_pred.sum(), y_test_pred.sum()],
+    }
+
+    return ds, stats

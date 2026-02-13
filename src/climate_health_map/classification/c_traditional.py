@@ -1,26 +1,23 @@
 import os
+import logging
 import warnings
-from abc import abstractmethod, ABC
 from typing import Any, Type
+from abc import abstractmethod, ABC
 
 import optuna
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
-from sklearn.exceptions import DataConversionWarning, ConvergenceWarning
-from sklearn.linear_model import SGDClassifier, LogisticRegression
-from sklearn.model_selection import StratifiedKFold, cross_val_score
-from lightgbm import LGBMClassifier
-import re
-import logging
-from nltk import WordNetLemmatizer, pos_tag, wordpunct_tokenize, sent_tokenize, word_tokenize
-from nltk.corpus import stopwords as sw
-from nltk.corpus import wordnet as wn
 
-logger = logging.getLogger('rank-simple')
+from sklearn.base import ClassifierMixin
+from sklearn.exceptions import DataConversionWarning, ConvergenceWarning
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import StratifiedKFold, cross_val_score
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+from .util import downsampling_mask, text_utils
+
+logger = logging.getLogger('classify-traditional')
 logging.getLogger('LightGBM').setLevel(logging.ERROR)
 
 # Stop optuna from logging all trial results
@@ -31,52 +28,17 @@ warnings.filterwarnings(action='ignore', category=DataConversionWarning)
 warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 warnings.filterwarnings(action='ignore', category=UserWarning)
 warnings.filterwarnings(action='ignore')
+
 # Not everything is caught when parallelising, this helps...
 os.environ['PYTHONWARNINGS'] = 'ignore'
 
-lemmatizer = WordNetLemmatizer()
-stopwords = sw.words('english')
-NOALPH = re.compile(r'[^A-Za-z]+')
+lemmatize, process_text_aggressive, process_text_light = text_utils()
 
 
-def lemmatize(token, tag):
-    tag = {'N': wn.NOUN, 'V': wn.VERB, 'R': wn.ADV, 'J': wn.ADJ}.get(tag[0], wn.NOUN)
-    return lemmatizer.lemmatize(token, tag)
-
-
-def process_text_aggressive(text: str):
-    return ' '.join(
-        [
-            lemmatize(tok, tag)
-            for sentence in sent_tokenize(text)
-            for tok, tag in pos_tag(wordpunct_tokenize(sentence))
-            if tok not in stopwords and len(NOALPH.sub('', tok)) >= 3
-        ]
-    )
-
-
-def process_text_light(text: str):
-    return ' '.join([tok for tok in word_tokenize(text) if tok not in stopwords])
-
-
-def downsampling_mask(y: np.ndarray, sampling: float) -> np.ndarray:
-    if sampling < 0.05:
-        return np.ones(len(y), dtype=bool)
-
-    sample = np.zeros(len(y), dtype=int)
-    sample[: int((1 - sampling) * len(y))] = 1
-    np.random.shuffle(sample)
-    sample = sample.astype(bool)
-    return (y == 1) | sample
-
-
-type Classifier = SGDClassifier | SVC | LogisticRegression | LGBMClassifier
-
-
-class _SimpleRanking(ABC):
+class _SimpleClassification(ABC):
     def __init__(
         self,
-        BaseModel: Type[Classifier],
+        BaseModel: Type[ClassifierMixin],
         model_params: dict[str, Any],
         dataset: pd.DataFrame,
         tuning_trials: int = 35,
@@ -186,7 +148,7 @@ class _SimpleRanking(ABC):
         }
 
 
-class SVMRanker(_SimpleRanking):
+class SVMClassifier(_SimpleClassification):
     name = 'svm'
 
     def __init__(
@@ -202,6 +164,8 @@ class SVMRanker(_SimpleRanking):
         min_df: int | float = 3,
         **kwargs: dict[str, Any],
     ):
+        from sklearn.svm import SVC
+
         super().__init__(
             BaseModel=SVC,
             model_params={'kernel': 'linear', 'class_weight': 'balanced', 'degree': 3, 'gamma': 'auto', 'probability': True, 'C': 1.0, 'max_iter': 1000}
@@ -226,7 +190,7 @@ class SVMRanker(_SimpleRanking):
         }
 
 
-class SGDRanker(_SimpleRanking):
+class SGDClassifier(_SimpleClassification):
     name = 'sgd'
 
     def __init__(
@@ -242,6 +206,8 @@ class SGDRanker(_SimpleRanking):
         min_df: int | float = 3,
         **kwargs: dict[str, Any],
     ):
+        from sklearn.linear_model import SGDClassifier
+
         super().__init__(
             BaseModel=SGDClassifier,
             model_params={'class_weight': 'balanced', 'loss': 'log_loss', 'max_iter': 1000} | (model_params or {}),
@@ -263,7 +229,7 @@ class SGDRanker(_SimpleRanking):
         }
 
 
-class RegressionRanker(_SimpleRanking):
+class RegressionClassifier(_SimpleClassification):
     name = 'logreg'
 
     def __init__(
@@ -279,6 +245,8 @@ class RegressionRanker(_SimpleRanking):
         min_df: int | float = 3,
         **kwargs: dict[str, Any],
     ):
+        from sklearn.linear_model import LogisticRegression
+
         super().__init__(
             BaseModel=LogisticRegression,
             model_params={
@@ -308,7 +276,104 @@ class RegressionRanker(_SimpleRanking):
         }
 
 
-class LightGBMRanker(_SimpleRanking):
+class IsolationForestClassifier(_SimpleClassification):
+    name = 'isoforest'
+
+    def __init__(
+        self,
+        dataset: pd.DataFrame,
+        tuning_trials: int = 35,
+        model_params: dict[str, Any] | None = None,
+        random_seed: int | None = None,
+        scoring: str | None = None,
+        n_jobs: int = 5,
+        max_features: int = 75000,
+        ngram_range: tuple[int, int] = (1, 3),
+        min_df: int | float = 3,
+        **kwargs: dict[str, Any],
+    ):
+        from sklearn.ensemble import IsolationForest
+
+        super().__init__(
+            BaseModel=IsolationForest,
+            model_params={
+                'n_estimators': 100,
+                'max_samples': 'auto',
+                'contamination': 'auto',
+                'max_features': 1.0,
+                'bootstrap': False,
+                'n_jobs': None,
+                'random_state': None,
+                'verbose': 0,
+                'warm_start': False,
+            }
+            | (model_params or {}),
+            tuning_trials=tuning_trials,
+            scoring=scoring or 'recall',
+            dataset=dataset,
+            random_seed=random_seed,
+            n_jobs=n_jobs,
+            max_features=max_features,
+            ngram_range=ngram_range,
+            min_df=min_df,
+            **kwargs,
+        )
+
+    def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
+        return {
+            'n_estimators': trial.suggest_float('n_estimators', low=20, high=250, log=True),
+            'max_features': trial.suggest_float('max_features', low=0.2, high=1.0),
+        }
+
+
+class NaiveBayesClassifier(_SimpleClassification):
+    name = 'naivebayes'
+
+    def __init__(
+        self,
+        dataset: pd.DataFrame,
+        tuning_trials: int = 35,
+        model_params: dict[str, Any] | None = None,
+        random_seed: int | None = None,
+        scoring: str | None = None,
+        n_jobs: int = 5,
+        max_features: int = 75000,
+        ngram_range: tuple[int, int] = (1, 3),
+        min_df: int | float = 3,
+        **kwargs: dict[str, Any],
+    ):
+        from sklearn.naive_bayes import GaussianNB
+
+        super().__init__(
+            BaseModel=GaussianNB,
+            model_params={
+                'n_estimators': 100,
+                'max_samples': 'auto',
+                'contamination': 'auto',
+                'max_features': 1.0,
+                'bootstrap': False,
+                'n_jobs': None,
+                'random_state': None,
+                'verbose': 0,
+                'warm_start': False,
+            }
+            | (model_params or {}),
+            tuning_trials=tuning_trials,
+            scoring=scoring or 'recall',
+            dataset=dataset,
+            random_seed=random_seed,
+            n_jobs=n_jobs,
+            max_features=max_features,
+            ngram_range=ngram_range,
+            min_df=min_df,
+            **kwargs,
+        )
+
+    def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
+        return {}
+
+
+class LightGBMClassifier(_SimpleClassification):
     name = 'lightgbm'
 
     def __init__(
@@ -324,6 +389,8 @@ class LightGBMRanker(_SimpleRanking):
         min_df: int | float = 3,
         **kwargs: dict[str, Any],
     ):
+        from lightgbm import LGBMClassifier
+
         super().__init__(
             BaseModel=LGBMClassifier,
             model_params={

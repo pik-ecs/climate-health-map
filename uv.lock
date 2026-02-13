@@ -119,16 +119,16 @@ wheels = [
 
 [[package]]
 name = "alembic"
-version = "1.18.3"
+version = "1.18.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "mako" },
     { name = "sqlalchemy" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/79/41/ab8f624929847b49f84955c594b165855efd829b0c271e1a8cac694138e5/alembic-1.18.3.tar.gz", hash = "sha256:1212aa3778626f2b0f0aa6dd4e99a5f99b94bd25a0c1ac0bba3be65e081e50b0", size = 2052564, upload-time = "2026-01-29T20:24:15.124Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/94/13/8b084e0f2efb0275a1d534838844926f798bd766566b1375174e2448cd31/alembic-1.18.4.tar.gz", hash = "sha256:cb6e1fd84b6174ab8dbb2329f86d631ba9559dd78df550b57804d607672cedbc", size = 2056725, upload-time = "2026-02-10T16:00:47.195Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/45/8e/d79281f323e7469b060f15bd229e48d7cdd219559e67e71c013720a88340/alembic-1.18.3-py3-none-any.whl", hash = "sha256:12a0359bfc068a4ecbb9b3b02cf77856033abfdb59e4a5aca08b7eacd7b74ddd", size = 262282, upload-time = "2026-01-29T20:24:17.488Z" },
+    { url = "https://files.pythonhosted.org/packages/d2/29/6533c317b74f707ea28f8d633734dbda2119bbadfc61b2f3640ba835d0f7/alembic-1.18.4-py3-none-any.whl", hash = "sha256:a5ed4adcf6d8a4cb575f3d759f071b03cd6e5c7618eb796cb52497be25bfe19a", size = 263893, upload-time = "2026-02-10T16:00:49.997Z" },
 ]
 
 [[package]]
@@ -542,8 +542,10 @@ name = "climate-health-map"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "matplotlib" },
     { name = "nacsos-data", extra = ["scripts", "utils"] },
     { name = "tabulate" },
+    { name = "tqdm" },
     { name = "xlsxwriter" },
 ]
 
@@ -579,7 +581,7 @@ dev = [
 requires-dist = [
     { name = "accelerate", marker = "extra == 'classify'", specifier = "==1.11.0" },
     { name = "cartopy", marker = "extra == 'notebook'", specifier = "==0.25.0" },
-    { name = "datasets", marker = "extra == 'classify'", specifier = "==4.4.2" },
+    { name = "datasets", marker = "extra == 'classify'", specifier = "==4.5.0" },
     { name = "evaluate", marker = "extra == 'classify'", specifier = "==0.4.6" },
     { name = "geopandas", marker = "extra == 'notebook'", specifier = "==1.1.1" },
     { name = "jupyter", marker = "extra == 'notebook'", specifier = "==1.1.1" },
@@ -587,13 +589,15 @@ requires-dist = [
     { name = "jupyter-server-fileid", marker = "extra == 'notebook'", specifier = "==0.9.3" },
     { name = "jupyter-server-ydoc", marker = "extra == 'notebook'", specifier = "==2.1.0rc0" },
     { name = "lightgbm", marker = "extra == 'classify'", specifier = "==4.6.0" },
+    { name = "matplotlib", specifier = "==3.10.8" },
     { name = "mordecai3", marker = "extra == 'extract'", git = "https://github.com/ahalterman/mordecai3" },
-    { name = "nacsos-data", extras = ["utils", "scripts"], git = "ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git?tag=v0.24.20" },
+    { name = "nacsos-data", extras = ["utils", "scripts"], editable = "../nacsos_data" },
     { name = "nbclassic", marker = "extra == 'notebook'", specifier = "==1.3.3" },
     { name = "nltk", marker = "extra == 'classify'", specifier = "==3.9.2" },
     { name = "optuna", marker = "extra == 'classify'", specifier = "==4.5.0" },
     { name = "tabulate", specifier = "==0.9.0" },
-    { name = "transformers", extras = ["torch"], marker = "extra == 'classify'", specifier = "==4.57.3" },
+    { name = "tqdm", specifier = "==4.67.3" },
+    { name = "transformers", extras = ["torch"], marker = "extra == 'classify'", specifier = "==4.57.6" },
     { name = "xlsxwriter", specifier = "==3.2.9" },
 ]
 provides-extras = ["classify", "extract", "notebook"]
@@ -781,7 +785,7 @@ wheels = [
 
 [[package]]
 name = "datasets"
-version = "4.4.2"
+version = "4.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dill" },
@@ -799,9 +803,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "xxhash" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c4/54/9359803da96bc65439a28fbb014dc2c90b7d4d8034a93b72362b0d40191f/datasets-4.4.2.tar.gz", hash = "sha256:9de16e415c4ba4713eac0493f7c7dc74f3aa21599297f00cc6ddab409cb7b24b", size = 586474, upload-time = "2025-12-19T15:03:09.129Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/55/bf/bb927bde63d649296c83e883171ae77074717c1b80fe2868b328bd0dbcbb/datasets-4.5.0.tar.gz", hash = "sha256:00c698ce1c2452e646cc5fad47fef39d3fe78dd650a8a6eb205bb45eb63cd500", size = 588384, upload-time = "2026-01-14T18:27:54.297Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7b/b5/fefa518c809de7bced5cddb7c21c010da66fa2ae494bda96844a280cc6ce/datasets-4.4.2-py3-none-any.whl", hash = "sha256:6f5ef3417504d9cd663c71c1b90b9a494ff4c2076a2cd6a6e40ceee6ad95befc", size = 512268, upload-time = "2025-12-19T15:03:07.087Z" },
+    { url = "https://files.pythonhosted.org/packages/fc/d5/0d563ea3c205eee226dc8053cf7682a8ac588db8acecd0eda2b587987a0b/datasets-4.5.0-py3-none-any.whl", hash = "sha256:b5d7e08096ffa407dd69e58b1c0271c9b2506140839b8d99af07375ad31b6726", size = 515196, upload-time = "2026-01-14T18:27:52.419Z" },
 ]
 
 [[package]]
@@ -2302,8 +2306,8 @@ wheels = [
 
 [[package]]
 name = "nacsos-data"
-version = "0.24.20"
-source = { git = "ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git?tag=v0.24.20#0094b607d0db9281134d65ac9ae1dd573878e667" }
+version = "0.24.23"
+source = { editable = "../nacsos_data" }
 dependencies = [
     { name = "email-validator" },
     { name = "lark" },
@@ -2333,6 +2337,46 @@ utils = [
     { name = "scikit-learn" },
     { name = "scipy" },
 ]
+
+[package.metadata]
+requires-dist = [
+    { name = "alembic", marker = "extra == 'scripts'", specifier = "==1.18.4" },
+    { name = "bcrypt", marker = "extra == 'utils'", specifier = "==5.0.0" },
+    { name = "bibtexparser", marker = "extra == 'utils'", specifier = "==1.4.4" },
+    { name = "datasets", marker = "extra == 'priority'", specifier = "==4.5.0" },
+    { name = "email-validator", specifier = "==2.3.0" },
+    { name = "evaluate", marker = "extra == 'priority'", specifier = "==0.4.6" },
+    { name = "httpx", extras = ["http2", "socks"], marker = "extra == 'utils'", specifier = "==0.28.1" },
+    { name = "lark", specifier = "==1.3.1" },
+    { name = "lxml", marker = "extra == 'utils'", specifier = "==6.0.2" },
+    { name = "markdownify", marker = "extra == 'utils'", specifier = "==1.2.2" },
+    { name = "matplotlib", marker = "extra == 'priority'", specifier = "==3.10.8" },
+    { name = "pandas", extras = ["excel"], marker = "extra == 'utils'", specifier = "==3.0.0" },
+    { name = "psycopg", extras = ["binary"], specifier = "==3.3.2" },
+    { name = "psycopg2-binary", specifier = "==2.9.11" },
+    { name = "pydantic", specifier = "==2.12.5" },
+    { name = "pydantic-settings", specifier = "==2.12.0" },
+    { name = "pymilvus", marker = "extra == 'utils'", specifier = "==2.6.9" },
+    { name = "python-dotenv", specifier = "==1.2.1" },
+    { name = "rispy", marker = "extra == 'utils'", specifier = "==0.10.0" },
+    { name = "scikit-learn", marker = "extra == 'utils'", specifier = "==1.8.0" },
+    { name = "scipy", marker = "extra == 'utils'", specifier = "==1.17.0" },
+    { name = "sqlalchemy", specifier = "==2.0.46" },
+    { name = "sqlalchemy-json", specifier = "==0.7.0" },
+    { name = "transformers", extras = ["torch"], marker = "extra == 'priority'", specifier = "==5.1.0" },
+    { name = "typer", marker = "extra == 'scripts'", specifier = "==0.23.1" },
+]
+provides-extras = ["utils", "priority", "scripts"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy", extras = ["faster-cache"], specifier = "==1.19.1" },
+    { name = "nacsos-data", extras = ["utils", "scripts"], editable = "../nacsos_data" },
+    { name = "ruff", specifier = ">=0.15.1" },
+    { name = "types-passlib", specifier = "==1.7.7.20260211" },
+    { name = "types-requests", specifier = "==2.32.4.20260107" },
+]
+mldev = [{ name = "nacsos-data", extras = ["utils", "scripts", "priority"], editable = "../nacsos_data" }]
 
 [[package]]
 name = "nbclassic"
@@ -3330,7 +3374,7 @@ wheels = [
 
 [[package]]
 name = "pymilvus"
-version = "2.6.8"
+version = "2.6.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachetools" },
@@ -3341,9 +3385,9 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "setuptools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/71/68/9b8bac2267af60035d65fb5a4247c5ac8da175d66ec794d84d9cd3486524/pymilvus-2.6.8.tar.gz", hash = "sha256:15232f5f66805bf2f50b30bbad59637b62f5258d9343f7615353ce1221fab6b5", size = 1421303, upload-time = "2026-01-29T07:32:16.519Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/94/0c/92adff800a04cd3e9b3f17c06fa972c8d590846b1e0bac0ccf39e054b596/pymilvus-2.6.9.tar.gz", hash = "sha256:c53a3d84ff15814e251be13edda70a98a1c8a6090d7597a908387cbb94a9504a", size = 1493560, upload-time = "2026-02-10T11:01:27.415Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/27/3af2199afaabd48791584fa5da5929f08d1a3c8c37a2ef12c15fc9309111/pymilvus-2.6.8-py3-none-any.whl", hash = "sha256:c4c413ffdef2599064301fd831de6f9839a753abe27c68c6148707629711d069", size = 300995, upload-time = "2026-01-29T07:32:14.199Z" },
+    { url = "https://files.pythonhosted.org/packages/6a/56/ab7f0a5aba6fc06dc210a059d6f6d2ee1f3371d40e2b4366a409576554b8/pymilvus-2.6.9-py3-none-any.whl", hash = "sha256:3e14e8072f6429dcd79d52a24dc021c594cb80841ddd76cb974bc539d1f4cdda", size = 301225, upload-time = "2026-02-10T11:01:25.796Z" },
 ]
 
 [[package]]
@@ -4489,7 +4533,7 @@ wheels = [
 
 [[package]]
 name = "transformers"
-version = "4.57.3"
+version = "4.57.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "filelock" },
@@ -4503,9 +4547,9 @@ dependencies = [
     { name = "tokenizers" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/dd/70/d42a739e8dfde3d92bb2fff5819cbf331fe9657323221e79415cd5eb65ee/transformers-4.57.3.tar.gz", hash = "sha256:df4945029aaddd7c09eec5cad851f30662f8bd1746721b34cc031d70c65afebc", size = 10139680, upload-time = "2025-11-25T15:51:30.139Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/35/67252acc1b929dc88b6602e8c4a982e64f31e733b804c14bc24b47da35e6/transformers-4.57.6.tar.gz", hash = "sha256:55e44126ece9dc0a291521b7e5492b572e6ef2766338a610b9ab5afbb70689d3", size = 10134912, upload-time = "2026-01-16T10:38:39.284Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6a/6b/2f416568b3c4c91c96e5a365d164f8a4a4a88030aa8ab4644181fdadce97/transformers-4.57.3-py3-none-any.whl", hash = "sha256:c77d353a4851b1880191603d36acb313411d3577f6e2897814f333841f7003f4", size = 11993463, upload-time = "2025-11-25T15:51:26.493Z" },
+    { url = "https://files.pythonhosted.org/packages/03/b8/e484ef633af3887baeeb4b6ad12743363af7cce68ae51e938e00aaa0529d/transformers-4.57.6-py3-none-any.whl", hash = "sha256:4c9e9de11333ddfe5114bc872c9f370509198acf0b87a832a0ab9458e2bd0550", size = 11993498, upload-time = "2026-01-16T10:38:31.289Z" },
 ]
 
 [package.optional-dependencies]
@@ -4527,17 +4571,17 @@ wheels = [
 
 [[package]]
 name = "typer"
-version = "0.21.1"
+version = "0.23.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "annotated-doc" },
     { name = "click" },
     { name = "rich" },
     { name = "shellingham" },
-    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/36/bf/8825b5929afd84d0dabd606c67cd57b8388cb3ec385f7ef19c5cc2202069/typer-0.21.1.tar.gz", hash = "sha256:ea835607cd752343b6b2b7ce676893e5a0324082268b48f27aa058bdb7d2145d", size = 110371, upload-time = "2026-01-06T11:21:10.989Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fd/07/b822e1b307d40e263e8253d2384cf98c51aa2368cc7ba9a07e523a1d964b/typer-0.23.1.tar.gz", hash = "sha256:2070374e4d31c83e7b61362fd859aa683576432fd5b026b060ad6b4cd3b86134", size = 120047, upload-time = "2026-02-13T10:04:30.984Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a0/1d/d9257dd49ff2ca23ea5f132edf1281a0c4f9de8a762b9ae399b670a59235/typer-0.21.1-py3-none-any.whl", hash = "sha256:7985e89081c636b88d172c2ee0cfe33c253160994d47bdfdc302defd7d1f1d01", size = 47381, upload-time = "2026-01-06T11:21:09.824Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/91/9b286ab899c008c2cb05e8be99814807e7fbbd33f0c0c960470826e5ac82/typer-0.23.1-py3-none-any.whl", hash = "sha256:3291ad0d3c701cbf522012faccfbb29352ff16ad262db2139e6b01f15781f14e", size = 56813, upload-time = "2026-02-13T10:04:32.008Z" },
 ]
 
 [[package]]

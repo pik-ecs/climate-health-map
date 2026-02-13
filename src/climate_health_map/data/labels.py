@@ -1,7 +1,8 @@
 from typing import Literal
 
 from pydantic import BaseModel, Field
-from climate_health_map.shared.colours import hsv_to_hex, hsv_to_rgb, rgb_to_hls
+from colorsys import rgb_to_hls
+from climate_health_map.shared.colours import hsv_to_hex, hsv_to_rgb
 
 
 class _Label(BaseModel):
@@ -58,30 +59,33 @@ class Group(_Label):
     type: Literal['single', 'bool', 'multi', 'str']
     labels: list[Label]
 
+    def __str__(self):
+        return f'{self.key} ({self.nacsos_key}) | {self.type} -> {[lab.column for lab in self.labels]}'
+
 
 LABELS = {
     'rel_major': Group(
-        key='rel',
+        key='rel_major',
         nacsos_key='relevant',
         name='Relevant',
         type='bool',
         colour=(0.04697222222222222, 0.8713, 0.6647),
         labels=[
             Label(
-                column='rel|1',
+                column='rel_major|1',
                 value=1,
                 name='Relevant (major category)',
                 desc='Abstracts covers nexus of climate change and health',
                 colour=(0.04697222222222222, 0.8713, 0.6647),
-                parent='rel',
+                parent='rel_major',
             ),
             Label(
-                column='rel|0',
+                column='rel_major|0',
                 value=0,
                 name='Not relevant (major category)',
                 desc='Abstracts covers nexus of climate change and health',
                 colour=(0, 0, 0),
-                parent='rel',
+                parent='rel_major',
             ),
         ],
     ),
@@ -156,27 +160,27 @@ LABELS = {
         ],
     ),
     'rel_impacts': Group(
-        key='relevant',
+        key='rel_impacts',
         nacsos_key='relevant',
         name='Relevant (impacts)',
         type='bool',
         colour=(0, 0, 0),
         labels=[
             Label(
-                column='relevant|1',
+                column='rel_impacts|1',
                 value=1,
                 name='Relevant (impacts)',
                 desc='Abstract covers nexus of climate impacts and health',
                 colour=(0, 0, 0),
-                parent='relevant',
+                parent='rel_impacts',
             ),
             Label(
-                column='relevant|0',
+                column='rel_impacts|0',
                 value=0,
                 name='Not relevant (impacts)',
                 desc='Abstract covers nexus of climate impacts and health',
                 colour=(0, 0, 0),
-                parent='relevant',
+                parent='rel_impacts',
             ),
         ],
     ),
@@ -375,14 +379,14 @@ LABELS = {
                 value=1,
                 name='Gender-specific outcome',
                 colour=(0, 0, 0),
-                parent='rel',
+                parent='gender_outcome',
             ),
             Label(
                 column='gender_outcome|0',
                 value=0,
                 name='No gender-specific outcome',
                 colour=(0, 0, 0),
-                parent='rel',
+                parent='gender_outcome',
             ),
         ],
     ),
@@ -1657,6 +1661,13 @@ LABELS = {
     ),
 }
 
+# list of columns per group (key)
+GROUP_COLUMNS: dict[str, list[str]] = {key: [label.column for label in group.labels] for key, group in LABELS.items()}
+# list of columns that are in the same group as the key column
+COLUMN_GROUP: dict[str, list[str]] = {label.column: GROUP_COLUMNS[label.parent] for group in LABELS.values() for label in group.labels}
+# column to Label lookup
+LABELS_LOOKUP: dict[str, Label | Topic | AggTopic | AggAggTopic] = {label.column: label for group in LABELS.values() for label in group.labels}
+
 LABELS_MAJOR = ['rel_major', 'cat', 'type']
 LABELS_IMPACTS = [
     'rel_impacts',
@@ -1671,8 +1682,24 @@ LABELS_TOPICS = ['topic', 'topic-agg', 'topic-agg-agg']
 # cont
 # 'notes_major', 'notes_impacts'
 
+COLUMNS_MAJOR = {label.column for key in LABELS_MAJOR for label in LABELS[key].labels}
+COLUMNS_IMPACTS = {label.column for key in LABELS_IMPACTS for label in LABELS[key].labels}
 
-__all__ = ['LABELS', 'LABELS_MAJOR', 'LABELS_IMPACTS', 'LABELS_TOPICS', 'Group', 'Label', 'Topic', 'AggTopic', 'AggAggTopic']
+__all__ = [
+    'LABELS',
+    'LABELS_LOOKUP',
+    'LABELS_MAJOR',
+    'LABELS_IMPACTS',
+    'LABELS_TOPICS',
+    'COLUMNS_IMPACTS',
+    'COLUMNS_MAJOR',
+    'COLUMN_GROUP',
+    'Group',
+    'Label',
+    'Topic',
+    'AggTopic',
+    'AggAggTopic',
+]
 
 if __name__ == '__main__':
     print(LABELS.keys())

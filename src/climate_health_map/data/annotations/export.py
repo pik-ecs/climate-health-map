@@ -135,7 +135,7 @@ def dump(
            SELECT lab.*,
                   ai.publication_year as py,
                   ai.title,
-                  i.text,
+                  i.text as abstract,
                   ai.doi,
                   ai.scopus_id,
                   ai.openalex_id,
@@ -182,9 +182,5 @@ def dump(
     )
 
 
-def main():
-    typer.run(dump)
-
-
 if __name__ == '__main__':
-    main()
+    typer.run(dump)

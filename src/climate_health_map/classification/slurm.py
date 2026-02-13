@@ -5,7 +5,9 @@ from typing import Annotated, Any
 
 import typer
 
-from S02_Classify.labels import FileConflict, LABEL_INFOS_FLAT
+from climate_health_map.data import LABELS
+from climate_health_map.shared.types import OnConflict
+from .util import prepare_nltk
 
 logger = logging.getLogger('precompute ranks')
 
@@ -38,17 +40,6 @@ def ensure_offline_models(model_data_path: Path) -> None:
         )
 
 
-def prepare_nltk() -> None:
-    logger.debug('Loading NLTK data...')
-    from nltk import download
-
-    download('stopwords')
-    download('punkt')
-    download('punkt_tab')
-    download('wordnet')
-    download('averaged_perceptron_tagger_eng')
-
-
 def sbatch(
     slurm_params: dict[str, Any],
     script_params: dict[str, Any],
@@ -57,14 +48,16 @@ def sbatch(
     venv_path: Path,
     models_path: Path,
 ):
+    # TODO: load dataset and check available columns
     array = [
         f'"{label.name}____{model}____{repeat}"'
-        for label in LABEL_INFOS_FLAT.values()
+        for group in LABELS.values()  # TODO: use get_filtered_labels
+        for label in group.labels
         for model in models
         for repeat in range(n_repeats)
         if (
             not (Path(script_params['target-dir']) / f'{model}-{label.parent}-{label.name}-{repeat}-pred.csv').exists()
-            or script_params['on-exists'] != FileConflict.SKIP.value
+            or script_params['on-exists'] != OnConflict.SKIP.value
         )
     ]
     logger.info(f'Number of array jobs: {len(array)}')
@@ -145,7 +138,7 @@ def create_sbatch_files(
     venv_path: Annotated[Path, typer.Option(help='')],
     log_path: Annotated[Path, typer.Option(help='')],
     slurm_user: Annotated[str, typer.Option(help='email address to notify when done')],
-    on_exists: Annotated[FileConflict, typer.Option(help='')] = FileConflict.IGNORE,
+    on_exists: Annotated[OnConflict, typer.Option(help='')] = OnConflict.IGNORE,
     num_repeats: int = 3,
     train_proportion: float = 0.85,
     max_vocab: int = 7500,

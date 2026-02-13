@@ -5,15 +5,17 @@ description = "Pipeline to keep the climate and health map up-to-date (mainly fo
 requires-python = ">=3.13"
 
 dependencies = [
-    "nacsos_data[utils,scripts]",
+    "nacsos_data[utils,scripts] @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git@v0.24.22",
     "xlsxwriter==3.2.9",
     "tabulate==0.9.0",
+    "tqdm==4.67.3",
+    "matplotlib==3.10.8",
 ]
 
 [project.optional-dependencies]
 classify = [
-    "transformers[torch]==4.57.3",
-    "datasets==4.4.2",
+    "transformers[torch]==4.57.6",
+    "datasets==4.5.0",
     "evaluate==0.4.6",
     "accelerate==1.11.0",
     "lightgbm==4.6.0",
@@ -35,10 +37,11 @@ notebook = [
 
 [tool.uv.sources]
 mordecai3 = { git = "git+https://github.com/ahalterman/mordecai3" }
-nacsos_data = { git = "git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git", tag = "v0.24.20" }
+#nacsos_data = { git = "git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git", tag = "v0.24.22" }
+nacsos_data = { path = "../nacsos_data", editable = true }
 
 [project.scripts]
-export_annotations = "climate_health_map.data.annotations.export:main"
+healthmap = "climate_health_map:main"
 
 [build-system]
 requires = ["uv-build>=0.9.10,<0.10.0"]
