@@ -156,6 +156,7 @@ def _base_args(
     train_proportion: float,
     on_exists: OnConflict,
     tuning_trials: int,
+    loglevel: str,
 ):
     sbatch_args = {
         'time': f'{slurm_hours:0>2}:00:00',
@@ -174,6 +175,7 @@ def _base_args(
         'repeat': '${repeat}',
         'model': '${model}',
         'on-exists': on_exists.value,
+        'loglevel': loglevel,
     }
     if random_state is not None:
         script_args['random-state'] = random_state
@@ -200,6 +202,7 @@ def prepare_tuning_slurm(
     slurm_hours: Annotated[int, typer.Option(help='')] = 2,
     tuning_trials: Annotated[int | None, typer.Option(help='')] = None,
     ensure_models_offline: Annotated[bool, typer.Option(help='')] = True,
+    loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ):
     logger.info('Ensuring that all paths and files are in place...')
     _ensure_directories(venv_path=venv_path, log_path=log_path, models_path=models_path, target_dir=target_dir, training_data=training_data)
@@ -222,6 +225,7 @@ def prepare_tuning_slurm(
         target_dir=target_dir,
         train_proportion=train_proportion,
         on_exists=OnConflict.SKIP,
+        loglevel=loglevel,
     )
 
     logger.info(f'Filtering labels/schema based on available columns in the dataset at {training_data}')
