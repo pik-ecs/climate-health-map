@@ -357,6 +357,6 @@ MAJOR_SCOPES_2 = [
     Scope('a2132c8f-b40d-479c-a0c4-33b63ed876db', '[BOT] Resolved_not_likleyrelevant_101'),
     Scope('93cd4163-9671-4ba1-b280-a3db690923c5', '[BOT] Resolved_Likely relevant 100'),
     Scope('d7e64ad1-7986-4c4b-bff4-3f3b2982b1ae', '[BOT] Resolved_Likely relevant 101'),
-    Scope('Resolved_Likely relevant 102', '[BOT] 85c88df0-b7a0-405f-b298-6a47c11ab82d'),
+    Scope('85c88df0-b7a0-405f-b298-6a47c11ab82d', '[BOT] Resolved_Likely relevant 102'),
 ]
 MAJOR_SCOPES = MAJOR_SCOPES_1 + MAJOR_SCOPES_2

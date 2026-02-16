@@ -163,6 +163,7 @@ class TransRanker:
         self.max_batch_size = max_batch_size
         self.models = models or self.DEFAULT_MODELS
         self.model_params = model_params or {}
+        self.final_params = {}
         self.model: CustomTrainer | None = None
         self.tuning_trials = tuning_trials
         self.test_split = test_split

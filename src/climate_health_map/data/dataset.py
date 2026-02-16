@@ -77,10 +77,8 @@ class Dataset:
         ).set_index('id')
 
     def get_mask(self, column: str, ensure_text: bool = False) -> pd.Series[bool]:
-        if column == 'rel_major|1':
-            mask = self.df['rel_major|1'].notna()
-        elif column == 'rel_impacts|1':
-            mask = self.df['rel_impacts|1'].notna()
+        if column in {'rel_major|1', 'rel_major|0','rel_impacts|1', 'rel_impacts|0'}:
+            mask = self.df[column].notna()
         elif column in COLUMNS_MAJOR:
             mask = (self.df['rel_major|1'] > 0.5) & self.df[[col for col in COLUMN_GROUP[column] if col in self.df.columns]].any(axis=1)
         elif column in COLUMNS_IMPACTS:

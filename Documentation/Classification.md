@@ -36,12 +36,17 @@ uv run --no-sources --extra classify --prerelease=allow healthmap slurm-tune-scr
     --num-repeats=3 \
     --train-proportion=0.66 \
     --min-minor-class=20 \
-    --slurm-hours=24 \
+    --slurm-hours=3 \
     --tuning-trials=20 \
-    --ensure-models-offline
+    --ensure-models-offline \
+    --loglevel="DEBUG"
 ```
 
 # Classifier quality summary
+```bash
+scp -r foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/tuning data/
+```
+
 TODO: script after tuning that creates pretty output to check into repository for reference
 
 # Training

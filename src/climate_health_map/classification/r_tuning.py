@@ -94,6 +94,10 @@ def tune(
                 'repeat': repeat,
                 'random_state': random_state * repeat,
                 'train_proportion': train_proportion,
+                'column': column,
+                'label_name': label.name,
+                'label_parent': label.parent,
+                'model': model_name,
             }
             | stats,
             indent=2,

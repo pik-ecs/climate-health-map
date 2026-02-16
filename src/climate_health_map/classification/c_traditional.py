@@ -52,6 +52,7 @@ class _SimpleClassification(ABC):
     ):
         self.dataset = dataset
         self.model_params = model_params
+        self.final_params = {}
         self.BaseModel = BaseModel
         self.scoring = scoring
         self.tuning_trials = tuning_trials
@@ -87,7 +88,8 @@ class _SimpleClassification(ABC):
         cv = StratifiedKFold(n_splits=2, shuffle=True, random_state=seed)
         score = cross_val_score(model, x[mask], y[mask], cv=cv, scoring=self.scoring)
         logger.debug(f'Using {y[mask].sum()}/{mask.sum()} inclusion for tuning trial {trial.number} | scores: {score} | sampling: {sampling} | {model_params}')
-        return score.mean()
+        mean = score.mean()
+        return 0 if np.isnan(mean) else mean
 
     def train(self, idxs: list[int] | None = None) -> None:
         if not idxs:
@@ -103,13 +105,13 @@ class _SimpleClassification(ABC):
             study = optuna.create_study(direction='maximize')
             study.optimize(lambda trial: self._tune(trial, x, y), n_trials=self.tuning_trials, n_jobs=self.n_jobs)
             logger.debug(f'Hyper-parameter-tuning for {self.name} done with best score {study.best_value}')
-            model_params = self.model_params | study.best_params
+            self.final_params = model_params = self.model_params | study.best_params
         else:
             logger.debug('Not running hyper-parameter tuning, using provided model params.')
-            model_params = self.model_params
+            self.final_params = self.model_params
 
-        mask = downsampling_mask(y, sampling=model_params.get('downsampling', 0))
-        model_params = {k: v for k, v in model_params.items() if k != 'downsampling'}
+        mask = downsampling_mask(y, sampling=self.final_params.get('downsampling', 0))
+        model_params = {k: v for k, v in self.final_params.model_params.items() if k != 'downsampling'}
         self.model = self.BaseModel(**model_params)
         self.model.fit(x[mask], y[mask])
 
@@ -144,7 +146,7 @@ class _SimpleClassification(ABC):
                 'min_df': self.vectorizer.min_df,
             },
             'model': self.name,
-            'hyperparams': {k: getattr(self.model, k) if hasattr(self.model, k) else v for k, v in self.model_params.items()},
+            'hyperparams': {k: getattr(self.model, k) if hasattr(self.model, k) else v for k, v in self.final_params.items()},
         }
 
 
@@ -171,7 +173,7 @@ class SVMClassifier(_SimpleClassification):
             model_params={'kernel': 'linear', 'class_weight': 'balanced', 'degree': 3, 'gamma': 'auto', 'probability': True, 'C': 1.0, 'max_iter': 1000}
             | (model_params or {}),
             tuning_trials=tuning_trials,
-            scoring=scoring or 'recall',
+            scoring=scoring or 'f1',
             dataset=dataset,
             random_seed=random_seed,
             n_jobs=n_jobs,
@@ -212,7 +214,7 @@ class SGDClassifier(_SimpleClassification):
             BaseModel=SGDClassifier,
             model_params={'class_weight': 'balanced', 'loss': 'log_loss', 'max_iter': 1000} | (model_params or {}),
             tuning_trials=tuning_trials,
-            scoring=scoring or 'recall',
+            scoring=scoring or 'f1',
             dataset=dataset,
             random_seed=random_seed,
             n_jobs=n_jobs,
@@ -258,7 +260,7 @@ class RegressionClassifier(_SimpleClassification):
             }
             | (model_params or {}),
             tuning_trials=tuning_trials,
-            scoring=scoring or 'recall',
+            scoring=scoring or 'f1',
             dataset=dataset,
             random_seed=random_seed,
             n_jobs=n_jobs,
@@ -309,7 +311,7 @@ class IsolationForestClassifier(_SimpleClassification):
             }
             | (model_params or {}),
             tuning_trials=tuning_trials,
-            scoring=scoring or 'recall',
+            scoring=scoring or 'f1',
             dataset=dataset,
             random_seed=random_seed,
             n_jobs=n_jobs,
@@ -321,7 +323,7 @@ class IsolationForestClassifier(_SimpleClassification):
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
         return {
-            'n_estimators': trial.suggest_float('n_estimators', low=20, high=250, log=True),
+            'n_estimators': trial.suggest_int('n_estimators', low=20, high=250),
             'max_features': trial.suggest_float('max_features', low=0.2, high=1.0),
         }
 
@@ -359,7 +361,7 @@ class NaiveBayesClassifier(_SimpleClassification):
             }
             | (model_params or {}),
             tuning_trials=tuning_trials,
-            scoring=scoring or 'recall',
+            scoring=scoring or 'f1',
             dataset=dataset,
             random_seed=random_seed,
             n_jobs=n_jobs,
@@ -398,12 +400,12 @@ class LightGBMClassifier(_SimpleClassification):
                 'learning_rate': 0.1,
                 'n_estimators': 100,  # Number of boosting rounds
                 'num_leaves': 31,  # Number of leaves in each tree
-                'random_state': 42,  # For reproducibility
+                'random_state': self.random_seed,  # For reproducibility
                 'verbose': -1,
                 **(model_params or {}),
             },
             tuning_trials=tuning_trials,
-            scoring=scoring or 'recall',
+            scoring=scoring or 'f1',
             dataset=dataset,
             random_seed=random_seed,
             n_jobs=n_jobs,

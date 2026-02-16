@@ -109,8 +109,8 @@ def get_prediction_stats(dataset: pd.DataFrame, y_pred: np.ndarray, test_idxs: l
         'f1_train': f1_score(y_train_true, y_train_pred, zero_division=0),
         'n_train': len(train_idxs),
         'n_test': len(test_idxs),
-        'balance_train': [len(train_idxs) - y_train_pred.sum(), y_train_pred.sum()],
-        'balance_test': [len(test_idxs) - y_test_pred.sum(), y_test_pred.sum()],
+        'balance_train': [len(train_idxs) - y_train_true.sum(), y_train_true.sum()],
+        'balance_test': [len(test_idxs) - y_test_true.sum(), y_test_true.sum()],
     }
 
     return ds, stats
