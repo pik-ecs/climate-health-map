@@ -345,19 +345,11 @@ class NaiveBayesClassifier(_SimpleClassification):
         **kwargs: dict[str, Any],
     ):
         from sklearn.naive_bayes import GaussianNB
-
         super().__init__(
             BaseModel=GaussianNB,
             model_params={
-                'n_estimators': 100,
-                'max_samples': 'auto',
-                'contamination': 'auto',
-                'max_features': 1.0,
-                'bootstrap': False,
-                'n_jobs': None,
-                'random_state': None,
-                'verbose': 0,
-                'warm_start': False,
+                'priors': 0,
+                'var_smoothing': 1e-9,
             }
             | (model_params or {}),
             tuning_trials=tuning_trials,
