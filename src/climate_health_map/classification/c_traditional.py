@@ -111,7 +111,7 @@ class _SimpleClassification(ABC):
             self.final_params = self.model_params
 
         mask = downsampling_mask(y, sampling=self.final_params.get('downsampling', 0))
-        model_params = {k: v for k, v in self.final_params.model_params.items() if k != 'downsampling'}
+        model_params = {k: v for k, v in self.final_params.items() if k != 'downsampling'}
         self.model = self.BaseModel(**model_params)
         self.model.fit(x[mask], y[mask])
 
