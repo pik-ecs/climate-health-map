@@ -159,7 +159,7 @@ def prepare_tuning_slurm(
     max_vocab: Annotated[int, typer.Option(help='')] = 7500,
     max_ngram: Annotated[int, typer.Option(help='')] = 1,
     min_df: Annotated[int, typer.Option(help='')] = 3,
-    max_df: Annotated[int | float, typer.Option(help='')] = 0.8,
+    max_df: Annotated[float, typer.Option(help='')] = 0.8,
     min_minor_class: Annotated[int, typer.Option(help='')] = 20,
     random_state: Annotated[int | None, typer.Option(help='')] = None,
     slurm_hours: Annotated[int, typer.Option(help='')] = 2,
