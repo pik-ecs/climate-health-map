@@ -36,8 +36,11 @@ uv run --no-sources --extra classify --prerelease=allow healthmap slurm-tune-scr
     --num-repeats=3 \
     --train-proportion=0.66 \
     --min-minor-class=20 \
+    --max-vocab=10000 \
+    --max-ngram=4 \
     --slurm-hours=3 \
-    --tuning-trials=20 \
+    --tuning-trials-trans=25 \
+    --tuning-trials-trad=50 \
     --ensure-models-offline \
     --loglevel="DEBUG"
 ```

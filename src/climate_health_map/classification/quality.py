@@ -17,25 +17,18 @@ def main(
 ):
     infos = []
     for file in tqdm(source.glob('*.json')):
-        name = file.stem.split('_')[0]
-        label = file.stem.split('_')[-2]
         with open(file) as f:
-            infos.append(json.load(f) | {'name': name, 'label': label})
+            infos.append(json.load(f))
     df = pd.DataFrame.from_records(infos)  # , exclude=['params', 'repeat', 'train_proportion', 'random_state', 'n_train', 'n_test'])
+
+    df_agg = df.groupby(['column', 'model']).describe()
+    df_aggagg = df_agg.sort_values(('f1_test', 'mean'), ascending=False).groupby('column').first().sort_values('column')
+    print(df_aggagg[[('f1_test', 'mean'), ('f1_test', 'std')]])
 
     with pd.ExcelWriter(target) as writer:
         df.to_excel(writer, index=False, sheet_name='Full dataset')
-        df_agg = df.groupby(['label', 'name']).describe()
-        df_agg.T.to_excel(writer, sheet_name='Quality (model, label)')
-        (
-            df_agg.sort_values(('f1_test', 'mean'), ascending=False)
-            .groupby('label')
-            .first()
-            .sort_values('label')
-            .T.to_excel(writer, index=False, sheet_name='Quality (label)')
-        )
-
-    print(df)
+        df_agg.T.to_excel(writer, sheet_name='Quality (model, column)')
+        df_aggagg.T.to_excel(writer, index=True, sheet_name='Quality (column)')
 
 
 if __name__ == '__main__':

@@ -146,18 +146,40 @@ def _ensure_directories(venv_path: Path, log_path: Path, training_data: Path, ta
         path.mkdir(parents=True, exist_ok=True)
 
 
-def _base_args(
-    random_state: int | None,
-    slurm_hours: int,
-    slurm_user: str,
-    log_path: Path,
-    training_data: Path,
-    target_dir: Path,
-    train_proportion: float,
-    on_exists: OnConflict,
-    tuning_trials: int,
-    loglevel: str,
+@app.command('slurm-tune-scripts', help='Write slurm sbatch script for properly submitting job arrays')
+def prepare_tuning_slurm(
+    training_data: Annotated[Path, typer.Option(help='')],
+    target_dir: Annotated[Path, typer.Option(help='')],
+    models_path: Annotated[Path, typer.Option(help='')],
+    venv_path: Annotated[Path, typer.Option(help='')],
+    log_path: Annotated[Path, typer.Option(help='')],
+    slurm_user: Annotated[str, typer.Option(help='email address to notify when done')],
+    num_repeats: Annotated[int, typer.Option(help='')] = 3,
+    train_proportion: Annotated[float, typer.Option(help='')] = 0.85,
+    max_vocab: Annotated[int, typer.Option(help='')] = 7500,
+    max_ngram: Annotated[int, typer.Option(help='')] = 1,
+    min_df: Annotated[int, typer.Option(help='')] = 3,
+    max_df: Annotated[int | float, typer.Option(help='')] = 0.8,
+    min_minor_class: Annotated[int, typer.Option(help='')] = 20,
+    random_state: Annotated[int | None, typer.Option(help='')] = None,
+    slurm_hours: Annotated[int, typer.Option(help='')] = 2,
+    tuning_trials_trad: Annotated[int | None, typer.Option(help='')] = None,
+    tuning_trials_trans: Annotated[int | None, typer.Option(help='')] = None,
+    on_exists: Annotated[OnConflict, typer.Option(help='')] = OnConflict.SKIP.value,
+    ensure_models_offline: Annotated[bool, typer.Option(help='')] = True,
+    loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ):
+    logger.info('Ensuring that all paths and files are in place...')
+    _ensure_directories(venv_path=venv_path, log_path=log_path, models_path=models_path, target_dir=target_dir, training_data=training_data)
+
+    if ensure_models_offline:
+        logger.info('Making sure all models are available offline!')
+        ensure_offline_transformers(model_data_path=models_path, logger=logger)
+
+        logger.info('Making sure NLTK is available offline!')
+        ensure_offline_nltk(target_dir=models_path / 'nltk_data', logger=logger)
+
+    logger.info('Preparing basic script parameters...')
     sbatch_args = {
         'time': f'{slurm_hours:0>2}:00:00',
         'nodes': '1',
@@ -179,59 +201,14 @@ def _base_args(
     }
     if random_state is not None:
         script_args['random-state'] = random_state
-    if tuning_trials is not None:
-        script_args['n-tuning-trials'] = tuning_trials
-    return sbatch_args, script_args
-
-
-@app.command('slurm-tune-scripts', help='Write slurm sbatch script for properly submitting job arrays')
-def prepare_tuning_slurm(
-    training_data: Annotated[Path, typer.Option(help='')],
-    target_dir: Annotated[Path, typer.Option(help='')],
-    models_path: Annotated[Path, typer.Option(help='')],
-    venv_path: Annotated[Path, typer.Option(help='')],
-    log_path: Annotated[Path, typer.Option(help='')],
-    slurm_user: Annotated[str, typer.Option(help='email address to notify when done')],
-    num_repeats: Annotated[int, typer.Option(help='')] = 3,
-    train_proportion: Annotated[float, typer.Option(help='')] = 0.85,
-    max_vocab: Annotated[int, typer.Option(help='')] = 7500,
-    max_ngram: Annotated[int, typer.Option(help='')] = 1,
-    min_df: Annotated[int, typer.Option(help='')] = 3,
-    min_minor_class: Annotated[int, typer.Option(help='')] = 20,
-    random_state: Annotated[int | None, typer.Option(help='')] = None,
-    slurm_hours: Annotated[int, typer.Option(help='')] = 2,
-    tuning_trials: Annotated[int | None, typer.Option(help='')] = None,
-    ensure_models_offline: Annotated[bool, typer.Option(help='')] = True,
-    loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
-):
-    logger.info('Ensuring that all paths and files are in place...')
-    _ensure_directories(venv_path=venv_path, log_path=log_path, models_path=models_path, target_dir=target_dir, training_data=training_data)
-
-    if ensure_models_offline:
-        logger.info('Making sure all models are available offline!')
-        ensure_offline_transformers(model_data_path=models_path, logger=logger)
-
-        logger.info('Making sure NLTK is available offline!')
-        ensure_offline_nltk(target_dir=models_path / 'nltk_data', logger=logger)
-
-    logger.info('Preparing basic script parameters...')
-    sbatch_args, script_args = _base_args(
-        random_state=random_state,
-        slurm_hours=slurm_hours,
-        slurm_user=slurm_user,
-        tuning_trials=tuning_trials,
-        log_path=log_path,
-        training_data=training_data,
-        target_dir=target_dir,
-        train_proportion=train_proportion,
-        on_exists=OnConflict.SKIP,
-        loglevel=loglevel,
-    )
 
     logger.info(f'Filtering labels/schema based on available columns in the dataset at {training_data}')
     schema = get_filtered_labels(dataset_path=training_data, min_minor_class=min_minor_class)
 
     logger.info('Compiling sbatch script for transformer model tuning...')
+
+    if tuning_trials_trans is not None:
+        script_args['n-tuning-trials'] = tuning_trials_trans
     sbatch_trans = _compile_tuning_sbatch_script(
         slurm_params=sbatch_args
         | {
@@ -251,12 +228,17 @@ def prepare_tuning_slurm(
         models_path=models_path,
         schema=schema,
     )
+
     fn_slurm_trans = 'tune-trans.slurm'
     logger.info(f'Writing transformer tuning script as `{fn_slurm_trans}`')
     with open(fn_slurm_trans, 'w') as slurm_file:
         slurm_file.write(sbatch_trans)
+    # Make sure the tuning trials are reset
+    script_args.pop('n-tuning-trials', None)
 
     logger.info('Compiling sbatch script for traditional model tuning...')
+    if tuning_trials_trad is not None:
+        script_args['n-tuning-trials'] = tuning_trials_trad
     sbatch_trad = _compile_tuning_sbatch_script(
         slurm_params=sbatch_args
         | {
@@ -269,6 +251,7 @@ def prepare_tuning_slurm(
             'max-vocab': max_vocab,
             'max-ngram': max_ngram,
             'min-df': min_df,
+            'max-df': max_df,
             'n-tuning-jobs': 5,
         },
         n_repeats=num_repeats,

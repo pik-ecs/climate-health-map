@@ -49,6 +49,7 @@ class _SimpleClassification(ABC):
         max_features: int = 75000,
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
+        max_df: int | float = 0.8,
         **kwargs: dict[str, Any],
     ):
         self.dataset = dataset
@@ -62,7 +63,17 @@ class _SimpleClassification(ABC):
         self.model = None
 
         stripped_texts = [process_text_aggressive(txt) for txt in tqdm(dataset['text'], desc='tokenising')]
-        self.vectorizer = TfidfVectorizer(ngram_range=ngram_range, max_features=max_features, min_df=min_df, strip_accents='unicode')
+        self.vectorizer = TfidfVectorizer(
+            # See https://github.com/AnneIsARealProgrammerNow/ClimateHealth_Wellcome/blob/v0.1/active_learning_with_evaluation.ipynb
+            ngram_range=ngram_range,
+            max_features=max_features,
+            min_df=min_df,
+            max_df=max_df,
+            strip_accents='unicode',
+            use_idf=True,
+            smooth_idf=True,
+            sublinear_tf=True,
+        )
         self.scaler = StandardScaler(with_mean=False)
         vectors = self.vectorizer.fit_transform(stripped_texts)
         self.vectors = self.scaler.fit_transform(vectors)
@@ -108,7 +119,7 @@ class _SimpleClassification(ABC):
             study = optuna.create_study(direction='maximize')
             study.optimize(lambda trial: self._tune(trial, x, y), n_trials=self.tuning_trials, n_jobs=self.n_jobs)
             logger.debug(f'Hyper-parameter-tuning for {self.name} done with best score {study.best_value}')
-            self.final_params = model_params = self.model_params | study.best_params
+            self.final_params = self.model_params | study.best_params
         else:
             logger.debug('Not running hyper-parameter tuning, using provided model params.')
             self.final_params = self.model_params
@@ -283,6 +294,54 @@ class RegressionClassifier(_SimpleClassification):
         return {
             'C': trial.suggest_float('C', low=0.01, high=10, log=True),
             'solver': trial.suggest_categorical('solver', ['saga', 'liblinear', 'lbfgs']),
+            'downsampling': trial.suggest_float('downsampling', low=0.0, high=0.95),
+        }
+
+
+class RandomForestClassifier(_SimpleClassification):
+    name = 'randforest'
+
+    def __init__(
+        self,
+        dataset: pd.DataFrame,
+        tuning_trials: int = 35,
+        model_params: dict[str, Any] | None = None,
+        random_seed: int | None = None,
+        scoring: str | None = None,
+        n_jobs: int = 5,
+        max_features: int = 75000,
+        ngram_range: tuple[int, int] = (1, 3),
+        min_df: int | float = 3,
+        **kwargs: dict[str, Any],
+    ):
+        from sklearn.ensemble import RandomForestClassifier as RandomForestClassifier_
+
+        super().__init__(
+            BaseModel=RandomForestClassifier_,
+            model_params={
+                'n_estimators': 1000,
+                'verbose': 0,
+                'random_state': random_seed,
+                'max_features': 'sqrt',
+                'min_samples_split': 2,
+                'max_depth': None,
+            }
+            | (model_params or {}),
+            tuning_trials=tuning_trials,
+            scoring=scoring or 'f1',
+            dataset=dataset,
+            random_seed=random_seed,
+            n_jobs=n_jobs,
+            max_features=max_features,
+            ngram_range=ngram_range,
+            min_df=min_df,
+            **kwargs,
+        )
+
+    def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
+        return {
+            'n_estimators': trial.suggest_int('n_estimators', low=100, high=5000),
+            'max_features': trial.suggest_categorical('max_features', ['sqrt', 'log2']),
             'downsampling': trial.suggest_float('downsampling', low=0.0, high=0.95),
         }
 

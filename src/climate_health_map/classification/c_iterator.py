@@ -138,6 +138,19 @@ def it_models(  # noqa: C901
             min_df=min_df,
         )
 
+    def rforest():
+        from .c_traditional import RandomForestClassifier
+
+        return RandomForestClassifier(
+            dataset=dataset,
+            model_params=model_params,
+            tuning_trials=n_tuning_trials if n_tuning_trials is not None else 50,
+            n_jobs=n_tuning_jobs,
+            max_features=max_vocab,
+            ngram_range=(1, max_ngram),
+            min_df=min_df,
+        )
+
     def nb():
         from .c_traditional import NaiveBayesClassifier
 
@@ -162,6 +175,7 @@ def it_models(  # noqa: C901
         'SGD': sgd,
         'NB': nb,
         'ISOFOREST': forest,
+        'RANDOMFOREST': rforest,
     }
 
     logger.info(f'Will iterate models: {models}')
