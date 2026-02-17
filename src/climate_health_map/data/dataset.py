@@ -22,7 +22,7 @@ def downsampling_mask(y: np.ndarray, sampling: float, min_n_majority: int = 3) -
     majority_class = counts.values[counts.counts.argmax()]
 
     # ensure that we always keep at least `min_n_majority` of the majority class
-    sample_size = int(n_majority * sampling)
+    sample_size = int(n_majority * (1 - sampling))
     if sample_size == n_majority:
         sample_size -= min_n_majority
 

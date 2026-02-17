@@ -212,7 +212,7 @@ def prepare_tuning_slurm(
         ensure_offline_transformers(model_data_path=models_path, logger=logger)
 
         logger.info('Making sure NLTK is available offline!')
-        ensure_offline_nltk(target_dir=models_path/'nltk_data',logger=logger)
+        ensure_offline_nltk(target_dir=models_path / 'nltk_data', logger=logger)
 
     logger.info('Preparing basic script parameters...')
     sbatch_args, script_args = _base_args(

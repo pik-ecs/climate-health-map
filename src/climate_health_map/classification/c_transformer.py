@@ -22,6 +22,8 @@ from transformers import Trainer, TrainingArguments, AutoModelForSequenceClassif
 from transformers.trainer_utils import PredictionOutput
 from transformers.utils.logging import disable_progress_bar
 
+from climate_health_map.data.dataset import downsampling_mask
+
 logger = logging.getLogger('trans-rank')
 logging.getLogger('urllib3').setLevel(logging.ERROR)
 warnings.filterwarnings('ignore', category=UndefinedMetricWarning)
@@ -108,12 +110,8 @@ class CustomTrainer(Trainer):
     def get_train_dataloader(self):
         if self.args.downsampling is not None and 0 < self.args.downsampling < 1:
             y_true = np.array(getattr(self.train_dataset, 'labels') if hasattr(self.train_dataset, 'labels') else self.train_dataset['labels'])
-            idxs = (
-                np.random.choice(np.where(y_true == 0)[0], size=int((y_true == 0).sum() * self.args.downsampling), replace=False).tolist()
-                + np.where(y_true == 1)[0].tolist()
-            )
-            np.random.shuffle(idxs)
-            return self.train_dataset.select(idxs)
+            mask = downsampling_mask(y_true, self.args.downsampling)
+            return self.train_dataset.select(np.arange(len(mask))[mask])
 
         return super().get_train_dataloader()
 
@@ -185,7 +183,10 @@ class TransRanker:
             )
 
     def args(
-        self, trial: Trial | None = None, weights: list[float] | torch.Tensor | None = None, best_params: dict[str, Any] | None = None
+        self,
+        trial: Trial | None = None,
+        weights: list[float] | torch.Tensor | None = None,
+        best_params: dict[str, Any] | None = None,
     ) -> CustomTrainingArguments:
         base = {
             'output_dir': str(model_data_path),
@@ -316,5 +317,6 @@ class TransRanker:
                 'weight_decay': self.model.args.weight_decay,
                 'model_name': self.model.args.model_name,
                 'optim': self.model.args.optim,
+                'downsampling': self.model.args.downsampling,
             },
         }

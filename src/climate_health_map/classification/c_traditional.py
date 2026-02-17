@@ -355,6 +355,7 @@ class NaiveBayesClassifier(_SimpleClassification):
         **kwargs: dict[str, Any],
     ):
         from sklearn.naive_bayes import MultinomialNB
+
         super().__init__(
             BaseModel=MultinomialNB,
             model_params={

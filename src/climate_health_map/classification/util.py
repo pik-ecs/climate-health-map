@@ -34,10 +34,11 @@ def ensure_offline_transformers(model_data_path: Path, logger: logging.Logger) -
         )
 
 
-def ensure_offline_nltk(logger: logging.Logger, target_dir:Path|None=None) -> None:
+def ensure_offline_nltk(logger: logging.Logger, target_dir: Path | None = None) -> None:
     logger.debug('Loading NLTK data...')
     from nltk import download
     import ssl
+
     try:
         _create_unverified_https_context = ssl._create_unverified_context
     except AttributeError:
