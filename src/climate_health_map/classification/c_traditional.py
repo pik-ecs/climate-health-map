@@ -355,7 +355,7 @@ class NaiveBayesClassifier(_SimpleClassification):
         super().__init__(
             BaseModel=GaussianNB,
             model_params={
-                'priors': 0,
+                'priors': None,
                 'var_smoothing': 1e-9,
             }
             | (model_params or {}),
