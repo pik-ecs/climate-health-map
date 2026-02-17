@@ -44,7 +44,7 @@ uv run --no-sources --extra classify --prerelease=allow healthmap slurm-tune-scr
 
 # Classifier quality summary
 ```bash
-scp -r foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/tuning data/
+rsync -avh --progress -e ssh foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/tuning data/
 ```
 
 TODO: script after tuning that creates pretty output to check into repository for reference

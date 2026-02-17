@@ -332,6 +332,7 @@ class IsolationForestClassifier(_SimpleClassification):
         return {
             'n_estimators': trial.suggest_int('n_estimators', low=20, high=250),
             'max_features': trial.suggest_float('max_features', low=0.2, high=1.0),
+            'downsampling': trial.suggest_float('downsampling', low=0.0, high=0.95),
         }
 
 
@@ -351,12 +352,13 @@ class NaiveBayesClassifier(_SimpleClassification):
         min_df: int | float = 3,
         **kwargs: dict[str, Any],
     ):
-        from sklearn.naive_bayes import GaussianNB
+        from sklearn.naive_bayes import MultinomialNB
         super().__init__(
-            BaseModel=GaussianNB,
+            BaseModel=MultinomialNB,
             model_params={
-                'priors': None,
-                'var_smoothing': 1e-9,
+                'force_alpha': True,
+                'alpha': 1.0,
+                'fit_prior': True,
             }
             | (model_params or {}),
             tuning_trials=tuning_trials,
@@ -371,7 +373,11 @@ class NaiveBayesClassifier(_SimpleClassification):
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
-        return {}
+        return {
+            'downsampling': trial.suggest_float('downsampling', low=0.0, high=0.95),
+            'alpha': trial.suggest_float('alpha', low=0.0, high=1.0),
+            'fit_prior': trial.suggest_categorical('fit_prior', [True, False]),
+        }
 
 
 class LightGBMClassifier(_SimpleClassification):
