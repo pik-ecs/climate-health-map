@@ -137,7 +137,11 @@ class _SimpleClassification(ABC):
 
         y_true = data.loc[idxs]['label'].to_numpy() if 'label' in data.columns else None
         logger.debug(f'Predicting on {len(idxs):,} samples ({y_true.sum() if y_true is not None else "??"} of which should be included)')
-        y_preds = self.model.predict_proba(vectors)
+        if hasattr(self.model, 'predict_proba'):
+            y_preds = self.model.predict_proba(vectors)
+        else:
+            y_preds = self.model.predict(vectors)
+
         logger.debug(f'  > Predictions found {(y_preds > 0.5).sum():,} to be included')
         return y_preds[:, 1]
 
@@ -395,7 +399,7 @@ class LightGBMClassifier(_SimpleClassification):
                 'learning_rate': 0.1,
                 'n_estimators': 100,  # Number of boosting rounds
                 'num_leaves': 31,  # Number of leaves in each tree
-                'random_state': self.random_seed,  # For reproducibility
+                'random_state': random_seed,  # For reproducibility
                 'verbose': -1,
                 **(model_params or {}),
             },

@@ -34,6 +34,8 @@ def tune(
     logger = get_logger('classify-train', loglevel=loglevel, run_log_init=True)
     dataset = Dataset(dataset_path=training_data, logger=logger)
 
+    target_dir.mkdir(parents=True, exist_ok=True)
+
     label = LABELS_LOOKUP[column]
     logger.info(f'Label "{column}" is in group "{label.parent}": {LABELS[label.parent]}')
 
