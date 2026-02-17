@@ -11,6 +11,7 @@ def it_models(  # noqa: C901
     max_vocab: int = 7500,
     max_ngram: int = 1,
     min_df: int = 3,
+    max_df: float = 0.8,
     model_params: dict[str, Any] | None = None,
     logger: logging.Logger | None = None,
 ) -> Generator[tuple[str, Any], None, None]:
@@ -84,6 +85,7 @@ def it_models(  # noqa: C901
             max_features=max_vocab,
             ngram_range=(1, max_ngram),
             min_df=min_df,
+            max_df=max_df,
         )
 
     def svm():
@@ -97,6 +99,7 @@ def it_models(  # noqa: C901
             max_features=max_vocab,
             ngram_range=(1, max_ngram),
             min_df=min_df,
+            max_df=max_df,
         )
 
     def lgbm():
@@ -110,6 +113,7 @@ def it_models(  # noqa: C901
             max_features=max_vocab,
             ngram_range=(1, max_ngram),
             min_df=min_df,
+            max_df=max_df,
         )
 
     def sgd():
@@ -123,6 +127,7 @@ def it_models(  # noqa: C901
             max_features=max_vocab,
             ngram_range=(1, max_ngram),
             min_df=min_df,
+            max_df=max_df,
         )
 
     def forest():
@@ -136,6 +141,7 @@ def it_models(  # noqa: C901
             max_features=max_vocab,
             ngram_range=(1, max_ngram),
             min_df=min_df,
+            max_df=max_df,
         )
 
     def rforest():
@@ -149,6 +155,7 @@ def it_models(  # noqa: C901
             max_features=max_vocab,
             ngram_range=(1, max_ngram),
             min_df=min_df,
+            max_df=max_df,
         )
 
     def nb():
@@ -162,6 +169,7 @@ def it_models(  # noqa: C901
             max_features=max_vocab,
             ngram_range=(1, max_ngram),
             min_df=min_df,
+            max_df=max_df,
         )
 
     CONFIGS = {

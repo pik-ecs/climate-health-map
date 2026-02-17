@@ -184,6 +184,7 @@ class SVMClassifier(_SimpleClassification):
         max_features: int = 75000,
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
+        max_df: float = 0.8,
         **kwargs: dict[str, Any],
     ):
         from sklearn.svm import SVC
@@ -200,6 +201,7 @@ class SVMClassifier(_SimpleClassification):
             max_features=max_features,
             ngram_range=ngram_range,
             min_df=min_df,
+            max_df=max_df,
             **kwargs,
         )
 
@@ -226,6 +228,7 @@ class SGDClassifier(_SimpleClassification):
         max_features: int = 75000,
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
+        max_df: float = 0.8,
         **kwargs: dict[str, Any],
     ):
         from sklearn.linear_model import SGDClassifier
@@ -241,6 +244,7 @@ class SGDClassifier(_SimpleClassification):
             max_features=max_features,
             ngram_range=ngram_range,
             min_df=min_df,
+            max_df=max_df,
             **kwargs,
         )
 
@@ -265,6 +269,7 @@ class RegressionClassifier(_SimpleClassification):
         max_features: int = 75000,
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
+        max_df: float = 0.8,
         **kwargs: dict[str, Any],
     ):
         from sklearn.linear_model import LogisticRegression
@@ -287,6 +292,7 @@ class RegressionClassifier(_SimpleClassification):
             max_features=max_features,
             ngram_range=ngram_range,
             min_df=min_df,
+            max_df=max_df,
             **kwargs,
         )
 
@@ -312,6 +318,7 @@ class RandomForestClassifier(_SimpleClassification):
         max_features: int = 75000,
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
+        max_df: float = 0.8,
         **kwargs: dict[str, Any],
     ):
         from sklearn.ensemble import RandomForestClassifier as RandomForestClassifier_
@@ -335,6 +342,7 @@ class RandomForestClassifier(_SimpleClassification):
             max_features=max_features,
             ngram_range=ngram_range,
             min_df=min_df,
+            max_df=max_df,
             **kwargs,
         )
 
@@ -360,6 +368,7 @@ class IsolationForestClassifier(_SimpleClassification):
         max_features: int = 75000,
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
+        max_df: float = 0.8,
         **kwargs: dict[str, Any],
     ):
         from sklearn.ensemble import IsolationForest
@@ -386,6 +395,7 @@ class IsolationForestClassifier(_SimpleClassification):
             max_features=max_features,
             ngram_range=ngram_range,
             min_df=min_df,
+            max_df=max_df,
             **kwargs,
         )
 
@@ -411,6 +421,7 @@ class NaiveBayesClassifier(_SimpleClassification):
         max_features: int = 75000,
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
+        max_df: float = 0.8,
         **kwargs: dict[str, Any],
     ):
         from sklearn.naive_bayes import MultinomialNB
@@ -431,6 +442,7 @@ class NaiveBayesClassifier(_SimpleClassification):
             max_features=max_features,
             ngram_range=ngram_range,
             min_df=min_df,
+            max_df=max_df,
             **kwargs,
         )
 
@@ -456,6 +468,7 @@ class LightGBMClassifier(_SimpleClassification):
         max_features: int = 75000,
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
+        max_df: float = 0.8,
         **kwargs: dict[str, Any],
     ):
         from lightgbm import LGBMClassifier
@@ -479,6 +492,7 @@ class LightGBMClassifier(_SimpleClassification):
             max_features=max_features,
             ngram_range=ngram_range,
             min_df=min_df,
+            max_df=max_df,
             **kwargs,
         )
 

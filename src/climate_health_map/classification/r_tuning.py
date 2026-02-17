@@ -26,6 +26,7 @@ def tune(
     max_vocab: Annotated[int, typer.Option(help='Maximum vocab size (only for sparse representations)')] = 7500,
     max_ngram: Annotated[int, typer.Option(help='n-gram range (only for sparse representations)')] = 1,
     min_df: Annotated[int, typer.Option(help='Minimum document frequency (only for sparse representations)')] = 3,
+    max_df: Annotated[float, typer.Option(help='Minimum document frequency (only for sparse representations)')] = 0.8,
     min_minor_class: Annotated[int, typer.Option(help='Minimum number of samples for the under-represented class')] = 20,
     on_exists: Annotated[OnConflict, typer.Option(help='How to react when the expected output file already exists in `target_dir`')] = OnConflict.IGNORE,
     on_uneligible: Annotated[OnConflict, typer.Option(help='How to react when the column has not enough data to tune a model')] = OnConflict.IGNORE,
