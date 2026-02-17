@@ -13,6 +13,7 @@ MODELS_TRAD = {
     'LGBM',
     'NB',
     'ISOFOREST',
+    'RANDOMFOREST',
 }
 MODELS_TRANS = {
     'CLIMATEBERT': 'climatebert/distilroberta-base-climate-f',
