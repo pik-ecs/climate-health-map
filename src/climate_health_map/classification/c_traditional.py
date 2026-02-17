@@ -143,6 +143,8 @@ class _SimpleClassification(ABC):
             y_preds = self.model.predict(vectors)
 
         logger.debug(f'  > Predictions found {(y_preds > 0.5).sum():,} to be included')
+        if len(y_preds.shape) == 1:
+            return y_preds
         return y_preds[:, 1]
 
     def get_params(self) -> dict[str, Any]:
