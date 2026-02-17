@@ -80,17 +80,6 @@ def text_utils():
     return lemmatize, process_text_aggressive, process_text_light
 
 
-def downsampling_mask(y: np.ndarray, sampling: float) -> np.ndarray:
-    if sampling < 0.05:
-        return np.ones(len(y), dtype=bool)
-
-    sample = np.zeros(len(y), dtype=int)
-    sample[: int((1 - sampling) * len(y))] = 1
-    np.random.shuffle(sample)
-    sample = sample.astype(bool)
-    return (y == 1) | sample
-
-
 def get_prediction_stats(dataset: pd.DataFrame, y_pred: np.ndarray, test_idxs: list[int], train_idxs: list[int]) -> tuple[pd.DataFrame, dict[str, float]]:
     ds = dataset.copy().drop(columns=['text'])
     ds['score'] = y_pred

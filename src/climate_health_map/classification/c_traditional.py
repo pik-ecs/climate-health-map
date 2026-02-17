@@ -15,7 +15,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from .util import downsampling_mask, text_utils
+from climate_health_map.data.dataset import downsampling_mask
+from .util import text_utils
 
 logger = logging.getLogger('classify-traditional')
 logging.getLogger('LightGBM').setLevel(logging.ERROR)
@@ -84,6 +85,8 @@ class _SimpleClassification(ABC):
         sampling = self.model_params.get('downsampling', 0)
         mask = downsampling_mask(y, sampling=sampling)
         model_params = {k: v for k, v in self.model_params.items() if k != 'downsampling'}
+        logger.debug(f'Downsampling from {y.shape[0]:,} ({y.sum():,} incl) to {mask.sum():,} ({y[mask].sum():,} incl)')
+        logger.debug(f'Preparing tuning trial with model_params: {model_params}')
         model = self.BaseModel(**model_params)
         cv = StratifiedKFold(n_splits=2, shuffle=True, random_state=seed)
         score = cross_val_score(model, x[mask], y[mask], cv=cv, scoring=self.scoring)

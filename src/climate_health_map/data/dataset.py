@@ -6,6 +6,35 @@ import pandas as pd
 from climate_health_map.data.labels import LABELS, Label, COLUMNS_MAJOR, COLUMN_GROUP, COLUMNS_IMPACTS
 
 
+def downsampling_mask(y: np.ndarray, sampling: float, min_n_majority: int = 3) -> np.ndarray:
+    mask = np.ones(len(y), dtype=bool)
+
+    # In an optima trial, values may never really go to zero, so use a cut-off to indicate "no downsampling"
+    if sampling < 0.05:
+        return mask
+
+    # Ensure we are doing this on binary labels
+    y_ = y > 0.5
+
+    # Find majority class, we only downsample on that one
+    counts = np.unique_counts(y_)
+    n_majority = counts.counts.max()
+    majority_class = counts.values[counts.counts.argmax()]
+
+    # ensure that we always keep at least `min_n_majority` of the majority class
+    sample_size = int(n_majority * sampling)
+    if sample_size == n_majority:
+        sample_size -= min_n_majority
+
+    # Find indexes of items of the majority class
+    sample = np.argwhere(y_ == majority_class)
+
+    # Shuffle to keep up the random spirit
+    np.random.shuffle(sample)
+    mask[sample[:sample_size]] = False
+    return mask
+
+
 def is_label_eligible(df: pd.DataFrame, label: Label, min_minor_class: int = 10, logger: logging.Logger | None = None) -> bool:
     logger = logger or logging.getLogger('dataset')
     if label.column not in df.columns:
@@ -77,7 +106,7 @@ class Dataset:
         ).set_index('id')
 
     def get_mask(self, column: str, ensure_text: bool = False) -> pd.Series[bool]:
-        if column in {'rel_major|1', 'rel_major|0','rel_impacts|1', 'rel_impacts|0'}:
+        if column in {'rel_major|1', 'rel_major|0', 'rel_impacts|1', 'rel_impacts|0'}:
             mask = self.df[column].notna()
         elif column in COLUMNS_MAJOR:
             mask = (self.df['rel_major|1'] > 0.5) & self.df[[col for col in COLUMN_GROUP[column] if col in self.df.columns]].any(axis=1)
@@ -94,6 +123,7 @@ class Dataset:
 
 
 __all__ = [
+    'downsampling_mask',
     'is_label_eligible',
     'get_filtered_labels',
     'Dataset',
