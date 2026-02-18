@@ -326,7 +326,7 @@ def prepare_training_slurm(
         script_args['random-seed'] = random_seed
 
     df_tuning = read_tuning_info(tuning_dir).sort_values(by=['f1_test']).groupby('column').first().reset_index()
-    columns_trained = {column for column in LABELS_LOOKUP.keys() if (target_dir / column).exists()}
+    columns_trained = {column for column in LABELS_LOOKUP.keys() if (target_dir / f'{column}/stats.json').exists()}
     columns_trans = {row['column'] for _, row in df_tuning.iterrows() if row['model'] in MODELS_TRANS and row['column'] not in columns_trained}
     columns_trad = {row['column'] for _, row in df_tuning.iterrows() if row['model'] in MODELS_TRAD and row['column'] not in columns_trained}
     logger.info(

@@ -129,7 +129,7 @@ def train(
     )
 
     logger.info('Training final model on full dataset...')
-    classifier.train()
+    classifier.train(df.index)
 
     logger.info(f'Write trained model to {model_target}')
     classifier.store(target=model_target)
