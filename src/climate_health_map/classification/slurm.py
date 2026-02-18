@@ -122,9 +122,10 @@ def _ensure_directories(**paths: tuple[Path | None, bool] | Path) -> None:
             path = path.absolute().resolve()
         if assert_exist and (path is None or not path.exists()):
             raise FileNotFoundError(f'Path for {info} does not exist at {path}')
-        if not assert_exist and path is None:
-            continue
-        path.mkdir(parents=True, exist_ok=True)
+        elif not assert_exist:
+            if path is None:
+                continue
+            path.mkdir(parents=True, exist_ok=True)
         logger.info(f'Will use {info} at {path}')
 
 
