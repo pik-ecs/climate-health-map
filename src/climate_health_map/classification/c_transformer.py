@@ -236,8 +236,10 @@ class TransformerClassifier:
         logger.debug(f'Time: {result.metrics["train_runtime"]:.2f}')
         logger.debug(f'Samples/second: {result.metrics["train_samples_per_second"]:.2f}')
 
-    def train(self, idxs: list[int]) -> None:
-        y_true = self.dataset.loc[idxs]['label']
+    def train(self, idxs: list[int]|None) -> None:
+        if idxs is None:
+            idxs = self.dataset.index
+        y_true = self.dataset.iloc[idxs]['label']
         class_weights = compute_class_weights(y_true)
 
         logger.debug(f'Fitting on {y_true.shape[0]:,} samples ({y_true.sum():,} of which included)')

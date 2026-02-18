@@ -93,10 +93,10 @@ def get_prediction_stats(
     ds = dataset.copy().drop(columns=['text'])
     ds['score'] = y_pred
 
-    y_test_true = ds.loc[test_idxs, 'label']
-    y_test_pred = ds.loc[test_idxs, 'score'] > threshold
-    y_train_true = ds.loc[train_idxs, 'label']
-    y_train_pred = ds.loc[train_idxs, 'score'] > threshold
+    y_test_true = ds.iloc[test_idxs, 'label']
+    y_test_pred = ds.iloc[test_idxs, 'score'] > threshold
+    y_train_true = ds.iloc[train_idxs, 'label']
+    y_train_pred = ds.iloc[train_idxs, 'score'] > threshold
 
     stats = {
         'precision_test': precision_score(y_test_true, y_test_pred, zero_division=0),

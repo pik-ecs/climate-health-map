@@ -43,7 +43,7 @@ def train(
     df_tuning = read_tuning_info(tuning_dir)
     if column not in df_tuning['column'].unique():
         raise KeyError(f'No tuning data available for column "{column}" in tuning directory {tuning_dir}')
-    best = df_tuning[df_tuning['column']==column].sort_values(by=['f1_test']).iloc[0]
+    best = df_tuning[df_tuning['column'] == column].sort_values(by=['f1_test']).iloc[0]
     info = best['params']
     model_params = info['hyperparams']
     downsampling = model_params.pop('downsampling', None)
@@ -79,15 +79,16 @@ def train(
     dataset = Dataset(dataset_path=training_data, logger=logger)
     df = dataset.get_simplified_df(column=column)
     mask_column = dataset.get_mask(column, ensure_text=True)
-    y = df[mask_column]['label']
+    y = df[mask_column]['label'].to_numpy()
 
     folding = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=random_seed)
     for i, (train_idxs, test_idxs) in enumerate(folding.split(np.arange(len(y)), y)):
-        logger.info(f'Executing evaluation for fold {i + 1}/{n_folds}')
+        logger.info(f'Executing evaluation for fold {i + 1}/{n_folds} ({len(train_idxs):,} train, {len(test_idxs):,} test)')
 
         # Prepare downsampled training data indexes
         mask_sampling = downsampling_mask(y=y[train_idxs], sampling=downsampling, min_n_majority=min_n_majority)
         train_idxs_sampled = train_idxs[mask_sampling]
+        logger.info(f'Downsampling with {downsampling} to {len(train_idxs_sampled):,} training samples')
 
         logger.info('Preparing model...')
         classifier = get_model(
@@ -99,6 +100,7 @@ def train(
             max_ngram=vectoriser_info.get('ngram_range', [0, 3])[1],
             model_params=model_params,
             logger=logger.getChild(f'fold-{i}'),
+            n_tuning_trials=0,
         )
 
         logger.info('Training model...')
@@ -139,3 +141,7 @@ def train(
     json_dump(stats_file, stats)
 
     logger.info('All done!')
+
+
+if __name__ == '__main__':
+    typer.run(train)

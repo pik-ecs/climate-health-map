@@ -114,7 +114,7 @@ class _SimpleClassification(ABC):
         return 0 if np.isnan(mean) else mean
 
     def train(self, idxs: list[int] | None = None) -> None:
-        if not idxs:
+        if idxs is None:
             idxs = self.dataset.index
         mask = self.dataset.index.isin(idxs)
         x = self.vectors[mask]
