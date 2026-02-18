@@ -31,7 +31,7 @@ uv run --no-sources --extra classify --prerelease=allow healthmap slurm-tune-scr
     --target-dir="../data/tuning" \
     --models-path="../data/offline_models" \
     --venv-path=".venv/" \
-    --log-path="../data/logs/tune/" \
+    --log-path="../data/logs/tuning/" \
     --slurm-user="timrepke@pik-potsdam.de" \
     --num-repeats=3 \
     --train-proportion=0.66 \
@@ -46,15 +46,33 @@ uv run --no-sources --extra classify --prerelease=allow healthmap slurm-tune-scr
     --on-exists="IGNORE"
 ```
 
-# Classifier quality summary
+# Classifier quality summary (optional)
+TODO: elaborate what this produces and how to interpret outputs
 ```bash
 rsync -avh --progress -e ssh foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/tuning data/
+
+uv run healthmap tuning-quality --source=data/tuning --target=quality/tuning
 ```
 
-TODO: script after tuning that creates pretty output to check into repository for reference
-
 # Training
-TODO: prepare ready-to-use easy-to-load models and store them using best setup
+TODO: elaborate on what this does, requires, and produces
+```bash
+uv run --no-sources --extra classify --prerelease=allow healthmap train \
+    --training-data="../data/exports/annotations_20260213.csv" \
+    --tuning-dir="../data/tuning" \
+    --target-dir="../data/trained" \
+    --models-path="../data/offline_models" \
+    --venv-path=".venv/" \
+    --log-path="../data/logs/train/" \
+    --slurm-user="timrepke@pik-potsdam.de" \
+    --n-folds=10 \
+    --min-n-majority=20 \
+    --random-seed=4243 \
+    --slurm-hours=5 \
+    --ensure-models-offline \
+    --loglevel="DEBUG" \
+    --on-exists="IGNORE"
+```
 
 # Classification
 TODO: NACSOS missing classification exporter
