@@ -40,9 +40,9 @@ def train(
             return
 
     df_tuning = read_tuning_info(tuning_dir)
-    if column not in df_tuning.index:
+    if column not in df_tuning['column'].unique():
         raise KeyError(f'No tuning data available for column "{column}" in tuning directory {tuning_dir}')
-    best = df_tuning.loc[column].sort_values(by=['f1_test']).iloc[0]
+    best = df_tuning[df_tuning['column']==column].sort_values(by=['f1_test']).iloc[0]
     info = best['params']
     model_params = info['hyperparams']
     downsampling = model_params.pop('downsampling', None)
