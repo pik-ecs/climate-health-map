@@ -178,11 +178,11 @@ def _compile_tuning_sbatch_script(
         models_path=models_path,
         array=array,
         params=['label', 'model', 'repeat'],
-        command='tune',
+        command='tuning',
     )
 
 
-@app.command('slurm-tune-scripts', help='Write slurm sbatch script for properly submitting job arrays')
+@app.command('slurm-tuning-scripts', help='Write slurm sbatch script for properly submitting job arrays')
 def prepare_tuning_slurm(
     training_data: Annotated[Path, typer.Option(help='')],
     target_dir: Annotated[Path, typer.Option(help='')],
@@ -278,10 +278,10 @@ def prepare_tuning_slurm(
         schema=schema,
     )
 
-    _write_sbatch(sbatch_trad=sbatch_trad, sbatch_trans=sbatch_trans, command='tune')
+    _write_sbatch(sbatch_trad=sbatch_trad, sbatch_trans=sbatch_trans, command='tuning')
 
 
-@app.command('slurm-tune-scripts', help='Write slurm sbatch script for properly submitting job arrays')
+@app.command('slurm-train-scripts', help='Write slurm sbatch script for properly submitting job arrays')
 def prepare_training_slurm(
     training_data: Annotated[Path, typer.Option(help='Path to csv file with training data')],
     tuning_dir: Annotated[Path, typer.Option(help='Path to directory containing all the tuning outputs')],

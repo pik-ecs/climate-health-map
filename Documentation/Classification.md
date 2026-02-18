@@ -5,7 +5,11 @@ Classification has three steps
 2) Training (using best model config from above per label and train+store a model)
 3) Application (point to a file, and this will apply trained classifiers)
 
+## Cluster environment
+When running any of the sl
+```bash
 
+```
 
 # Hyper-parameter tuning
 ```bash
@@ -57,7 +61,7 @@ uv run healthmap tuning-quality --source=data/tuning --target=quality/tuning
 # Training
 TODO: elaborate on what this does, requires, and produces
 ```bash
-uv run --no-sources --extra classify --prerelease=allow healthmap train \
+uv run --no-sources --extra classify --prerelease=allow healthmap slurm-train-scripts \
     --training-data="../data/exports/annotations_20260213.csv" \
     --tuning-dir="../data/tuning" \
     --target-dir="../data/trained" \
