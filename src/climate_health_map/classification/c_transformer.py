@@ -143,26 +143,27 @@ def compute_class_weights(labels: np.ndarray) -> torch.Tensor:
     return torch.tensor(labels.shape[0] / (2 * np.unique_counts(labels).counts), device=device, dtype=torch.float)
 
 
-class TransRanker:
-    name: str = 'trans-rank'
+class TransformerClassifier:
+    name: str = 'transformer'
     DEFAULT_MODELS = DEFAULT_MODELS
 
     def __init__(
         self,
-        dataset: pd.DataFrame,
+        dataset: pd.DataFrame | None = None,
         model_params: dict[str, Any] | None = None,
         min_batch_size: int = 2,
         max_batch_size: int = 32,
         models: list[str] | None = None,
         tuning_trials: int = 20,
         test_split: float = 0.1,
+        instance: AutoModelForSequenceClassification | None = None,
     ):
         self.min_batch_size = min_batch_size
         self.max_batch_size = max_batch_size
         self.models = models or self.DEFAULT_MODELS
         self.model_params = model_params or {}
         self.final_params = {}
-        self.model: CustomTrainer | None = None
+        self.model: CustomTrainer | None = instance
         self.tuning_trials = tuning_trials
         self.test_split = test_split
         self.dataset = dataset
@@ -258,17 +259,27 @@ class TransRanker:
         )
         self._train(args, dataset)
 
-    def predict(self, idxs: list[int] | None = None, data: pd.DataFrame | None = None) -> np.ndarray:
-        data = self.dataset if data is None else data
-
-        if not idxs:
-            idxs = data.index
+    def predict(self, idxs: list[int] | None = None, data: pd.DataFrame | None = None, texts: list[str] | None = None) -> np.ndarray:
+        y_true = None
+        if texts is not None:
+            idxs = np.arange(len(texts))
+            texts = texts
+        elif data is not None:
+            idxs = idxs or data.index
+            texts = data.loc[idxs]['text']
+            y_true = data.loc[idxs]['label'] if 'label' in data.columns else None
+        elif self.dataset is not None:
+            idxs = idxs or self.dataset.index
+            texts = self.dataset.loc[idxs]['text']
+            y_true = self.dataset.loc[idxs]['label'] if 'label' in self.dataset.columns else None
+        else:
+            raise RuntimeError('You must data either as part of the instance or you provide a dataframe or list of texts')
 
         if len(idxs) == 0:
             return np.array([])
-        y_true = data.loc[idxs]['label'] if 'label' in data.columns else None
+
         dataset = tokenize(
-            texts=data.loc[idxs]['text'],
+            texts=texts,
             labels=y_true,
             model=self.model.args.model_name,
             cache_dir=model_data_path,
@@ -276,7 +287,7 @@ class TransRanker:
 
         logger.debug(f'Predicting on {len(idxs):,} samples ({y_true.sum() if y_true is not None else "??"} of which should be included)')
         y_preds = self.model.predict_proba(dataset)
-        logger.debug(f'  > Predictions found {(y_preds > 0.5).sum():,} to be included')
+        logger.debug(f'  > Predictions found {(y_preds > 0.5).sum():,} to be included (threshold > 0.5)')
         return y_preds[:, 1]
 
     def objective(self, idxs: list[int]) -> Callable[[Trial], float]:
@@ -320,3 +331,12 @@ class TransRanker:
                 'downsampling': self.model.args.downsampling,
             },
         }
+
+    def store(self, target: Path):
+        self.model.save_model(target.resolve().as_posix())
+
+    @classmethod
+    def load(cls, source: Path) -> 'TransformerClassifier':
+        model = AutoModelForSequenceClassification.from_pretrained(source, cache_dir=model_data_path, num_labels=2, ignore_mismatched_sizes=True)
+
+        return cls(instance=model)

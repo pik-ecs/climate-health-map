@@ -6,11 +6,11 @@ import pandas as pd
 from climate_health_map.data.labels import LABELS, Label, COLUMNS_MAJOR, COLUMN_GROUP, COLUMNS_IMPACTS
 
 
-def downsampling_mask(y: np.ndarray, sampling: float, min_n_majority: int = 3) -> np.ndarray:
+def downsampling_mask(y: np.ndarray, sampling: float | None, min_n_majority: int = 3) -> np.ndarray:
     mask = np.ones(len(y), dtype=bool)
 
     # In an optima trial, values may never really go to zero, so use a cut-off to indicate "no downsampling"
-    if sampling < 0.05:
+    if sampling is None or sampling < 0.05:
         return mask
 
     # Ensure we are doing this on binary labels

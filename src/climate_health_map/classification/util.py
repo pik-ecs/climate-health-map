@@ -1,4 +1,5 @@
 import re
+import json
 import logging
 from pathlib import Path
 
@@ -82,14 +83,20 @@ def text_utils():
     return lemmatize, process_text_aggressive, process_text_light
 
 
-def get_prediction_stats(dataset: pd.DataFrame, y_pred: np.ndarray, test_idxs: list[int], train_idxs: list[int]) -> tuple[pd.DataFrame, dict[str, float]]:
+def get_prediction_stats(
+    dataset: pd.DataFrame,
+    y_pred: np.ndarray,
+    test_idxs: list[int],
+    train_idxs: list[int],
+    threshold: float = 0.5,
+) -> tuple[pd.DataFrame, dict[str, float]]:
     ds = dataset.copy().drop(columns=['text'])
     ds['score'] = y_pred
 
     y_test_true = ds.loc[test_idxs, 'label']
-    y_test_pred = ds.loc[test_idxs, 'score'] > 0.5
+    y_test_pred = ds.loc[test_idxs, 'score'] > threshold
     y_train_true = ds.loc[train_idxs, 'label']
-    y_train_pred = ds.loc[train_idxs, 'score'] > 0.5
+    y_train_pred = ds.loc[train_idxs, 'score'] > threshold
 
     stats = {
         'precision_test': precision_score(y_test_true, y_test_pred, zero_division=0),
@@ -100,8 +107,19 @@ def get_prediction_stats(dataset: pd.DataFrame, y_pred: np.ndarray, test_idxs: l
         'f1_train': f1_score(y_train_true, y_train_pred, zero_division=0),
         'n_train': len(train_idxs),
         'n_test': len(test_idxs),
-        'balance_train': [len(train_idxs) - y_train_true.sum(), y_train_true.sum()],
-        'balance_test': [len(test_idxs) - y_test_true.sum(), y_test_true.sum()],
+        'train_pos': y_train_true.sum(),
+        'train_neg': len(train_idxs) - y_train_true.sum(),
+        'test_pos': y_test_true.sum(),
+        'test_neg': len(test_idxs) - y_test_true.sum(),
+        'decision_threshold': threshold,
     }
 
     return ds, stats
+
+
+def read_tuning_info(tuning_dir: Path):
+    infos = []
+    for file in tuning_dir.glob('*.json'):
+        with open(file) as f:
+            infos.append(json.load(f))
+    return pd.DataFrame.from_records(infos)

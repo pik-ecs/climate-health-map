@@ -1,6 +1,10 @@
 import logging
-from typing import Generator, Any
+from typing import Generator, Any, TYPE_CHECKING, Callable, Union
 import pandas as pd
+
+if TYPE_CHECKING:
+    from sklearn.base import ClassifierMixin
+    from .c_transformer import TransformerClassifier
 
 
 def it_models(  # noqa: C901
@@ -14,7 +18,7 @@ def it_models(  # noqa: C901
     max_df: float = 0.8,
     model_params: dict[str, Any] | None = None,
     logger: logging.Logger | None = None,
-) -> Generator[tuple[str, Any], None, None]:
+) -> Generator[tuple[str, Union['TransformerClassifier', 'ClassifierMixin']], None, None]:
     if logger is None:
         logger = logging.getLogger('classify-iterator')
     if models is None:
@@ -36,9 +40,9 @@ def it_models(  # noqa: C901
         memory_factor = 1.0
 
     def cbert():
-        from .c_transformer import TransRanker
+        from .c_transformer import TransformerClassifier
 
-        return TransRanker(
+        return TransformerClassifier(
             dataset=dataset,
             model_params=model_params,
             min_batch_size=2,
@@ -49,9 +53,9 @@ def it_models(  # noqa: C901
         )
 
     def sbert():
-        from .c_transformer import TransRanker
+        from .c_transformer import TransformerClassifier
 
-        return TransRanker(
+        return TransformerClassifier(
             dataset=dataset,
             model_params=model_params,
             min_batch_size=2,
@@ -62,9 +66,9 @@ def it_models(  # noqa: C901
         )
 
     def tbert():
-        from .c_transformer import TransRanker
+        from .c_transformer import TransformerClassifier
 
-        return TransRanker(
+        return TransformerClassifier(
             dataset=dataset,
             model_params=model_params,
             min_batch_size=2,
@@ -172,7 +176,7 @@ def it_models(  # noqa: C901
             max_df=max_df,
         )
 
-    CONFIGS = {
+    CONFIGS: dict[str, Callable[[], Union['TransformerClassifier', 'ClassifierMixin']]] = {
         'CLIMATEBERT': cbert,
         'SCIBERT': sbert,
         'TINYBERT': tbert,
@@ -190,3 +194,33 @@ def it_models(  # noqa: C901
     for model in models:
         if model in CONFIGS:
             yield model, CONFIGS[model]()
+        else:
+            logger.warning(f'Model key "{model}" is not known.')
+
+
+def get_model(
+    dataset: pd.DataFrame,
+    model: str,
+    n_tuning_trials: int | None = None,
+    n_tuning_jobs: int = 1,
+    max_vocab: int = 7500,
+    max_ngram: int = 1,
+    min_df: int = 3,
+    max_df: float = 0.8,
+    model_params: dict[str, Any] | None = None,
+    logger: logging.Logger | None = None,
+) -> Union['TransformerClassifier', 'ClassifierMixin']:
+    for _, classifier in it_models(
+        dataset=dataset,
+        models=[model],
+        n_tuning_trials=n_tuning_trials,
+        n_tuning_jobs=n_tuning_jobs,
+        max_vocab=max_vocab,
+        max_ngram=max_ngram,
+        min_df=min_df,
+        max_df=max_df,
+        model_params=model_params,
+        logger=logger,
+    ):
+        return classifier
+    raise KeyError(f'No model for key "{model}"')

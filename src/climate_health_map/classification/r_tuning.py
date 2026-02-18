@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from climate_health_map.classification.c_iterator import it_models
 from climate_health_map.classification.util import get_prediction_stats
 from climate_health_map.data.dataset import Dataset
-from climate_health_map.shared.encoder import json_dumps
+from climate_health_map.shared.encoder import json_dump
 from climate_health_map.shared.types import OnConflict
 from climate_health_map.data.labels import LABELS, LABELS_LOOKUP
 from climate_health_map.shared.env import get_logger
@@ -89,7 +89,7 @@ def tune(
         logger.debug(f'Stats for {model_name} ({column}): {stats}')
 
         logger.info(f'Writing info to {info_file}')
-        json_dumps(
+        json_dump(
             info_file,
             {
                 'params': classifier.get_params(),

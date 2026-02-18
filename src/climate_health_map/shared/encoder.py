@@ -19,6 +19,6 @@ class NumpyEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-def json_dumps(file_path: Path, obj: dict[str, Any], **kwargs) -> None:
+def json_dump(file_path: Path, obj: dict[str, Any], **kwargs) -> None:
     with open(file_path, 'w') as f:
         f.write(json.dumps(obj, cls=NumpyEncoder, **kwargs))

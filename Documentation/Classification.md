@@ -40,9 +40,10 @@ uv run --no-sources --extra classify --prerelease=allow healthmap slurm-tune-scr
     --max-ngram=4 \
     --slurm-hours=3 \
     --tuning-trials-trans=25 \
-    --tuning-trials-trad=50 \
+    --tuning-trials-trad=500 \
     --ensure-models-offline \
-    --loglevel="DEBUG"
+    --loglevel="DEBUG" \
+    --on-exists="IGNORE"
 ```
 
 # Classifier quality summary

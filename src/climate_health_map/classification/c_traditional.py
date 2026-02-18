@@ -1,7 +1,8 @@
 import os
 import logging
 import warnings
-from typing import Any, Type
+from pathlib import Path
+from typing import Any, Type, TypeVar
 from abc import abstractmethod, ABC
 
 import optuna
@@ -34,14 +35,15 @@ warnings.filterwarnings(action='ignore')
 os.environ['PYTHONWARNINGS'] = 'ignore'
 
 lemmatize, process_text_aggressive, process_text_light = text_utils()
+T = TypeVar('T', bound='_SimpleClassification')
 
 
 class _SimpleClassification(ABC):
     def __init__(
         self,
         BaseModel: Type[ClassifierMixin],
-        model_params: dict[str, Any],
-        dataset: pd.DataFrame,
+        model_params: dict[str, Any] | None = None,
+        dataset: pd.DataFrame | None = None,
         tuning_trials: int = 35,
         scoring: str | None = None,
         random_seed: int | None = None,
@@ -50,10 +52,11 @@ class _SimpleClassification(ABC):
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
         max_df: int | float = 0.8,
+        instances: tuple[StandardScaler, TfidfVectorizer, ClassifierMixin] | None = None,
         **kwargs: dict[str, Any],
     ):
         self.dataset = dataset
-        self.model_params = model_params
+        self.model_params = model_params or {}
         self.final_params = {}
         self.BaseModel = BaseModel
         self.scoring = scoring
@@ -62,21 +65,26 @@ class _SimpleClassification(ABC):
         self.n_jobs = n_jobs
         self.model = None
 
-        stripped_texts = [process_text_aggressive(txt) for txt in tqdm(dataset['text'], desc='tokenising')]
-        self.vectorizer = TfidfVectorizer(
-            # See https://github.com/AnneIsARealProgrammerNow/ClimateHealth_Wellcome/blob/v0.1/active_learning_with_evaluation.ipynb
-            ngram_range=ngram_range,
-            max_features=max_features,
-            min_df=min_df,
-            max_df=max_df,
-            strip_accents='unicode',
-            use_idf=True,
-            smooth_idf=True,
-            sublinear_tf=True,
-        )
-        self.scaler = StandardScaler(with_mean=False)
-        vectors = self.vectorizer.fit_transform(stripped_texts)
-        self.vectors = self.scaler.fit_transform(vectors)
+        if instances is not None:
+            self.scaler, self.vectorizer, self.model = instances
+        elif self.dataset is not None:
+            stripped_texts = [process_text_aggressive(txt) for txt in tqdm(dataset['text'], desc='tokenising')]
+            self.vectorizer = TfidfVectorizer(
+                # See https://github.com/AnneIsARealProgrammerNow/ClimateHealth_Wellcome/blob/v0.1/active_learning_with_evaluation.ipynb
+                ngram_range=ngram_range,
+                max_features=max_features,
+                min_df=min_df,
+                max_df=max_df,
+                strip_accents='unicode',
+                use_idf=True,
+                smooth_idf=True,
+                sublinear_tf=True,
+            )
+            self.scaler = StandardScaler(with_mean=False)
+            vectors = self.vectorizer.fit_transform(stripped_texts)
+            self.vectors = self.scaler.fit_transform(vectors)
+        else:
+            raise RuntimeError('You must provide either a dataset or a set of pre-trained vectorizer, scaler, and model')
 
     @property
     @classmethod
@@ -129,31 +137,41 @@ class _SimpleClassification(ABC):
         self.model = self.BaseModel(**model_params)
         self.model.fit(x[mask], y[mask])
 
-    def predict(self, idxs: list[int] | None = None, data: pd.DataFrame | None = None) -> np.ndarray:
-        needs_vectors = data is not None
-        data = self.dataset if data is None else data
+    def vectorise(self, texts: list[str]) -> np.ndarray:
+        stripped_texts = [process_text_aggressive(txt) for txt in tqdm(texts, desc='tokenising')]
+        vectors = self.vectorizer.transform(stripped_texts)
+        return self.scaler.transform(vectors)
 
-        if not idxs:
-            idxs = data.index
+    def predict(self, idxs: list[int] | None = None, data: pd.DataFrame | None = None, texts: list[str] | None = None) -> np.ndarray:
+        y_true = None
+        if texts is not None:
+            idxs = np.arange(len(texts))
+            vectors = self.vectorise(texts=texts)
+        elif data is not None:
+            idxs = idxs or data.index
+            vectors = self.vectorise(texts=data.loc[idxs]['text'])
+            y_true = data.loc[idxs]['label'].to_numpy() if 'label' in data.columns else None
+        elif self.vectors is not None:
+            idxs = idxs or self.dataset.index  # we assume that self.vectors never exists without self.dataset
+            vectors = self.vectors[self.dataset.index.isin(idxs)]
+            y_true = self.dataset.loc[idxs]['label'].to_numpy() if 'label' in self.dataset.columns else None
+        elif self.dataset is not None:
+            idxs = idxs or self.dataset.index
+            vectors = self.vectorise(texts=self.dataset.loc[idxs]['text'])
+            y_true = self.dataset.loc[idxs]['label'].to_numpy() if 'label' in self.dataset.columns else None
+        else:
+            raise RuntimeError('You must data either as part of the classifier, a dataframe, or list of texts')
 
         if len(idxs) == 0:
             return np.array([])
 
-        if needs_vectors:
-            stripped_texts = [process_text_aggressive(txt) for txt in tqdm(data.loc[idxs]['text'], desc='tokenising')]
-            vectors = self.vectorizer.transform(stripped_texts)
-            vectors = self.scaler.fit_transform(vectors)
-        else:
-            vectors = self.vectors[self.dataset.index.isin(idxs)]
-
-        y_true = data.loc[idxs]['label'].to_numpy() if 'label' in data.columns else None
         logger.debug(f'Predicting on {len(idxs):,} samples ({y_true.sum() if y_true is not None else "??"} of which should be included)')
         if hasattr(self.model, 'predict_proba'):
             y_preds = self.model.predict_proba(vectors)
         else:
             y_preds = self.model.predict(vectors)
 
-        logger.debug(f'  > Predictions found {(y_preds > 0.5).sum():,} to be included')
+        logger.debug(f'  > Predictions found {(y_preds > 0.5).sum():,} to be included (above 0.5 threshold)')
         if len(y_preds.shape) == 1:
             return y_preds
         return y_preds[:, 1]
@@ -168,6 +186,32 @@ class _SimpleClassification(ABC):
             'model': self.name,
             'hyperparams': {k: getattr(self.model, k) if hasattr(self.model, k) else v for k, v in self.final_params.items()},
         }
+
+    def store(self, target: Path):
+        from joblib import dump
+
+        with open(target / 'vectorizer.pkl', 'wb') as f_out:
+            dump(self.vectorizer, f_out, compress=True)
+        with open(target / 'scaler.pkl', 'wb') as f_out:
+            dump(self.scaler, f_out, compress=True)
+        with open(target / 'model.pkl', 'wb') as f_out:
+            dump(self.model, f_out, compress=True)
+
+    @classmethod
+    def load(cls: Type[T], source: Path) -> T:
+        from joblib import load
+
+        with open(source / 'vectorizer.pk', 'rb') as f_in:
+            vectoriser = load(f_in)
+        with open(source / 'scaler.pk', 'rb') as f_in:
+            scaler = load(f_in)
+        with open(source / 'model.pk', 'rb') as f_in:
+            model = load(f_in)
+
+        return cls(
+            BaseModel=type(model),
+            instances=(scaler, vectoriser, model),
+        )
 
 
 class SVMClassifier(_SimpleClassification):
