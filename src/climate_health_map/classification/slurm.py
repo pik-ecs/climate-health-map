@@ -5,10 +5,11 @@ from typing import Annotated, Any
 
 import typer
 
+from climate_health_map.data.labels import LABELS_LOOKUP
 from climate_health_map.shared import get_logger
 from climate_health_map.data import Group, get_filtered_labels
 from climate_health_map.shared.types import OnConflict
-from .util import ensure_offline_nltk, ensure_offline_transformers, MODELS_TRANS, MODELS_TRAD
+from .util import ensure_offline_nltk, ensure_offline_transformers, MODELS_TRANS, MODELS_TRAD, read_tuning_info
 
 logger = logging.getLogger('slurm-prep')
 app = typer.Typer(no_args_is_help=True)
@@ -23,6 +24,7 @@ def _compile_sbatch_script(
     params: list[str],
     command: str,
 ):
+    logger.info(f'Number of array jobs: {len(array)}')
     awk_params = '\n'.join(
         [f"{param}=$(echo $param | awk -F'____' '{{print ${pi}}}')" for pi, param in enumerate(params, start=1)],
     )
@@ -98,6 +100,56 @@ uv run --no-sources --extra classify --prerelease=allow healthmap {command} \\
     return batch[:-3]
 
 
+def _write_sbatch(sbatch_trad: str, sbatch_trans: str, command: str) -> None:
+    fn_slurm_trans = f'{command}-trans.slurm'
+    logger.info(f'Writing transformer tuning script as `{fn_slurm_trans}`')
+    with open(fn_slurm_trans, 'w') as slurm_file:
+        slurm_file.write(sbatch_trans)
+
+    fn_slurm_trad = f'{command}-trad.slurm'
+    logger.info(f'Writing traditional tuning script as `{fn_slurm_trad}`')
+    with open(fn_slurm_trad, 'w') as slurm_file:
+        slurm_file.write(sbatch_trad)
+
+    logger.info(f'Run the following to tune transformer models: sbatch {fn_slurm_trans}')
+    logger.info(f'Run the following to tune traditional models: sbatch {fn_slurm_trad}')
+
+
+def _ensure_directories(**paths: tuple[Path | None, bool] | Path) -> None:
+    for info, entry in paths.items():
+        path, assert_exist = entry if type(entry) is tuple else (entry, False)
+        if path is not None:
+            path = path.absolute().resolve()
+        if assert_exist and (path is None or not path.exists()):
+            raise FileNotFoundError(f'Path for {info} does not exist at {path}')
+        if not assert_exist and path is None:
+            continue
+        path.mkdir(parents=True, exist_ok=True)
+        logger.info(f'Will use {info} at {path}')
+
+
+def _ensure_offline_models(ensure_models_offline: bool, models_path: Path) -> None:
+    if not ensure_models_offline:
+        return
+    logger.info('Making sure all models are available offline!')
+    ensure_offline_transformers(model_data_path=models_path, logger=logger)
+
+    logger.info('Making sure NLTK is available offline!')
+    ensure_offline_nltk(target_dir=models_path / 'nltk_data', logger=logger)
+
+
+def _sbatch_args(slurm_hours: int, slurm_user: str, log_path: Path) -> dict[str, Any]:
+    return {
+        'time': f'{slurm_hours:0>2}:00:00',
+        'nodes': '1',
+        'mem': '12G',
+        'mail-user': slurm_user,
+        'output': f'{log_path.resolve()}/%A_%a.out',
+        'error': f'{log_path.resolve()}/%A_%a.err',
+        'chdir': os.getcwd(),
+    }
+
+
 def _compile_tuning_sbatch_script(
     slurm_params: dict[str, Any],
     script_params: dict[str, Any],
@@ -114,7 +166,7 @@ def _compile_tuning_sbatch_script(
         for model in models
         for repeat in range(n_repeats)
         if (
-            not (Path(script_params['target-dir']) / f'{model}-{label.parent}-{label.name}-{repeat}-pred.csv').exists()
+            not (Path(script_params['target-dir']) / f'{model}-{label.parent}-{label.name}-{repeat}.json').exists()
             or script_params['on-exists'] != OnConflict.SKIP.value
         )
     ]
@@ -128,28 +180,6 @@ def _compile_tuning_sbatch_script(
         params=['label', 'model', 'repeat'],
         command='tune',
     )
-
-
-def _ensure_directories(venv_path: Path, log_path: Path, training_data: Path, target_dir: Path, models_path: Path | None = None) -> None:
-    for info, path in [
-        ('virtual environment', venv_path),
-        ('training data', training_data),
-    ]:
-        path = path.absolute().resolve()
-        if not path.exists():
-            raise FileNotFoundError(f'Path for {info} does not exist at {path}')
-        logger.info(f'Will use {info} at {path}')
-
-    for info, path in [
-        ('logging directory', log_path),
-        ('model directory', models_path),
-        ('target directory', target_dir),
-    ]:
-        if path is None:
-            continue
-        path = path.absolute().resolve()
-        logger.info(f'Will use {info} at {path}')
-        path.mkdir(parents=True, exist_ok=True)
 
 
 @app.command('slurm-tune-scripts', help='Write slurm sbatch script for properly submitting job arrays')
@@ -176,25 +206,11 @@ def prepare_tuning_slurm(
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ):
     logger.info('Ensuring that all paths and files are in place...')
-    _ensure_directories(venv_path=venv_path, log_path=log_path, models_path=models_path, target_dir=target_dir, training_data=training_data)
-
-    if ensure_models_offline:
-        logger.info('Making sure all models are available offline!')
-        ensure_offline_transformers(model_data_path=models_path, logger=logger)
-
-        logger.info('Making sure NLTK is available offline!')
-        ensure_offline_nltk(target_dir=models_path / 'nltk_data', logger=logger)
+    _ensure_directories(venv_path=(venv_path, True), log_path=log_path, models_path=models_path, target_dir=target_dir, training_data=(training_data, True))
+    _ensure_offline_models(ensure_models_offline=ensure_models_offline, models_path=models_path)
 
     logger.info('Preparing basic script parameters...')
-    sbatch_args = {
-        'time': f'{slurm_hours:0>2}:00:00',
-        'nodes': '1',
-        'mem': '12G',
-        'mail-user': slurm_user,
-        'output': f'{log_path.resolve()}/%A_%a.out',
-        'error': f'{log_path.resolve()}/%A_%a.err',
-        'chdir': os.getcwd(),
-    }
+    sbatch_args = _sbatch_args(slurm_user=slurm_user, slurm_hours=slurm_hours, log_path=log_path)
     script_args = {
         'training-data': training_data.resolve(),
         'target-dir': target_dir.resolve(),
@@ -212,7 +228,6 @@ def prepare_tuning_slurm(
     schema = get_filtered_labels(dataset_path=training_data, min_minor_class=min_minor_class)
 
     logger.info('Compiling sbatch script for transformer model tuning...')
-
     if tuning_trials_trans is not None:
         script_args['n-tuning-trials'] = tuning_trials_trans
     sbatch_trans = _compile_tuning_sbatch_script(
@@ -235,10 +250,6 @@ def prepare_tuning_slurm(
         schema=schema,
     )
 
-    fn_slurm_trans = 'tune-trans.slurm'
-    logger.info(f'Writing transformer tuning script as `{fn_slurm_trans}`')
-    with open(fn_slurm_trans, 'w') as slurm_file:
-        slurm_file.write(sbatch_trans)
     # Make sure the tuning trials are reset
     script_args.pop('n-tuning-trials', None)
 
@@ -267,13 +278,98 @@ def prepare_tuning_slurm(
         schema=schema,
     )
 
-    fn_slurm_trad = 'tune-trad.slurm'
-    logger.info(f'Writing transformer tuning script as `{fn_slurm_trad}`')
-    with open(fn_slurm_trad, 'w') as slurm_file:
-        slurm_file.write(sbatch_trad)
+    _write_sbatch(sbatch_trad=sbatch_trad, sbatch_trans=sbatch_trans, command='tune')
 
-    logger.info(f'Run the following to tune transformer models: sbatch {fn_slurm_trans}')
-    logger.info(f'Run the following to tune traditional models: sbatch {fn_slurm_trad}')
+
+@app.command('slurm-tune-scripts', help='Write slurm sbatch script for properly submitting job arrays')
+def prepare_training_slurm(
+    training_data: Annotated[Path, typer.Option(help='Path to csv file with training data')],
+    tuning_dir: Annotated[Path, typer.Option(help='Path to directory containing all the tuning outputs')],
+    target_dir: Annotated[Path, typer.Option(help='Path to output directory')],
+    models_path: Annotated[Path, typer.Option(help='Huggingface model cache directory')],
+    venv_path: Annotated[Path, typer.Option(help='')],
+    log_path: Annotated[Path, typer.Option(help='')],
+    slurm_user: Annotated[str, typer.Option(help='email address to notify when done')],
+    n_folds: Annotated[int, typer.Option(help='Number of folds in k-fold validation')] = 10,
+    min_n_majority: Annotated[int, typer.Option(help='Minimum number of majority class to keep when downsampling')] = 20,
+    random_seed: Annotated[int | None, typer.Option(help='')] = None,
+    slurm_hours: Annotated[int, typer.Option(help='')] = 2,
+    on_exists: Annotated[OnConflict, typer.Option(help='')] = OnConflict.SKIP.value,
+    ensure_models_offline: Annotated[bool, typer.Option(help='')] = True,
+    loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
+):
+    logger.info('Ensuring that all paths and files are in place...')
+    _ensure_directories(
+        venv_path=venv_path,
+        log_path=log_path,
+        models_path=models_path,
+        target_dir=target_dir,
+        training_data=(training_data, True),
+        tuning_dir=(tuning_dir, True),
+    )
+    _ensure_offline_models(ensure_models_offline=ensure_models_offline, models_path=models_path)
+
+    logger.info('Preparing basic script parameters...')
+    sbatch_args = _sbatch_args(slurm_user=slurm_user, slurm_hours=slurm_hours, log_path=log_path)
+    script_args = {
+        'training-data': training_data.resolve(),
+        'tuning-data': tuning_dir.resolve(),
+        'output-dir': f'{target_dir.resolve()}/${{label}}',
+        'column': '${label}',
+        'n-folds': n_folds,
+        'min-n-majority': min_n_majority,
+        'on-exists': on_exists.value,
+        'loglevel': loglevel,
+    }
+    if random_seed is not None:
+        script_args['random-seed'] = random_seed
+
+    df_tuning = read_tuning_info(tuning_dir).sort_values(by=['f1_test']).groupby('column').first()
+    columns_trained = {column for column in LABELS_LOOKUP.keys() if (target_dir / column).exists()}
+    columns_trans = {row['column'] for _, row in df_tuning.iterrows() if row['model'] in MODELS_TRANS and row['column'] not in columns_trained}
+    columns_trad = {row['column'] for _, row in df_tuning.iterrows() if row['model'] in MODELS_TRAD and row['column'] not in columns_trained}
+    logger.info(
+        f'Have tuning info for {len(df_tuning)} columns, {len(columns_trained)} columns have a trained model, '
+        f'{len(columns_trans)} need training on GPU and {len(columns_trad)} need training on CPU.',
+    )
+
+    logger.info('Compiling sbatch script for transformer model tuning...')
+    array = [f'"{column}"' for column in columns_trans]
+    sbatch_trans = _compile_sbatch_script(
+        slurm_params=sbatch_args
+        | {
+            'gres': 'gpu:1',  # number of GPUs
+            'partition': 'gpu',
+            'qos': 'gpumedium',  # or gpumedium (has MaxJobsPU=None but half priority, see `$ sacctmgr show qos`)
+            'cpus-per-task': 5,
+            'oversubscribe': None,  # use non-utilized GPUs on busy nodes
+        },
+        script_params=script_args,
+        venv_path=venv_path,
+        models_path=models_path,
+        array=array,
+        params=['label'],
+        command='train',
+    )
+
+    logger.info('Compiling sbatch script for traditional model tuning...')
+    array = [f'"{column}"' for column in columns_trad]
+    sbatch_trad = _compile_sbatch_script(
+        slurm_params=sbatch_args
+        | {
+            'cpus-per-task': 12,
+            'partition': 'standard',
+            'qos': 'short',
+        },
+        script_params=script_args,
+        venv_path=venv_path,
+        models_path=models_path,
+        array=array,
+        params=['label'],
+        command='train',
+    )
+
+    _write_sbatch(sbatch_trad=sbatch_trad, sbatch_trans=sbatch_trans, command='train')
 
 
 if __name__ == '__main__':

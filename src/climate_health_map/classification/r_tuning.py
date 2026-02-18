@@ -64,6 +64,7 @@ def tune(
         dataset=data,
         models=model,
         min_df=min_df,
+        max_df=max_df,
         max_ngram=max_ngram,
         max_vocab=max_vocab,
         n_tuning_jobs=n_tuning_jobs,

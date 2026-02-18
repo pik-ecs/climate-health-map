@@ -123,3 +123,12 @@ def read_tuning_info(tuning_dir: Path):
         with open(file) as f:
             infos.append(json.load(f))
     return pd.DataFrame.from_records(infos)
+
+
+def columns_with_tuning_info(tuning_dir: Path) -> set[str]:
+    tuned_columns = set()
+    for file in tuning_dir.glob('*.json'):
+        with open(file) as f:
+            info = json.load(f)
+            tuned_columns.add(info['column'])
+    return tuned_columns
