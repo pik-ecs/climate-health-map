@@ -6,25 +6,34 @@ import pandas as pd
 from climate_health_map.data.labels import LABELS, Label, COLUMNS_MAJOR, COLUMN_GROUP, COLUMNS_IMPACTS
 
 
-def downsampling_mask(y: np.ndarray, sampling: float | None, min_n_majority: int = 3) -> np.ndarray:
+def downsampling_mask(y: np.ndarray, sampling: float | None, min_n_majority: int = 3, threshold:float=0.5) -> np.ndarray:
+    """Produce downsampling mask.
+    This figures out which one the majority class is and reduces it's size to `sampling`% of the original number
+
+    Example:
+       - sampling = 0.6
+       - y has 20x 0 and 1200x 1
+        --> then 1 is the majority class
+        --> mask will be True for all indexes of `y` where it is `0`
+        --> mask will be True for 60% of indexes of `y` where it is `1`
+
+    `sampling == 1.0` -> keep all
+    `sampling == 0.0` -> keep `min_n_majority` of majority class
+    """
     mask = np.ones(len(y), dtype=bool)
 
-    # In an optima trial, values may never really go to zero, so use a cut-off to indicate "no downsampling"
-    if sampling is None or sampling < 0.05:
-        return mask
-
     # Ensure we are doing this on binary labels
-    y_ = y > 0.5
+    y_ = y > threshold
 
     # Find majority class, we only downsample on that one
     counts = np.unique_counts(y_)
     n_majority = counts.counts.max()
     majority_class = counts.values[counts.counts.argmax()]
 
-    # ensure that we always keep at least `min_n_majority` of the majority class
-    sample_size = int(n_majority * (1 - sampling))
-    if sample_size == n_majority:
-        sample_size -= min_n_majority
+    # Ensure that we always keep at least `min_n_majority` of the majority class
+    sample_size = int(n_majority * sampling)
+    if sample_size < min_n_majority:
+        sample_size = min_n_majority
 
     # Find indexes of items of the majority class
     sample = np.argwhere(y_ == majority_class)
