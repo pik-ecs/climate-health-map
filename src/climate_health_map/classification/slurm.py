@@ -315,7 +315,7 @@ def prepare_training_slurm(
     script_args = {
         'training-data': training_data.resolve(),
         'tuning-dir': tuning_dir.resolve(),
-        'output-dir': f'{target_dir.resolve()}/${{label}}',
+        'output-dir': target_dir.resolve(),
         'column': '${label}',
         'n-folds': n_folds,
         'min-n-majority': min_n_majority,
