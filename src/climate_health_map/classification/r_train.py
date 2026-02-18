@@ -2,14 +2,15 @@ from pathlib import Path
 from typing import Annotated
 
 import typer
+import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
 from climate_health_map.classification.c_iterator import get_model
 from climate_health_map.classification.util import get_prediction_stats, read_tuning_info
 from climate_health_map.data.dataset import Dataset, downsampling_mask
+from climate_health_map.data.labels import LABELS, LABELS_LOOKUP
 from climate_health_map.shared.encoder import json_dump
 from climate_health_map.shared.types import OnConflict
-from climate_health_map.data.labels import LABELS, LABELS_LOOKUP
 from climate_health_map.shared.env import get_logger
 
 
@@ -81,7 +82,7 @@ def train(
     y = df[mask_column]['label']
 
     folding = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=random_seed)
-    for i, (train_idxs, test_idxs) in enumerate(folding.split(None, y)):
+    for i, (train_idxs, test_idxs) in enumerate(folding.split(np.arange(len(y)), y)):
         logger.info(f'Executing evaluation for fold {i + 1}/{n_folds}')
 
         # Prepare downsampled training data indexes
