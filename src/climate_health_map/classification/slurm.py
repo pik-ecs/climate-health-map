@@ -314,7 +314,7 @@ def prepare_training_slurm(
     sbatch_args = _sbatch_args(slurm_user=slurm_user, slurm_hours=slurm_hours, log_path=log_path)
     script_args = {
         'training-data': training_data.resolve(),
-        'tuning-data': tuning_dir.resolve(),
+        'tuning-dir': tuning_dir.resolve(),
         'output-dir': f'{target_dir.resolve()}/${{label}}',
         'column': '${label}',
         'n-folds': n_folds,
