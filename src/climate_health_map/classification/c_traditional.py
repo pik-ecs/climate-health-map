@@ -118,7 +118,7 @@ class _SimpleClassification(ABC):
             idxs = self.dataset.index
         mask = self.dataset.index.isin(idxs)
         x = self.vectors[mask]
-        y = self.dataset.loc[idxs]['label'].to_numpy()
+        y = self.dataset.iloc[idxs]['label'].to_numpy()
 
         logger.debug(f'Fitting on {y.shape[0]:,} samples ({y.sum():,} of which included)')
 
@@ -149,16 +149,16 @@ class _SimpleClassification(ABC):
             vectors = self.vectorise(texts=texts)
         elif data is not None:
             idxs = idxs or data.index
-            vectors = self.vectorise(texts=data.loc[idxs]['text'])
-            y_true = data.loc[idxs]['label'].to_numpy() if 'label' in data.columns else None
+            vectors = self.vectorise(texts=data.iloc[idxs]['text'])
+            y_true = data.iloc[idxs]['label'].to_numpy() if 'label' in data.columns else None
         elif self.vectors is not None:
             idxs = idxs or self.dataset.index  # we assume that self.vectors never exists without self.dataset
             vectors = self.vectors[self.dataset.index.isin(idxs)]
-            y_true = self.dataset.loc[idxs]['label'].to_numpy() if 'label' in self.dataset.columns else None
+            y_true = self.dataset.iloc[idxs]['label'].to_numpy() if 'label' in self.dataset.columns else None
         elif self.dataset is not None:
             idxs = idxs or self.dataset.index
-            vectors = self.vectorise(texts=self.dataset.loc[idxs]['text'])
-            y_true = self.dataset.loc[idxs]['label'].to_numpy() if 'label' in self.dataset.columns else None
+            vectors = self.vectorise(texts=self.dataset.iloc[idxs]['text'])
+            y_true = self.dataset.iloc[idxs]['label'].to_numpy() if 'label' in self.dataset.columns else None
         else:
             raise RuntimeError('You must data either as part of the classifier, a dataframe, or list of texts')
 

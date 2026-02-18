@@ -254,7 +254,7 @@ class TransformerClassifier:
             args = self.args()
 
         dataset = tokenize(
-            texts=self.dataset.loc[idxs]['text'],
+            texts=self.dataset.iloc[idxs]['text'],
             labels=y_true,
             model=args.model_name,
             cache_dir=model_data_path,
@@ -268,12 +268,12 @@ class TransformerClassifier:
             texts = texts
         elif data is not None:
             idxs = idxs or data.index
-            texts = data.loc[idxs]['text']
-            y_true = data.loc[idxs]['label'] if 'label' in data.columns else None
+            texts = data.iloc[idxs]['text']
+            y_true = data.iloc[idxs]['label'] if 'label' in data.columns else None
         elif self.dataset is not None:
             idxs = idxs or self.dataset.index
-            texts = self.dataset.loc[idxs]['text']
-            y_true = self.dataset.loc[idxs]['label'] if 'label' in self.dataset.columns else None
+            texts = self.dataset.iloc[idxs]['text']
+            y_true = self.dataset.iloc[idxs]['label'] if 'label' in self.dataset.columns else None
         else:
             raise RuntimeError('You must data either as part of the instance or you provide a dataframe or list of texts')
 
@@ -295,10 +295,10 @@ class TransformerClassifier:
     def objective(self, idxs: list[int]) -> Callable[[Trial], float]:
         def run_trial(trial: Trial) -> float:
             logger.debug(f'Running tuning trial {trial.number}')
-            training_args = self.args(trial=trial, weights=compute_class_weights(self.dataset.loc[idxs]['label']))
+            training_args = self.args(trial=trial, weights=compute_class_weights(self.dataset.iloc[idxs]['label']))
             dataset = tokenize(
-                texts=self.dataset.loc[idxs]['text'],
-                labels=self.dataset.loc[idxs]['label'],
+                texts=self.dataset.iloc[idxs]['text'],
+                labels=self.dataset.iloc[idxs]['label'],
                 model=training_args.model_name,
                 cache_dir=model_data_path,
             )
