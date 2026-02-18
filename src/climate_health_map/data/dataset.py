@@ -112,7 +112,7 @@ class Dataset:
                 }
                 for _, row in masked.iterrows()
             ],
-        ).set_index('id')
+        )#.set_index('id')
 
     def get_mask(self, column: str, ensure_text: bool = False) -> pd.Series[bool]:
         if column in {'rel_major|1', 'rel_major|0', 'rel_impacts|1', 'rel_impacts|0'}:

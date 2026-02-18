@@ -118,7 +118,7 @@ class _SimpleClassification(ABC):
             idxs = self.dataset.index
         mask = self.dataset.index.isin(idxs)
         x = self.vectors[mask]
-        y = self.dataset.iloc[idxs]['label'].to_numpy()
+        y = self.dataset[mask]['label'].to_numpy()
 
         logger.debug(f'Fitting on {y.shape[0]:,} samples ({y.sum():,} of which included)')
 
