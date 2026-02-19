@@ -52,9 +52,9 @@ def tune(
 
     logger.info(f'Prepared labeled dataset with {data.shape} records, of which {data["label"].sum()} are >=1')
 
-    idxs = list(data.index)
-    train_idxs, test_idxs = train_test_split(
-        idxs,
+    ids = list(data.index)
+    train_ids, test_ids = train_test_split(
+        ids,
         train_size=train_proportion,
         stratify=data['label'],
         random_state=random_state * repeat,
@@ -81,12 +81,12 @@ def tune(
             continue
 
         logger.info(f'Initializing and training ranker {model_name} for column {column} (run: {repeat})')
-        classifier.train(idxs=train_idxs)
+        classifier.train(idxs=train_ids)
 
         logger.info(f'Making predictions for "{column}" on all annotated data')
         y_pred = classifier.predict()
         logger.debug(f'Testing ranker {model_name} for column "{column}" on {1 - train_proportion:.0%} test set')
-        ds, stats = get_prediction_stats(dataset=data, y_pred=y_pred, test_idxs=test_idxs, train_idxs=train_idxs)
+        ds, stats = get_prediction_stats(dataset=data, y_pred=y_pred, test_idxs=test_ids, train_idxs=train_ids)
         logger.debug(f'Stats for {model_name} ({column}): {stats}')
 
         logger.info(f'Writing info to {info_file}')

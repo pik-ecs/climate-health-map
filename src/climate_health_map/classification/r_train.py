@@ -72,26 +72,8 @@ def train(
         'folds': [],
     }
 
-    label = LABELS_LOOKUP[column]
-    logger.info(f'Label "{column}" is in group "{label.parent}": {LABELS[label.parent]}')
-
-    logger.info(f'Loading training data from {training_data}')
-    dataset = Dataset(dataset_path=training_data, logger=logger)
-    df = dataset.get_simplified_df(column=column)
-    mask_column = dataset.get_mask(column, ensure_text=True)
-    y = df[mask_column]['label'].to_numpy()
-
-    folding = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=random_seed)
-    for i, (train_idxs, test_idxs) in enumerate(folding.split(np.arange(len(y)), y)):
-        logger.info(f'Executing evaluation for fold {i + 1}/{n_folds} ({len(train_idxs):,} train, {len(test_idxs):,} test)')
-
-        # Prepare downsampled training data indexes
-        mask_sampling = downsampling_mask(y=y[train_idxs], sampling=downsampling, min_n_majority=min_n_majority)
-        train_idxs_sampled = train_idxs[mask_sampling]
-        logger.info(f'Downsampling with {downsampling} to {len(train_idxs_sampled):,} training samples')
-
-        logger.info('Preparing model...')
-        classifier = get_model(
+    def _get_model(logger_name:str):
+        return get_model(
             dataset=df,
             model=best['model'],
             max_df=vectoriser_info.get('max_df', 0.8),
@@ -99,16 +81,39 @@ def train(
             max_vocab=vectoriser_info.get('max_features', 10000),
             max_ngram=vectoriser_info.get('ngram_range', [0, 3])[1],
             model_params=model_params,
-            logger=logger.getChild(f'fold-{i}'),
+            logger=logger.getChild(logger_name),
             n_tuning_trials=0,
         )
 
+    label = LABELS_LOOKUP[column]
+    logger.info(f'Label "{column}" is in group "{label.parent}": {LABELS[label.parent]}')
+
+    logger.info(f'Loading training data from {training_data}')
+    dataset = Dataset(dataset_path=training_data, logger=logger)
+    df_ = dataset.get_simplified_df(column=column)
+    mask_column = dataset.get_mask(column, ensure_text=True)
+    df = df_[mask_column]
+
+    folding = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=random_seed)
+    for i, (train_idxs, test_idxs) in enumerate(folding.split(np.arange(len(df)), df['label'].to_numpy())):
+        logger.info(f'Executing evaluation for fold {i + 1}/{n_folds} ({len(train_idxs):,} train, {len(test_idxs):,} test)')
+        train_ids = df.iloc[train_idxs].index
+        test_ids = df.iloc[test_idxs].index
+
+        # Prepare downsampled training data indexes
+        mask_sampling = downsampling_mask(y=df.loc[train_ids, 'label'], sampling=downsampling, min_n_majority=min_n_majority)
+        train_ids_sampled = train_ids[mask_sampling]
+        logger.info(f'Downsampling with {downsampling} to {len(train_ids_sampled):,} training samples')
+
+        logger.info('Preparing model...')
+        classifier = _get_model(logger_name=f'fold-{i}')
+
         logger.info('Training model...')
-        classifier.train(train_idxs_sampled)
+        classifier.train(train_ids_sampled)
 
         logger.info(f'Evaluating model at fold {i + 1}/{n_folds}')
         y_pred = classifier.predict()
-        _ds, fold_stats = get_prediction_stats(dataset=df, y_pred=y_pred, test_idxs=test_idxs, train_idxs=train_idxs)
+        _ds, fold_stats = get_prediction_stats(dataset=df, y_pred=y_pred, test_idxs=test_ids, train_idxs=train_ids)
         stats['folds'].append(fold_stats)
         logger.debug(f'Stats for fold {i + 1}/{n_folds}: {fold_stats}')
 
@@ -120,16 +125,7 @@ def train(
 
     # Final training with full dataset
     logger.info('Preparing final model...')
-    classifier = get_model(
-        dataset=df,
-        model=best['model'],
-        max_df=vectoriser_info.get('max_df', 0.8),
-        min_df=vectoriser_info.get('min_df', 4),
-        max_vocab=vectoriser_info.get('max_features', 10000),
-        max_ngram=vectoriser_info.get('ngram_range', [0, 3])[1],
-        model_params=model_params,
-        logger=logger.getChild('total'),
-    )
+    classifier = _get_model(logger_name='total')
 
     logger.info('Training final model on full dataset...')
     classifier.train(df.index)

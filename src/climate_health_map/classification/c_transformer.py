@@ -236,10 +236,34 @@ class TransformerClassifier:
         logger.debug(f'Time: {result.metrics["train_runtime"]:.2f}')
         logger.debug(f'Samples/second: {result.metrics["train_samples_per_second"]:.2f}')
 
+    def objective(self, idxs: list[int]) -> Callable[[Trial], float]:
+        def run_trial(trial: Trial) -> float:
+            logger.debug(f'Running tuning trial {trial.number}')
+            training_args = self.args(trial=trial, weights=compute_class_weights(self.dataset.loc[idxs]['label']))
+            dataset = tokenize(
+                texts=self.dataset.loc[idxs]['text'],
+                labels=self.dataset.loc[idxs]['label'],
+                model=training_args.model_name,
+                cache_dir=model_data_path,
+            )
+            dataset = dataset.shuffle()
+            train_dataset = dataset.take(n=int(0.6 * len(dataset)))
+            test_dataset = dataset.skip(n=int(0.6 * len(dataset)))
+
+            self._train(training_args, train_dataset)
+            predictions = self.model.predict(test_dataset)
+            results = evaluate_trainer(predictions=predictions)
+
+            logger.info(f'Performance: {results}')
+
+            return results['F1']
+
+        return run_trial
+
     def train(self, idxs: list[int]|None) -> None:
         if idxs is None:
             idxs = self.dataset.index
-        y_true = self.dataset.iloc[idxs]['label']
+        y_true = self.dataset.loc[idxs]['label']
         class_weights = compute_class_weights(y_true)
 
         logger.debug(f'Fitting on {y_true.shape[0]:,} samples ({y_true.sum():,} of which included)')
@@ -254,7 +278,7 @@ class TransformerClassifier:
             args = self.args()
 
         dataset = tokenize(
-            texts=self.dataset.iloc[idxs]['text'],
+            texts=self.dataset.loc[idxs]['text'],
             labels=y_true,
             model=args.model_name,
             cache_dir=model_data_path,
@@ -265,15 +289,15 @@ class TransformerClassifier:
         y_true = None
         if texts is not None:
             idxs = np.arange(len(texts))
-            texts = texts
+            # texts = texts
         elif data is not None:
             idxs = idxs or data.index
-            texts = data.iloc[idxs]['text']
-            y_true = data.iloc[idxs]['label'] if 'label' in data.columns else None
+            texts = data.loc[idxs]['text']
+            y_true = data.loc[idxs]['label'] if 'label' in data.columns else None
         elif self.dataset is not None:
             idxs = idxs or self.dataset.index
-            texts = self.dataset.iloc[idxs]['text']
-            y_true = self.dataset.iloc[idxs]['label'] if 'label' in self.dataset.columns else None
+            texts = self.dataset.loc[idxs]['text']
+            y_true = self.dataset.loc[idxs]['label'] if 'label' in self.dataset.columns else None
         else:
             raise RuntimeError('You must data either as part of the instance or you provide a dataframe or list of texts')
 
@@ -292,29 +316,6 @@ class TransformerClassifier:
         logger.debug(f'  > Predictions found {(y_preds > 0.5).sum():,} to be included (threshold > 0.5)')
         return y_preds[:, 1]
 
-    def objective(self, idxs: list[int]) -> Callable[[Trial], float]:
-        def run_trial(trial: Trial) -> float:
-            logger.debug(f'Running tuning trial {trial.number}')
-            training_args = self.args(trial=trial, weights=compute_class_weights(self.dataset.iloc[idxs]['label']))
-            dataset = tokenize(
-                texts=self.dataset.iloc[idxs]['text'],
-                labels=self.dataset.iloc[idxs]['label'],
-                model=training_args.model_name,
-                cache_dir=model_data_path,
-            )
-            dataset = dataset.shuffle()
-            train_dataset = dataset.take(n=int(0.6 * len(dataset)))
-            test_dataset = dataset.skip(n=int(0.6 * len(dataset)))
-
-            self._train(training_args, train_dataset)
-            predictions = self.model.predict(test_dataset)
-            results = evaluate_trainer(predictions=predictions)
-
-            logger.info(f'Performance: {results}')
-
-            return results['F1']
-
-        return run_trial
 
     def get_params(self) -> dict[str, Any]:
         return {
