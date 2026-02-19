@@ -6,7 +6,7 @@ import pandas as pd
 from climate_health_map.data.labels import LABELS, Label, COLUMNS_MAJOR, COLUMN_GROUP, COLUMNS_IMPACTS
 
 
-def downsampling_mask(y: np.ndarray, sampling: float | None, min_n_majority: int = 3, threshold:float=0.5) -> np.ndarray:
+def downsampling_mask(y: np.ndarray, sampling: float | None, min_n_majority: int = 3, threshold: float = 0.5) -> np.ndarray:
     """Produce downsampling mask.
     This figures out which one the majority class is and reduces it's size to `sampling`% of the original number
 

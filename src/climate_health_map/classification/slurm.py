@@ -9,7 +9,7 @@ from climate_health_map.data.labels import LABELS_LOOKUP
 from climate_health_map.shared import get_logger
 from climate_health_map.data import Group, get_filtered_labels
 from climate_health_map.shared.types import OnConflict
-from .util import ensure_offline_nltk, ensure_offline_transformers, MODELS_TRANS, MODELS_TRAD, read_tuning_info
+from .util import ensure_offline_nltk, ensure_offline_transformers, MODELS_TRANS, MODELS_TRAD, get_best_infos
 
 logger = logging.getLogger('slurm-prep')
 app = typer.Typer(no_args_is_help=True)
@@ -325,10 +325,10 @@ def prepare_training_slurm(
     if random_seed is not None:
         script_args['random-seed'] = random_seed
 
-    df_tuning = read_tuning_info(tuning_dir).sort_values(by=['f1_test'], ascending=False).groupby('column').first().reset_index()
+    df_tuning = get_best_infos(tuning_dir, metric='f1')
     columns_trained = {column for column in LABELS_LOOKUP.keys() if (target_dir / f'{column}/stats.json').exists()}
-    columns_trans = {row['column'] for _, row in df_tuning.iterrows() if row['model'] in MODELS_TRANS and row['column'] not in columns_trained}
-    columns_trad = {row['column'] for _, row in df_tuning.iterrows() if row['model'] in MODELS_TRAD and row['column'] not in columns_trained}
+    columns_trans = {column for column, row in df_tuning.iterrows() if row['model'] in MODELS_TRANS and column not in columns_trained}
+    columns_trad = {column for column, row in df_tuning.iterrows() if row['model'] in MODELS_TRAD and column not in columns_trained}
     logger.info(
         f'Have tuning info for {len(df_tuning)} columns, {len(columns_trained)} columns have a trained model, '
         f'{len(columns_trans)} need training on GPU and {len(columns_trad)} need training on CPU.',

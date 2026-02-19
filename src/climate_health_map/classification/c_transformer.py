@@ -260,7 +260,7 @@ class TransformerClassifier:
 
         return run_trial
 
-    def train(self, idxs: list[int]|None) -> None:
+    def train(self, idxs: list[int] | None) -> None:
         if idxs is None:
             idxs = self.dataset.index
         y_true = self.dataset.loc[idxs]['label']
@@ -315,7 +315,6 @@ class TransformerClassifier:
         y_preds = self.model.predict_proba(dataset)
         logger.debug(f'  > Predictions found {(y_preds > 0.5).sum():,} to be included (threshold > 0.5)')
         return y_preds[:, 1]
-
 
     def get_params(self) -> dict[str, Any]:
         return {

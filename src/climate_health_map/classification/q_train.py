@@ -4,7 +4,6 @@ from typing import Annotated
 import typer
 import pandas as pd
 
-from climate_health_map.classification.util import read_tuning_info
 
 pd.options.display.max_columns = 650
 pd.options.display.max_rows = 200

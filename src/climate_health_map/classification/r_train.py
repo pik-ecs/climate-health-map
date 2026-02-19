@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
 from climate_health_map.classification.c_iterator import get_model
-from climate_health_map.classification.util import get_prediction_stats, read_tuning_info
+from climate_health_map.classification.util import get_prediction_stats, get_best_info
 from climate_health_map.data.dataset import Dataset, downsampling_mask
 from climate_health_map.data.labels import LABELS, LABELS_LOOKUP
 from climate_health_map.shared.encoder import json_dump
@@ -40,12 +40,7 @@ def train(
         if on_exists == OnConflict.SKIP:
             return
 
-    df_tuning = read_tuning_info(tuning_dir)
-    if column not in df_tuning['column'].unique():
-        raise KeyError(f'No tuning data available for column "{column}" in tuning directory {tuning_dir}')
-    best = df_tuning[df_tuning['column'] == column].sort_values(by=['f1_test']).iloc[0]
-    info = best['params']
-    model_params = info['hyperparams']
+    best, info, model_params = get_best_info(tuning_dir=tuning_dir, column=column, metric='f1')
     downsampling = model_params.pop('downsampling', None)
     vectoriser_info = info['vectoriser'] if 'vectoriser' in info and info['vectoriser'] is not None else {}
     logger.info(
@@ -72,7 +67,7 @@ def train(
         'folds': [],
     }
 
-    def _get_model(logger_name:str):
+    def _get_model(logger_name: str):
         return get_model(
             dataset=df,
             model=best['model'],

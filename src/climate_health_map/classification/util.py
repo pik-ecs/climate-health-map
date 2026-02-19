@@ -125,6 +125,18 @@ def read_tuning_info(tuning_dir: Path):
     return pd.DataFrame.from_records(infos)
 
 
+def get_best_infos(tuning_dir: Path, metric: str = 'f1'):
+    return read_tuning_info(tuning_dir).sort_values(by=[f'{metric}_test'], ascending=False).groupby('column').first()
+
+
+def get_best_info(tuning_dir: Path, column: str, metric: str = 'f1'):
+    df_tuning = get_best_infos(tuning_dir=tuning_dir, metric=metric)
+    if column not in df_tuning.index:
+        raise KeyError(f'No tuning data available for column "{column}" in tuning directory {tuning_dir}')
+    best = df_tuning.loc[column]
+    return best.to_dict(), best['params'], best['params']['hyperparams']
+
+
 def columns_with_tuning_info(tuning_dir: Path) -> set[str]:
     tuned_columns = set()
     for file in tuning_dir.glob('*.json'):
