@@ -9,7 +9,7 @@ from climate_health_map.data.labels import LABELS_LOOKUP
 from climate_health_map.shared import get_logger
 from climate_health_map.data import Group, get_filtered_labels
 from climate_health_map.shared.types import OnConflict
-from .util import ensure_offline_nltk, ensure_offline_transformers, MODELS_TRANS, MODELS_TRAD, get_best_infos
+from .util import ensure_offline_nltk, ensure_offline_transformers, MODELS_TRANS, MODELS_TRAD, get_best_infos, ensure_directories
 
 logger = logging.getLogger('slurm-prep')
 app = typer.Typer(no_args_is_help=True)
@@ -115,20 +115,6 @@ def _write_sbatch(sbatch_trad: str, sbatch_trans: str, command: str) -> None:
     logger.info(f'Run the following to tune traditional models: sbatch {fn_slurm_trad}')
 
 
-def _ensure_directories(**paths: tuple[Path | None, bool] | Path) -> None:
-    for info, entry in paths.items():
-        path, assert_exist = entry if type(entry) is tuple else (entry, False)
-        if path is not None:
-            path = path.absolute().resolve()
-        if assert_exist and (path is None or not path.exists()):
-            raise FileNotFoundError(f'Path for {info} does not exist at {path}')
-        elif not assert_exist:
-            if path is None:
-                continue
-            path.mkdir(parents=True, exist_ok=True)
-        logger.info(f'Will use {info} at {path}')
-
-
 def _ensure_offline_models(ensure_models_offline: bool, models_path: Path) -> None:
     if not ensure_models_offline:
         return
@@ -207,7 +193,9 @@ def prepare_tuning_slurm(
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ):
     logger.info('Ensuring that all paths and files are in place...')
-    _ensure_directories(venv_path=(venv_path, True), log_path=log_path, models_path=models_path, target_dir=target_dir, training_data=(training_data, True))
+    ensure_directories(
+        logger=logger, venv_path=(venv_path, True), log_path=log_path, models_path=models_path, target_dir=target_dir, training_data=(training_data, True)
+    )
     _ensure_offline_models(ensure_models_offline=ensure_models_offline, models_path=models_path)
 
     logger.info('Preparing basic script parameters...')
@@ -300,7 +288,8 @@ def prepare_training_slurm(
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ):
     logger.info('Ensuring that all paths and files are in place...')
-    _ensure_directories(
+    ensure_directories(
+        logger=logger,
         venv_path=venv_path,
         log_path=log_path,
         models_path=models_path,

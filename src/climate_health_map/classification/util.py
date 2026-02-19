@@ -117,6 +117,25 @@ def get_prediction_stats(
     return ds, stats
 
 
+def ensure_directories(logger: logging.Logger, **paths: tuple[Path | None, bool] | Path) -> None:
+    """Batch-test that all necessary paths exist.
+
+    * Directory paths -> this method will make sure it exists.
+    * tuple[Path, bool] -> if bool is true, check if file/path exists and throw exception otherwise.
+    """
+    for info, entry in paths.items():
+        path, assert_exist = entry if type(entry) is tuple else (entry, False)
+        if path is not None:
+            path = path.absolute().resolve()
+        if assert_exist and (path is None or not path.exists()):
+            raise FileNotFoundError(f'Path for {info} does not exist at {path}')
+        elif not assert_exist:
+            if path is None:
+                continue
+            path.mkdir(parents=True, exist_ok=True)
+        logger.info(f'Will use {info} at {path}')
+
+
 def read_tuning_info(tuning_dir: Path):
     infos = []
     for file in tuning_dir.glob('*.json'):

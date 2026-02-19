@@ -28,10 +28,10 @@ def train(
     logger = get_logger('classify-train', loglevel=loglevel, run_log_init=True)
 
     target_dir = (output_dir / column).resolve()
-    target_dir.mkdir(parents=True, exist_ok=True)
     logger.info(f'Will write trained model to {target_dir}')
     stats_file = target_dir / 'stats.json'
     model_target = target_dir / 'model'
+    model_target.mkdir(parents=True, exist_ok=True)
 
     if stats_file.exists():
         logger.warning(f'Output directory {target_dir} already exists.')
