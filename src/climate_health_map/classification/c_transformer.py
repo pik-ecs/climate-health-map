@@ -168,21 +168,6 @@ class TransformerClassifier:
         self.test_split = test_split
         self.dataset = dataset
 
-    @classmethod
-    def ensure_offline_models(cls, models: list[str] | None = None):
-        from huggingface_hub import snapshot_download
-
-        models = models or cls.DEFAULT_MODELS
-
-        for model in models:
-            logger.info(f'Downloading model: {model} so it is available offline in {model_data_path}')
-            snapshot_download(
-                repo_id=model,
-                repo_type='model',
-                cache_dir=model_data_path,
-                force_download=False,
-            )
-
     def args(
         self,
         trial: Trial | None = None,
@@ -342,3 +327,11 @@ class TransformerClassifier:
         model = AutoModelForSequenceClassification.from_pretrained(source, cache_dir=model_data_path, num_labels=2, ignore_mismatched_sizes=True)
 
         return cls(instance=model)
+
+
+MODELS_TRANS = {
+    'CLIMATEBERT': 'climatebert/distilroberta-base-climate-f',
+    'SCIBERT': 'allenai/scibert_scivocab_uncased',
+    'TINYBERT': 'prajjwal1/bert-tiny',
+    # TODO: Maybe add 'malteos/scincl', 'distilbert-base',
+}

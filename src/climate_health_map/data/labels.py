@@ -1,8 +1,17 @@
+from enum import Enum
 from typing import Literal
 
 from pydantic import BaseModel, Field
 from colorsys import rgb_to_hls
 from climate_health_map.shared.colours import hsv_to_hex, hsv_to_rgb
+
+
+class Collection(str, Enum):
+    MAJOR = 'MAJOR'  # Anything annotated under the "major climate category" scheme
+    IMPACTS = 'IMPACTS'  # Anything annotated under the impacts scheme
+    TOPICS = 'TOPICS'  # Topic models
+    EXTERNAL = 'EXTERNAL'  # External huggingface classifiers (no training data here)
+    OTHER = 'OTHER'  # Any meta-labels, e.g. geographics
 
 
 class _Label(BaseModel):
@@ -57,14 +66,21 @@ class Group(_Label):
     key: str
     nacsos_key: str | None = None
     type: Literal['single', 'bool', 'multi', 'str']
+    collection: Collection
     labels: list[Label]
 
     def __str__(self):
         return f'{self.key} ({self.nacsos_key}) | {self.type} -> {[lab.column for lab in self.labels]}'
 
 
+class HfGroup(Group):
+    model: str
+    token_model: str = 'climatebert/distilroberta-base-climate-f'
+
+
 LABELS = {
     'rel_major': Group(
+        collection=Collection.MAJOR,
         key='rel_major',
         nacsos_key='relevant',
         name='Relevant',
@@ -90,6 +106,7 @@ LABELS = {
         ],
     ),
     'cat': Group(
+        collection=Collection.MAJOR,
         key='cat',
         nacsos_key='climateCategory',
         name='Category',
@@ -102,6 +119,7 @@ LABELS = {
         ],
     ),
     'type': Group(
+        collection=Collection.MAJOR,
         key='type',
         nacsos_key='Resourcetype',
         name='Resource type',
@@ -145,6 +163,7 @@ LABELS = {
         ],
     ),
     'cont': Group(
+        collection=Collection.OTHER,
         key='cont',
         name='Continent',
         type='multi',
@@ -160,6 +179,7 @@ LABELS = {
         ],
     ),
     'rel_impacts': Group(
+        collection=Collection.IMPACTS,
         key='rel_impacts',
         nacsos_key='relevant',
         name='Relevant (impacts)',
@@ -185,6 +205,7 @@ LABELS = {
         ],
     ),
     'driver': Group(
+        collection=Collection.IMPACTS,
         key='driver',
         nacsos_key='climateDrivers',
         name='Climate drivers',
@@ -210,6 +231,7 @@ LABELS = {
         ],
     ),
     'event': Group(
+        collection=Collection.IMPACTS,
         key='event',
         nacsos_key='extremeEvent',
         name='Extreme event',
@@ -227,6 +249,7 @@ LABELS = {
         ],
     ),
     'health': Group(
+        collection=Collection.IMPACTS,
         key='health',
         nacsos_key='impactsHealth',
         name='Health impacts',
@@ -291,6 +314,7 @@ LABELS = {
         ],
     ),
     'expose': Group(
+        collection=Collection.IMPACTS,
         key='expose',
         nacsos_key='Exposuretype',
         name='Exposure',
@@ -318,6 +342,7 @@ LABELS = {
         ],
     ),
     'attr': Group(
+        collection=Collection.IMPACTS,
         key='attr',
         nacsos_key='Atrributiontype',
         name='Attribution type',
@@ -368,6 +393,7 @@ LABELS = {
         ],
     ),
     'gender_outcome': Group(
+        collection=Collection.IMPACTS,
         key='gender_outcome',
         nacsos_key='GenderOutcomes',
         name='Gener-related outcomes',
@@ -391,6 +417,7 @@ LABELS = {
         ],
     ),
     'notes_major': Group(
+        collection=Collection.MAJOR,
         key='notes_major',
         nacsos_key='Notes',
         name='Notes (major)',
@@ -399,6 +426,7 @@ LABELS = {
         labels=[],
     ),
     'notes_impacts': Group(
+        collection=Collection.IMPACTS,
         key='notes_impacts',
         nacsos_key='notes',
         name='Notes (impacts)',
@@ -406,7 +434,68 @@ LABELS = {
         colour=(0, 0, 0),
         labels=[],
     ),
+    'sector': HfGroup(
+        collection=Collection.EXTERNAL,
+        model='evidence-for-climate-solutions/climatebert-policyinstruments-sector',
+        key='sector',
+        nacsos_key=None,
+        name='Sector',
+        type='multi',
+        colour=(0, 0, 0),
+        labels=[
+            Label(
+                column='sector|0',
+                value=0,
+                name='AFOLU',
+                colour=(0, 0, 0),
+                parent='sector',
+            ),
+            Label(
+                column='sector|1',
+                value=1,
+                name='Buildings',
+                colour=(0, 0, 0),
+                parent='sector',
+            ),
+            Label(
+                column='sector|2',
+                value=2,
+                name='Industry',
+                colour=(0, 0, 0),
+                parent='sector',
+            ),
+            Label(
+                column='sector|3',
+                value=3,
+                name='Energy',
+                colour=(0, 0, 0),
+                parent='sector',
+            ),
+            Label(
+                column='sector|4',
+                value=4,
+                name='Transport',
+                colour=(0, 0, 0),
+                parent='sector',
+            ),
+            Label(
+                column='sector|5',
+                value=5,
+                name='Waste',
+                colour=(0, 0, 0),
+                parent='sector',
+            ),
+            Label(
+                column='sector|6',
+                value=6,
+                name='Cross-sectoral',
+                colour=(0, 0, 0),
+                parent='sector',
+            ),
+        ],
+    ),
     'topic': Group(
+        collection=Collection.TOPICS,
         key='topic',
         name='Topic',
         type='multi',
@@ -1325,6 +1414,7 @@ LABELS = {
         ],
     ),
     'topic-agg': Group(
+        collection=Collection.TOPICS,
         key='topic-agg',
         name='Meta-topic',
         type='multi',
@@ -1543,6 +1633,7 @@ LABELS = {
         ],
     ),
     'topic-agg-agg': Group(
+        collection=Collection.TOPICS,
         key='topic-agg-agg',
         name='Aggregated meta-topic',
         type='multi',
@@ -1668,19 +1759,10 @@ COLUMN_GROUP: dict[str, list[str]] = {label.column: GROUP_COLUMNS[label.parent] 
 # column to Label lookup
 LABELS_LOOKUP: dict[str, Label | Topic | AggTopic | AggAggTopic] = {label.column: label for group in LABELS.values() for label in group.labels}
 
-LABELS_MAJOR = ['rel_major', 'cat', 'type']
-LABELS_IMPACTS = [
-    'rel_impacts',
-    'driver',
-    'event',
-    'health',
-    'expose',
-    'attr',
-    'gender_outcome',
-]
-LABELS_TOPICS = ['topic', 'topic-agg', 'topic-agg-agg']
-# cont
-# 'notes_major', 'notes_impacts'
+LABELS_MAJOR = [key for key, group in LABELS.items() if group.collection == Collection.MAJOR and group.type != 'str']
+LABELS_IMPACTS = [key for key, group in LABELS.items() if group.collection == Collection.IMPACTS and group.type != 'str']
+LABELS_TOPICS = [key for key, group in LABELS.items() if group.collection == Collection.TOPICS]
+
 
 COLUMNS_MAJOR = {label.column for key in LABELS_MAJOR for label in LABELS[key].labels}
 COLUMNS_IMPACTS = {label.column for key in LABELS_IMPACTS for label in LABELS[key].labels}
@@ -1695,6 +1777,7 @@ __all__ = [
     'COLUMNS_MAJOR',
     'COLUMN_GROUP',
     'Group',
+    'HfGroup',
     'Label',
     'Topic',
     'AggTopic',

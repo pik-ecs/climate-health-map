@@ -1,10 +1,18 @@
 import logging
-from typing import Generator, Any, TYPE_CHECKING, Callable, Union
+from typing import Generator, Any, Callable, Union
 import pandas as pd
 
-if TYPE_CHECKING:
-    from sklearn.base import ClassifierMixin
-    from .c_transformer import TransformerClassifier
+from sklearn.base import ClassifierMixin
+from .c_traditional import (
+    NaiveBayesClassifier,
+    RegressionClassifier,
+    SVMClassifier,
+    RandomForestClassifier,
+    IsolationForestClassifier,
+    SGDClassifier,
+    LightGBMClassifier,
+)
+from .c_transformer import MODELS_TRANS, TransformerClassifier
 
 
 def it_models(  # noqa: C901
@@ -21,11 +29,8 @@ def it_models(  # noqa: C901
 ) -> Generator[tuple[str, Union['TransformerClassifier', 'ClassifierMixin']], None, None]:
     if logger is None:
         logger = logging.getLogger('classify-iterator')
-    if models is None:
-        models = [
-            'TINYBERT',
-            'CLIMATEBERT',
-        ]
+
+    models = models or ['TINYBERT', 'CLIMATEBERT']
     try:
         import torch
 
@@ -39,49 +44,36 @@ def it_models(  # noqa: C901
     except:  # noqa: E722
         memory_factor = 1.0
 
-    def cbert():
-        from .c_transformer import TransformerClassifier
-
-        return TransformerClassifier(
+    CONFIGS: dict[str, Callable[[], Union['TransformerClassifier', 'ClassifierMixin']]] = {
+        'CLIMATEBERT': lambda: TransformerClassifier(
             dataset=dataset,
             model_params=model_params,
             min_batch_size=2,
             max_batch_size=int(6 * memory_factor),
-            models=['climatebert/distilroberta-base-climate-f'],
+            models=[MODELS_TRANS['CLIMATEBERT']],
             tuning_trials=n_tuning_trials if n_tuning_trials is not None else 20,
             test_split=0.1,
-        )
-
-    def sbert():
-        from .c_transformer import TransformerClassifier
-
-        return TransformerClassifier(
+        ),
+        'SCIBERT': lambda: TransformerClassifier(
             dataset=dataset,
             model_params=model_params,
             min_batch_size=2,
             max_batch_size=int(6 * memory_factor),
-            models=['allenai/scibert_scivocab_uncased'],
+            models=[MODELS_TRANS['SCIBERT']],
             tuning_trials=n_tuning_trials if n_tuning_trials is not None else 20,
             test_split=0.1,
-        )
-
-    def tbert():
-        from .c_transformer import TransformerClassifier
-
-        return TransformerClassifier(
+        ),
+        'TINYBERT': lambda: TransformerClassifier(
             dataset=dataset,
             model_params=model_params,
             min_batch_size=2,
             max_batch_size=int(10 * memory_factor),
-            models=['prajjwal1/bert-tiny'],
+            models=[MODELS_TRANS['TINYBERT']],
             tuning_trials=n_tuning_trials if n_tuning_trials is not None else 20,
             test_split=0.1,
-        )
-
-    def reg():
-        from .c_traditional import RegressionClassifier
-
-        return RegressionClassifier(
+        ),
+        # TODO: Maybe add 'malteos/scincl', 'distilbert-base',
+        'REG': lambda: RegressionClassifier(
             dataset=dataset,
             model_params=model_params,
             tuning_trials=n_tuning_trials if n_tuning_trials is not None else 50,
@@ -90,12 +82,8 @@ def it_models(  # noqa: C901
             ngram_range=(1, max_ngram),
             min_df=min_df,
             max_df=max_df,
-        )
-
-    def svm():
-        from .c_traditional import SVMClassifier
-
-        return SVMClassifier(
+        ),
+        'SVM': lambda: SVMClassifier(
             dataset=dataset,
             model_params=model_params,
             tuning_trials=n_tuning_trials if n_tuning_trials is not None else 50,
@@ -104,12 +92,8 @@ def it_models(  # noqa: C901
             ngram_range=(1, max_ngram),
             min_df=min_df,
             max_df=max_df,
-        )
-
-    def lgbm():
-        from .c_traditional import LightGBMClassifier
-
-        return LightGBMClassifier(
+        ),
+        'LGBM': lambda: LightGBMClassifier(
             dataset=dataset,
             model_params=model_params,
             tuning_trials=n_tuning_trials if n_tuning_trials is not None else 50,
@@ -118,12 +102,8 @@ def it_models(  # noqa: C901
             ngram_range=(1, max_ngram),
             min_df=min_df,
             max_df=max_df,
-        )
-
-    def sgd():
-        from .c_traditional import SGDClassifier
-
-        return SGDClassifier(
+        ),
+        'SGD': lambda: SGDClassifier(
             dataset=dataset,
             model_params=model_params,
             tuning_trials=n_tuning_trials if n_tuning_trials is not None else 50,
@@ -132,40 +112,8 @@ def it_models(  # noqa: C901
             ngram_range=(1, max_ngram),
             min_df=min_df,
             max_df=max_df,
-        )
-
-    def forest():
-        from .c_traditional import IsolationForestClassifier
-
-        return IsolationForestClassifier(
-            dataset=dataset,
-            model_params=model_params,
-            tuning_trials=n_tuning_trials if n_tuning_trials is not None else 50,
-            n_jobs=n_tuning_jobs,
-            max_features=max_vocab,
-            ngram_range=(1, max_ngram),
-            min_df=min_df,
-            max_df=max_df,
-        )
-
-    def rforest():
-        from .c_traditional import RandomForestClassifier
-
-        return RandomForestClassifier(
-            dataset=dataset,
-            model_params=model_params,
-            tuning_trials=n_tuning_trials if n_tuning_trials is not None else 50,
-            n_jobs=n_tuning_jobs,
-            max_features=max_vocab,
-            ngram_range=(1, max_ngram),
-            min_df=min_df,
-            max_df=max_df,
-        )
-
-    def nb():
-        from .c_traditional import NaiveBayesClassifier
-
-        return NaiveBayesClassifier(
+        ),
+        'NB': lambda: NaiveBayesClassifier(
             dataset=dataset,
             model_params=model_params,
             tuning_trials=n_tuning_trials if n_tuning_trials is not None else 1,
@@ -174,20 +122,27 @@ def it_models(  # noqa: C901
             ngram_range=(1, max_ngram),
             min_df=min_df,
             max_df=max_df,
-        )
-
-    CONFIGS: dict[str, Callable[[], Union['TransformerClassifier', 'ClassifierMixin']]] = {
-        'CLIMATEBERT': cbert,
-        'SCIBERT': sbert,
-        'TINYBERT': tbert,
-        # TODO: Maybe add 'malteos/scincl', 'distilbert-base',
-        'REG': reg,
-        'SVM': svm,
-        'LGBM': lgbm,
-        'SGD': sgd,
-        'NB': nb,
-        'ISOFOREST': forest,
-        'RANDOMFOREST': rforest,
+        ),
+        'ISOFOREST': lambda: IsolationForestClassifier(
+            dataset=dataset,
+            model_params=model_params,
+            tuning_trials=n_tuning_trials if n_tuning_trials is not None else 50,
+            n_jobs=n_tuning_jobs,
+            max_features=max_vocab,
+            ngram_range=(1, max_ngram),
+            min_df=min_df,
+            max_df=max_df,
+        ),
+        'RANDOMFOREST': lambda: RandomForestClassifier(
+            dataset=dataset,
+            model_params=model_params,
+            tuning_trials=n_tuning_trials if n_tuning_trials is not None else 50,
+            n_jobs=n_tuning_jobs,
+            max_features=max_vocab,
+            ngram_range=(1, max_ngram),
+            min_df=min_df,
+            max_df=max_df,
+        ),
     }
 
     logger.info(f'Will iterate models: {models}')

@@ -9,7 +9,8 @@ from climate_health_map.data.labels import LABELS_LOOKUP
 from climate_health_map.shared import get_logger
 from climate_health_map.data import Group, get_filtered_labels
 from climate_health_map.shared.types import OnConflict
-from .util import ensure_offline_nltk, ensure_offline_transformers, MODELS_TRANS, MODELS_TRAD, get_best_infos, ensure_directories
+from .util import ensure_offline_nltk, ensure_offline_transformers, MODELS_TRANS, get_best_infos, ensure_directories
+from .c_traditional import MODELS_TRAD
 
 logger = logging.getLogger('slurm-prep')
 app = typer.Typer(no_args_is_help=True)
@@ -119,7 +120,7 @@ def _ensure_offline_models(ensure_models_offline: bool, models_path: Path) -> No
     if not ensure_models_offline:
         return
     logger.info('Making sure all models are available offline!')
-    ensure_offline_transformers(model_data_path=models_path, logger=logger)
+    ensure_offline_transformers(model_data_path=models_path, logger=logger, include_extras=True)
 
     logger.info('Making sure NLTK is available offline!')
     ensure_offline_nltk(target_dir=models_path / 'nltk_data', logger=logger)

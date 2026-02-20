@@ -219,7 +219,7 @@ class SVMClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame,
+        dataset: pd.DataFrame | None = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,
@@ -263,7 +263,7 @@ class SGDClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame,
+        dataset: pd.DataFrame | None = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,
@@ -304,7 +304,7 @@ class RegressionClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame,
+        dataset: pd.DataFrame | None = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,
@@ -353,7 +353,7 @@ class RandomForestClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame,
+        dataset: pd.DataFrame | None = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,
@@ -403,7 +403,7 @@ class IsolationForestClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame,
+        dataset: pd.DataFrame | None = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,
@@ -456,7 +456,7 @@ class NaiveBayesClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame,
+        dataset: pd.DataFrame | None = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,
@@ -503,7 +503,7 @@ class LightGBMClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame,
+        dataset: pd.DataFrame | None = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,
@@ -562,3 +562,14 @@ class LightGBMClassifier(_SimpleClassification):
             'reg_lambda': trial.suggest_float('reg_alpha', 0.0, 1.0),
             'downsampling': trial.suggest_float('downsampling', low=0.0, high=0.95),
         }
+
+
+MODELS_TRAD = {
+    'REG': RegressionClassifier,
+    'SVM': SVMClassifier,
+    'LGBM': LightGBMClassifier,
+    'SGD': SGDClassifier,
+    'NB': NaiveBayesClassifier,
+    'ISOFOREST': IsolationForestClassifier,
+    'RANDOMFOREST': RandomForestClassifier,
+}

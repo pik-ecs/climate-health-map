@@ -50,7 +50,7 @@ uv run --no-sources --extra classify --prerelease=allow healthmap slurm-tune-scr
     --on-exists="IGNORE"
 ```
 
-# Classifier quality summary (optional)
+## Tuning quality summary (optional)
 TODO: elaborate what this produces and how to interpret outputs
 ```bash
 rsync -avh --progress -e ssh foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/tuning data/
@@ -61,6 +61,7 @@ uv run healthmap tuning-quality --source=data/tuning --target=quality/tuning
 # Training
 TODO: elaborate on what this does, requires, and produces
 ```bash
+# prepare job scripts
 uv run --no-sources --extra classify --prerelease=allow healthmap slurm-train-scripts \
     --training-data="../data/exports/annotations_20260213.csv" \
     --tuning-dir="../data/tuning" \
@@ -76,89 +77,34 @@ uv run --no-sources --extra classify --prerelease=allow healthmap slurm-train-sc
     --ensure-models-offline \
     --loglevel="DEBUG" \
     --on-exists="IGNORE"
+
+# submit jobs
+sbatch train-trans.slurm
+sbatch train-trad.slurm
+```
+
+## k-fold evaluation (optional)
+```bash
+# download to local dir (optional)
+rsync -avh --progress --include='*.json' --include='*/' --exclude='*' -e ssh foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/trained data/
 ```
 
 # Classification
 TODO: NACSOS missing classification exporter
 TODO: run classification
 
-# SLURM
-TODO: notes on slurm
 
 # Persisting predictions to NACSOS
 TODO: push classifications upstream to platform
 
+# Additional classifiers
+We also have our [policy instruments sector](https://huggingface.co/evidence-for-climate-solutions/climatebert-policyinstruments-sector) classifier on huggingface.
+This is loaded separately and applied.
 
-
-# Below is deprecated!!!
-# Below is deprecated!!!
-# Below is deprecated!!!
-# Below is deprecated!!!
-# Below is deprecated!!!
-# Below is deprecated!!!
-# Below is deprecated!!!
-```bash
-
-export PYTHONPATH=.:$PYTHONPATH && python S02_Classify/classify.py --help
-
-
-export PYTHONPATH=.:$PYTHONPATH && python S02_Classify/classify.py \                                                                                     :(
-    --training-data data/00_TrainingData/original_converted/annotations.csv \
-    --predict-data data/03_Predictions/dataset.csv \
-    --target-dir data/03_Predictions/ \
-    --column Agroforestry \
-    --model TINYBERT
-
-```
-
-## Set up on cluster
+# Some SLURM tips
+TODO: elaborate
 
 ```bash
-# copy data to cluster
-scp data/dataset_nacsos.csv foote:/p/tmp/timrepke/living-cdr-map/data/
-scp -r data/00_TrainingData/ foote:/p/tmp/timrepke/living-cdr-map/data/
-scp -r data/03_Predictions/ foote:/p/tmp/timrepke/living-cdr-map/data/
-# or
-rsync -avh --progress -e ssh  data/00_TrainingData/ foote:/p/tmp/timrepke/living-cdr-map/data/00_TrainingData/ 
-
-# copy data from cluster
-scp -r foote:/p/tmp/timrepke/living-cdr-map/data/03_Predictions data/
-scp -r foote:/p/tmp/timrepke/living-cdr-map/data/00_TrainingData data/
-
-# sync data from cluster
-rsync -avh --progress -e ssh  foote:/p/tmp/timrepke/living-cdr-map/data/03_Predictions data/
-# sync data to VM or rechner 
-rsync -avh --progress -e ssh  data/03_Predictions rept@10.10.13.45:/home/rept/workspace/living-cdr-map/data/
-rsync -avh --progress -e ssh  data/03_Predictions rept@10.10.12.41:/home/rept/workspace/living-cdr-map/data/
-```
-
-```bash
-ssh user@hpc
-# ---
-cd /p/tmp/[username]
-git clone git@gitlab.pik-potsdam.de:mcc-apsis/living-evidence-maps/cdr-map/living-cdr-map.git
-module load anaconda/2025
-cd living-cdr-map
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-export PYTHONPATH=$PYTHONPATH:.
-
-python S02_Classify/classify_slurm.py \
-    --training-data "data/00_TrainingData/original_converted/annotations.csv" \
-    --predict-data "data/dataset_nacsos.csv" \
-    --target-dir "data/03_Predictions" \
-    --models-path "data/models" \
-    --venv-path "venv" \
-    --log-path "data/logs" \
-    --on-exists "SKIP" \
-    --slurm-user "your.address@pik-potsdam.de"
- # OR THIS: --training-data "data/00_TrainingData/original_converted/annotations_extended.csv" \ 
-
-# Submit
-sbatch S02_Classify/classify-gpu.slurm
-sbatch S02_Classify/classify-cpu.slurm
-
 # Check progress
 squeue --me -t all
 squeue --job [jobid]

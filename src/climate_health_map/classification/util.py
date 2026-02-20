@@ -5,28 +5,17 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import precision_score, recall_score, f1_score
-
-MODELS_TRAD = {
-    'SVM',
-    'REG',
-    'SGD',
-    'LGBM',
-    'NB',
-    'ISOFOREST',
-    'RANDOMFOREST',
-}
-MODELS_TRANS = {
-    'CLIMATEBERT': 'climatebert/distilroberta-base-climate-f',
-    'SCIBERT': 'allenai/scibert_scivocab_uncased',
-    'TINYBERT': 'prajjwal1/bert-tiny',
-}
 
 
-def ensure_offline_transformers(model_data_path: Path, logger: logging.Logger) -> None:
+def ensure_offline_transformers(model_data_path: Path, logger: logging.Logger, include_extras: bool = True) -> None:
+    # importing here for performance
     from huggingface_hub import snapshot_download
+    from climate_health_map.data.labels import LABELS, HfGroup
+    from climate_health_map.classification.c_transformer import MODELS_TRANS
 
-    for key, name in MODELS_TRANS.items():
+    extras = {key: group.model for key, group in LABELS.items() if type(group) is HfGroup} if include_extras else {}
+
+    for key, name in (MODELS_TRANS | extras).items():
         logger.info(f'Downloading model: {key} ({name}) so it is available offline in {model_data_path}')
         snapshot_download(
             repo_id=name,
@@ -90,6 +79,9 @@ def get_prediction_stats(
     train_idxs: list[int],
     threshold: float = 0.5,
 ) -> tuple[pd.DataFrame, dict[str, float]]:
+    # importing here for performance
+    from sklearn.metrics import precision_score, recall_score, f1_score
+
     ds = dataset.copy().drop(columns=['text'])
     ds['score'] = y_pred
 
