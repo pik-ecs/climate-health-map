@@ -1,18 +1,11 @@
 import logging
-from typing import Generator, Any, Callable, Union
+from typing import Generator, Any, Callable, Union, TYPE_CHECKING
 import pandas as pd
 
 from sklearn.base import ClassifierMixin
-from .c_traditional import (
-    NaiveBayesClassifier,
-    RegressionClassifier,
-    SVMClassifier,
-    RandomForestClassifier,
-    IsolationForestClassifier,
-    SGDClassifier,
-    LightGBMClassifier,
-)
-from .c_transformer import MODELS_TRANS, TransformerClassifier
+
+if TYPE_CHECKING:
+    from .c_transformer import TransformerClassifier
 
 
 def it_models(  # noqa: C901
@@ -27,6 +20,17 @@ def it_models(  # noqa: C901
     model_params: dict[str, Any] | None = None,
     logger: logging.Logger | None = None,
 ) -> Generator[tuple[str, Union['TransformerClassifier', 'ClassifierMixin']], None, None]:
+    from .c_traditional import (
+        NaiveBayesClassifier,
+        RegressionClassifier,
+        SVMClassifier,
+        RandomForestClassifier,
+        IsolationForestClassifier,
+        SGDClassifier,
+        LightGBMClassifier,
+    )
+    from .c_transformer import MODELS_TRANS, TransformerClassifier
+
     if logger is None:
         logger = logging.getLogger('classify-iterator')
 

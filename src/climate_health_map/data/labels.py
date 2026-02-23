@@ -36,11 +36,15 @@ class _Label(BaseModel):
     shade1_hls: tuple[float, float, float] = Field(lambda data: rgb_to_hls(*data['shade1_rgb']))
     shade2_hls: tuple[float, float, float] = Field(lambda data: rgb_to_hls(*data['shade2_rgb']))
 
+    # Should this group or label be included on the literature hub
+    incl_lithub: bool = True
+
 
 class Label(_Label):
     parent: str  # Group name (typically Group.key)
     value: int  # label value (e.g. technology = 1)
     column: str  # Column in the database (typically {parent}|{value})
+    hf_name: str | None = None  # corresponding name in huggingface model (from `label2id` field)
 
 
 class Topic(Label):
@@ -75,6 +79,7 @@ class Group(_Label):
 
 class HfGroup(Group):
     model: str
+    normalisation: str = 'softmax'
     token_model: str = 'climatebert/distilroberta-base-climate-f'
 
 
@@ -447,6 +452,7 @@ LABELS = {
                 column='sector|0',
                 value=0,
                 name='AFOLU',
+                hf_name='8 - 01. AFOLU',
                 colour=(0, 0, 0),
                 parent='sector',
             ),
@@ -454,6 +460,7 @@ LABELS = {
                 column='sector|1',
                 value=1,
                 name='Buildings',
+                hf_name='8 - 02. Buildings',
                 colour=(0, 0, 0),
                 parent='sector',
             ),
@@ -461,6 +468,7 @@ LABELS = {
                 column='sector|2',
                 value=2,
                 name='Industry',
+                hf_name='8 - 03. Industry',
                 colour=(0, 0, 0),
                 parent='sector',
             ),
@@ -468,6 +476,7 @@ LABELS = {
                 column='sector|3',
                 value=3,
                 name='Energy',
+                hf_name='8 - 04. Energy',
                 colour=(0, 0, 0),
                 parent='sector',
             ),
@@ -475,6 +484,7 @@ LABELS = {
                 column='sector|4',
                 value=4,
                 name='Transport',
+                hf_name='8 - 05. Transport',
                 colour=(0, 0, 0),
                 parent='sector',
             ),
@@ -482,6 +492,7 @@ LABELS = {
                 column='sector|5',
                 value=5,
                 name='Waste',
+                hf_name='8 - 06. Waste',
                 colour=(0, 0, 0),
                 parent='sector',
             ),
@@ -489,6 +500,7 @@ LABELS = {
                 column='sector|6',
                 value=6,
                 name='Cross-sectoral',
+                hf_name='8 - 15. Cross-sectoral',
                 colour=(0, 0, 0),
                 parent='sector',
             ),

@@ -9,7 +9,7 @@ def main():
     _logger = get_logger('slurm-prep', run_log_init=True, loglevel='DEBUG')
     app = typer.Typer(no_args_is_help=True)
 
-    app.add_typer(export_app)
-    app.add_typer(classifier_app)
+    app.add_typer(export_app, name='export')
+    app.add_typer(classifier_app, name='classification')
 
     app()

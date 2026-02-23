@@ -14,6 +14,7 @@ def ensure_offline_transformers(model_data_path: Path, logger: logging.Logger, i
     from climate_health_map.classification.c_transformer import MODELS_TRANS
 
     extras = {key: group.model for key, group in LABELS.items() if type(group) is HfGroup} if include_extras else {}
+    extras |= {f'{key}-token': group.token_model for key, group in LABELS.items() if type(group) is HfGroup} if include_extras else {}
 
     for key, name in (MODELS_TRANS | extras).items():
         logger.info(f'Downloading model: {key} ({name}) so it is available offline in {model_data_path}')

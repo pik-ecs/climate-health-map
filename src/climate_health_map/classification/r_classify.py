@@ -1,32 +1,43 @@
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Annotated
 
-import numpy as np
 import typer
+import numpy as np
 import pandas as pd
 
-from climate_health_map import get_logger
 from climate_health_map.shared.types import OnConflict
 from climate_health_map.data.labels import Label, LABELS, HfGroup
-from .c_transformer import MODELS_TRANS
-from .c_traditional import MODELS_TRAD
 
 
-def classify_huggingface(data: pd.DataFrame, group: HfGroup, logger: logging.Logger) -> pd.DataFrame:
+def classify_huggingface(data: pd.DataFrame, group: HfGroup, cache_dir: Path, logger: logging.Logger) -> pd.DataFrame:
+    import torch
     from transformers import TextClassificationPipeline, AutoTokenizer, AutoModelForSequenceClassification
 
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
     logger.info('Loading tokenizer')
-    tokenizer = AutoTokenizer.from_pretrained(group.token_model, model_max_length=512)
+    tokenizer = AutoTokenizer.from_pretrained(group.token_model, model_max_length=512, cache_dir=cache_dir)
     logger.info('Loading model')
     model = AutoModelForSequenceClassification.from_pretrained(group.model)
     logger.info('Constructing pipe')
-    pipe = TextClassificationPipeline(model=model, tokenizer=tokenizer, truncation=True, top_k=None, function_to_apply='softmax')
-    # TODO: model to gpu
-    _res = pipe('Carbon pricing is thought of as an economically efficient policy to reduce GHG emissions')  # FIXME
-    # TODO: result to cpu
-    # TODO: construct dataframe with id index from input and column from group
+    pipe = TextClassificationPipeline(model=model, tokenizer=tokenizer, truncation=True, top_k=None, function_to_apply=group.normalisation, device=device)
+
+    logger.info('Constructing label->column lookup')
+    label_map = {label.hf_name: label.column for label in group.labels}
+    logger.warning(f'Label mismatch: {set(model.config.label2id) - set(label_map)}  (OK when empty; shows labels in HF model missing in configured labels)')
+    logger.warning(f'Label mismatch: {set(label_map) - set(model.config.label2id)}  (OK when empty; shows configured labels missing in HF model -> BAD!)')
+
+    logger.info('Classifying in batches')
+    y_pred: list[list[dict[str, str | float]]] = pipe(data['text'].tolist(), batch_size=32)
+    return pd.DataFrame(
+        [
+            {'item_id': idx} | {label_map[lab['label']]: lab['score'] for lab in pred if lab['label'] in label_map}
+            for idx, pred in zip(data.index, y_pred, strict=True)
+        ]
+    ).set_index('item_id')
 
 
 def classify_local(texts: list[str], label: Label, models_dir: Path, on_missing_model: OnConflict, logger: logging.Logger) -> np.ndarray | None:
@@ -41,6 +52,9 @@ def classify_local(texts: list[str], label: Label, models_dir: Path, on_missing_
 
     with open(stats_file) as f_in:
         info = json.load(f_in)
+
+    from .c_transformer import MODELS_TRANS
+    from .c_traditional import MODELS_TRAD
 
     models = MODELS_TRANS | MODELS_TRAD
     if info['model'] not in models:
@@ -57,10 +71,13 @@ def classify(
     target: Annotated[Path, typer.Option(help='Path to write classifications to')],
     group: Annotated[str, typer.Option(help='Label/classifier to predict (group name)')],
     models_dir: Annotated[Path, typer.Option(help='Path to trained models (not the huggingface `OFFLINE_MODEL_PATH`!)')],
+    cache_dir: Annotated[Path | None, typer.Option(help='Optional to override OFFLINE_MODEL_PATH')] = None,
     on_exists: Annotated[OnConflict, typer.Option(help='How to behave when the target file already exists')] = OnConflict.IGNORE,
     on_missing_model: Annotated[OnConflict, typer.Option(help="How to behave when we don't have a model for this column")] = OnConflict.IGNORE,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ):
+    from climate_health_map import get_logger
+
     logger = get_logger('classify', loglevel=loglevel, run_log_init=True)
     label_group = LABELS[group]
     logger.info(f'Found requested label group: {label_group}')
@@ -70,14 +87,21 @@ def classify(
     if target.exists() and on_exists == OnConflict.SKIP:
         logger.warning(f'Output already exists at {target}')
         return
+    if cache_dir is None:
+        cd = os.getenv('OFFLINE_MODEL_PATH')
+        if cd is None:
+            raise AssertionError('You should either set the `OFFLINE_MODEL_PATH` environment variable or the `--cache-dir` argument')
+        cache_dir = Path(cd)
 
     df_source = pd.read_csv(source)
     if 'item_id' in df_source.columns:
         df_source.set_index('item_id', inplace=True)
+    if 'text' not in df_source.columns:
+        df_source['text'] = df_source.apply(lambda row: f'{row["title"] or ""} {row["abstract"] or ""}', axis=1)
 
     if type(label_group) is HfGroup:
         logger.info('Going to use huggingface model for classification.')
-        df_res = classify_huggingface(None, group=label_group, logger=logger)
+        df_res = classify_huggingface(df_source, group=label_group, cache_dir=cache_dir, logger=logger)
     else:
         logger.info('Will iterate internal models for classification.')
         results = {'item_id': df_source.index}
@@ -88,9 +112,9 @@ def classify(
 
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.suffix == '.csv':
-        df_res.to_csv(target)
+        df_res.reset_index().to_csv(target, index=False)
     elif target.suffix == '.feather':
-        df_res.to_feather(target)
+        df_res.reset_index().to_feather(target, index=False)
     else:
         raise ValueError(f'Unsupported output file type: {target.suffix}')
     logger.info(f'Wrote to {target}')

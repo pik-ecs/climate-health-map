@@ -9,8 +9,7 @@ from climate_health_map.data.labels import LABELS_LOOKUP
 from climate_health_map.shared import get_logger
 from climate_health_map.data import Group, get_filtered_labels
 from climate_health_map.shared.types import OnConflict
-from .util import ensure_offline_nltk, ensure_offline_transformers, MODELS_TRANS, get_best_infos, ensure_directories
-from .c_traditional import MODELS_TRAD
+from .util import ensure_offline_nltk, ensure_offline_transformers, get_best_infos, ensure_directories
 
 logger = logging.getLogger('slurm-prep')
 app = typer.Typer(no_args_is_help=True)
@@ -198,6 +197,8 @@ def prepare_tuning_slurm(
         logger=logger, venv_path=(venv_path, True), log_path=log_path, models_path=models_path, target_dir=target_dir, training_data=(training_data, True)
     )
     _ensure_offline_models(ensure_models_offline=ensure_models_offline, models_path=models_path)
+    from .c_transformer import MODELS_TRANS
+    from .c_traditional import MODELS_TRAD
 
     logger.info('Preparing basic script parameters...')
     sbatch_args = _sbatch_args(slurm_user=slurm_user, slurm_hours=slurm_hours, log_path=log_path)
@@ -298,6 +299,9 @@ def prepare_training_slurm(
         training_data=(training_data, True),
         tuning_dir=(tuning_dir, True),
     )
+    from .c_transformer import MODELS_TRANS
+    from .c_traditional import MODELS_TRAD
+
     _ensure_offline_models(ensure_models_offline=ensure_models_offline, models_path=models_path)
 
     logger.info('Preparing basic script parameters...')
