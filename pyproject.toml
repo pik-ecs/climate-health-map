@@ -5,7 +5,7 @@ description = "Pipeline to keep the climate and health map up-to-date (mainly fo
 requires-python = ">=3.13"
 
 dependencies = [
-    "nacsos_data[utils,scripts] @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git@v0.24.24",
+    "nacsos_data[utils,scripts] @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git@v0.24.27",
     "xlsxwriter==3.2.9",
     "tabulate==0.9.0",
     "tqdm==4.67.3",
@@ -14,21 +14,16 @@ dependencies = [
 
 [project.optional-dependencies]
 classify = [
-    "transformers[torch]==4.57.6",
+    "transformers[torch]==4.57.6",  #  mordecai3==3.4.0 depends on transformers>=4.2.2,<5.0
     "datasets==4.5.0",
     "evaluate==0.4.6",
-    "accelerate==1.11.0",
+    "accelerate==1.12.0",
     "lightgbm==4.6.0",
-    "optuna==4.5.0",
+    "optuna==4.7.0",
     "nltk==3.9.2",
 ]
 extract = [
-   # "mordecai3",  # FIXME
-#   × No solution found when resolving dependencies for split (markers: python_full_version >= '3.14' and sys_platform == 'win32'):
-#  ╰─▶ Because climate-health-map[extract] depends on mordecai3 and only mordecai3==3.0.0a0 is available, we can conclude that climate-health-map[extract] depends on mordecai3==3.0.0a0.
-#      And because mordecai3==3.0.0a0 depends on pandas>=1.2.2,<2.0, we can conclude that climate-health-map[extract] depends on pandas>=1.2.2,<2.0.
-#      And because nacsos-data[utils]==0.24.24 depends on pandas[excel]==3.0.0 and only nacsos-data[utils]==0.24.24 is available, we can conclude that climate-health-map[extract] and all versions of nacsos-data[utils] are incompatible.
-#      And because your project depends on nacsos-data[utils] and your project requires climate-health-map[extract], we can conclude that your project's requirements are unsatisfiable.
+   "mordecai3==3.4.0",
 ]
 notebook = [
     "cartopy==0.25.0",
