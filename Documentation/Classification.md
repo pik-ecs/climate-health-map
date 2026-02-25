@@ -86,7 +86,7 @@ sbatch train-trad.slurm
 ## k-fold evaluation (optional)
 ```bash
 # download to local dir (optional)
-rsync -avh --progress --include='*.json' --include='*/' --exclude='*' -e ssh foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/trained data/
+rsync -avh --progress --include='stats.json' --include='*/' --exclude='*' -e ssh foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/trained data/
 ```
 
 # Classification

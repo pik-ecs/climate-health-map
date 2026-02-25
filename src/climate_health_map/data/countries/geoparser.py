@@ -6,7 +6,6 @@ import typer
 from tqdm import tqdm
 import sqlalchemy as sa
 
-from mordecai3 import Geoparser
 
 from climate_health_map.shared.env import essentials
 from nacsos_data.util import clear_empty
@@ -26,6 +25,7 @@ def mordecai(
     logger, settings, db_engine = essentials(config=config, loglevel=loglevel, logger_name='export', run_log_init=True)
 
     logger.info('Setting up geoparser...')
+    from mordecai3 import Geoparser
     geo = Geoparser(debug=verbose, hosts=hosts, port=port, device=device)
 
     if created_after:
