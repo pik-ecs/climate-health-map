@@ -115,3 +115,9 @@ tail -f data/logs/[jobid]_[array].err
 scancel --me
 scancel [jobid]
 ```
+
+
+```bash
+uv sync --no-sources-package nacsos_data --extra extract --extra classify
+uv run  --no-sources-package nacsos_data nacsos ...
+```
