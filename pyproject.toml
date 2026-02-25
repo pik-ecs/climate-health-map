@@ -40,8 +40,8 @@ prerelease = "allow"
 
 [tool.uv.sources]
 mordecai3 = { git = "git+https://github.com/ahalterman/mordecai3" }
-#nacsos_data = { git = "git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git", tag = "v0.24.24" }
 nacsos_data = { path = "../nacsos_data", editable = true }
+#nacsos_data = { git = "git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git", tag = "v0.24.24" }
 
 [project.scripts]
 healthmap = "climate_health_map:main"
@@ -53,7 +53,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "ruff>=0.14.11",
+    "ruff>=0.15.2",
 ]
 [tool.ruff]
 line-length = 160

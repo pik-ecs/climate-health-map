@@ -29,8 +29,9 @@ source venv/bin/activate
 pip install uv
 # ignore the warning, we want a separate environment!
 uv sync --no-sources --extra classify --prerelease=allow 
-source .venv/bin/activate
-uv run --no-sources --extra classify --prerelease=allow healthmap classify slurm-tune-scripts \
+#source .venv/bin/activate
+uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
+    healthmap classification slurm-tuning-scripts \
     --training-data="../data/exports/annotations_20260213.csv" \
     --target-dir="../data/tuning" \
     --models-path="../data/offline_models" \
@@ -62,7 +63,8 @@ uv run healthmap tuning-quality --source=data/tuning --target=quality/tuning
 TODO: elaborate on what this does, requires, and produces
 ```bash
 # prepare job scripts
-uv run --no-sources --extra classify --prerelease=allow healthmap classify slurm-train-scripts \
+uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
+    healthmap classification slurm-train-scripts \
     --training-data="../data/exports/annotations_20260213.csv" \
     --tuning-dir="../data/tuning" \
     --target-dir="../data/trained" \
