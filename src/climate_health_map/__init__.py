@@ -3,7 +3,8 @@ import typer
 from climate_health_map.data.export import app as export_app
 from climate_health_map.classification import app as classifier_app
 from climate_health_map.shared import get_logger
-from climate_health_map.data.countries.geoparser import mordecai
+from climate_health_map.data.geographies.geoparser import mordecai
+
 
 def main():
     _logger = get_logger('slurm-prep', run_log_init=True, loglevel='DEBUG')

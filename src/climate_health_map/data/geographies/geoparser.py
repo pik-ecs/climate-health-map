@@ -26,6 +26,7 @@ def mordecai(
 
     logger.info('Setting up geoparser...')
     from mordecai3 import Geoparser
+
     geo = Geoparser(debug=verbose, hosts=hosts, port=port, device=device)
 
     if created_after:

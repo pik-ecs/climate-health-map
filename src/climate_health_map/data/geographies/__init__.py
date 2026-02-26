@@ -22,10 +22,16 @@ from .continents import CONTINENT_MAP
 from .variations import country_names as COUNTRY_NORMALISATION
 
 here = Path(__file__).parent.resolve()
-countries = pd.read_csv(here / 'countries.csv', dtype=str).map(str.strip, na_action='ignore')
+
+def load_country_infos()->pd.DataFrame:
+    return pd.read_csv(here / '_countries.csv', dtype=str, keep_default_na=False).map(str.strip, na_action='ignore')
+
+def load_grid_data()->pd.DataFrame:
+    return pd.read_csv(here / '_grid_data.csv', dtype=str, keep_default_na=False).map(str.strip, na_action='ignore')
 
 __all__ = [
-    'countries',
+    'load_country_infos',
+    'load_grid_data',
     'mordecai',
     'CONTINENT_MAP',
     'COUNTRY_NORMALISATION',

@@ -134,6 +134,7 @@ def read_tuning_info(tuning_dir: Path):
     for file in tuning_dir.glob('*.json'):
         with open(file) as f:
             infos.append(json.load(f))
+    logging.debug(f'Found {len(infos)} tuning infos')
     return pd.DataFrame.from_records(infos)
 
 

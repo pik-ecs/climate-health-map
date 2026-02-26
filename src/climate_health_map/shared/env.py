@@ -12,6 +12,7 @@ def get_logger(logger_name: str, run_log_init=True, loglevel: str = 'INFO') -> l
         logging.getLogger('httpcore').setLevel(logging.WARNING)
         logging.getLogger('urllib3').setLevel(logging.WARNING)
         logging.getLogger('httpx').setLevel(logging.WARNING)
+        logging.getLogger('filelock').setLevel(logging.WARNING)
 
         logging.getLogger('root').setLevel(loglevel)
 

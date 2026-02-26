@@ -328,6 +328,7 @@ def prepare_training_slurm(
         f'Have tuning info for {len(df_tuning)} columns, {len(columns_trained)} columns have a trained model, '
         f'{len(columns_trans)} need training on GPU and {len(columns_trad)} need training on CPU.',
     )
+    logger.info(df_tuning[['model', 'f1_test']])
 
     logger.info('Compiling sbatch script for transformer model tuning...')
     array = [f'"{column}"' for column in columns_trans]

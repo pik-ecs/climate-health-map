@@ -56,11 +56,12 @@ TODO: elaborate what this produces and how to interpret outputs
 ```bash
 rsync -avh --progress -e ssh foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/tuning data/
 
-uv run healthmap tuning-quality --source=data/tuning --target=quality/tuning
+uv run healthmap classification tuning-quality --source=data/tuning --target=quality/tuning
 ```
 
 # Training
 TODO: elaborate on what this does, requires, and produces
+
 ```bash
 # prepare job scripts
 uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \

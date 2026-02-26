@@ -59,7 +59,7 @@ dev = [
 line-length = 160
 indent-width = 4
 target-version = "py313"
-include = ["pyproject.toml", "src/**/*.py"]
+include = ["pyproject.toml", "src/**/*.py", "codepile/**/*.py"]
 exclude = []
 
 [tool.ruff.lint]

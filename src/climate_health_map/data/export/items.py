@@ -14,6 +14,8 @@ def export(
     batch_size: Annotated[int, typer.Option(help='Batch size')] = 1000,
     project_id: Annotated[str | None, typer.Option(help='Project ID override')] = None,
     import_ids: Annotated[list[str] | None, typer.Option(help='Import ID override')] = None,
+    label_filter: Annotated[str | None, typer.Option(help='Add filter for this enhancement key')] = None,
+    label_threshold: Annotated[float, typer.Option(help='Add filter for this enhancement key above payload threshold')] = 0.5,
     on_exists: Annotated[OnConflict, typer.Option(help='How to react if the target file already exists')] = OnConflict.IGNORE,
     loglevel: Annotated[str, typer.Option(help='Loglevel')] = 'INFO',
 ):
@@ -22,14 +24,17 @@ def export(
     with ExportContext(
         target=target,
         config=config,
+        params={'key': label_filter, 'threshold': label_threshold} if label_filter else None,
         project_id=project_id,
         import_ids=import_ids,
         on_exists=on_exists,
         loglevel=loglevel,
         batch_size=batch_size,
     ) as ctx:
+        enhancement_join = 'JOIN enhancement en ON ai.item_id = en.item_id'
+        enhancement_where = ' AND en.key = :key AND en.payload::float > :threshold'
         ctx.query = sa.text(
-            """
+            f"""
             SELECT i.item_id::text,
                    ai.openalex_id,
                    ai.doi,
@@ -40,8 +45,9 @@ def export(
                    ai.publication_year
             FROM academic_item ai
                  JOIN item i on i.item_id = ai.item_id
-                    JOIN m2m_import_item ii ON ai.item_id = ii.item_id
-            WHERE ai.project_id = :project_id AND ii.import_id::text = ANY(:import_ids);
+                 JOIN m2m_import_item ii ON ai.item_id = ii.item_id JOIN enhancement en ON ai.item_id = en.item_id
+                 {enhancement_join}
+            WHERE ai.project_id = :project_id AND ii.import_id::text = ANY(:import_ids) {enhancement_where};
             """,
         )
 
