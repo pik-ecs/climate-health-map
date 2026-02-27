@@ -15,7 +15,7 @@ pd.options.display.width = 100000
 def main(
     source: Annotated[Path, typer.Option(help='Path to folder containing training stats')],
     target: Annotated[Path, typer.Option(help='Path to folder to write quality summary to')],
-):
+) -> None:
     logger = get_logger('classify-train', loglevel='DEBUG', run_log_init=True)
     target.mkdir(parents=True, exist_ok=True)
     folds = []

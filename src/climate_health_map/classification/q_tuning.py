@@ -14,7 +14,7 @@ pd.options.display.width = 100000
 def main(
     source: Annotated[Path, typer.Option(help='Path to folder containing all the validation and tuning parameters')],
     target: Annotated[Path, typer.Option(help='Path to folder to write quality summary to')],
-):
+) -> None:
     target.mkdir(parents=True, exist_ok=True)
 
     df = read_tuning_info(source)

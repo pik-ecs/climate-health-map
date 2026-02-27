@@ -1,6 +1,6 @@
 """Common variations of country names mapped to ISO3"""
 
-country_names: dict[str, str] = {  # FIXME: use ISO3 mapping
+country_names: dict[str, str] = {  # FIXME: consistently use ISO3 mapping
     'Bolivia (Plurinational State of)': 'Bolivia',
     'Bosnia-Herzegovina': 'Bosnia and Herzegovina',
     'Brunei Darussalam': 'Brunei',

@@ -4,7 +4,7 @@ from nacsos_data.db import DatabaseEngine, get_engine
 from climate_health_map.shared.config import Settings, load_settings
 
 
-def get_logger(logger_name: str, run_log_init=True, loglevel: str = 'INFO') -> logging.Logger:
+def get_logger(logger_name: str, run_log_init: bool = True, loglevel: str = 'INFO') -> logging.Logger:
     if run_log_init:
         logging.basicConfig(format='%(asctime)s [%(levelname)s] %(name)s (%(process)d): %(message)s', level=loglevel)
         logging.getLogger('elasticsearch').setLevel(logging.WARNING)
@@ -22,7 +22,7 @@ def get_logger(logger_name: str, run_log_init=True, loglevel: str = 'INFO') -> l
     return logger
 
 
-def essentials(config: Path, logger_name: str, run_log_init=True, loglevel: str = 'INFO') -> tuple[logging.Logger, Settings, DatabaseEngine]:
+def base_essentials(config: Path, logger_name: str, run_log_init: bool = True, loglevel: str = 'INFO') -> tuple[logging.Logger, Settings]:
     logger = get_logger(logger_name=logger_name, run_log_init=run_log_init, loglevel=loglevel)
 
     logger.info(f'Loading config from {config.resolve()}...')
@@ -30,9 +30,16 @@ def essentials(config: Path, logger_name: str, run_log_init=True, loglevel: str 
         raise AssertionError(f'Config file does not exist at {config.resolve()}!')
     settings = load_settings(config)
 
+    return logger, settings
+
+
+def essentials(config: Path, logger_name: str, run_log_init: bool = True, loglevel: str = 'INFO') -> tuple[logging.Logger, Settings, DatabaseEngine]:
+    logger, settings = base_essentials(config=config, logger_name=logger_name, run_log_init=run_log_init, loglevel=loglevel)
+
     logger.info('Connecting to database...')
     db_engine = get_engine(settings=settings.DB)
+
     return logger, settings, db_engine
 
 
-__all__ = ['essentials', 'get_logger']
+__all__ = ['base_essentials', 'essentials', 'get_logger']

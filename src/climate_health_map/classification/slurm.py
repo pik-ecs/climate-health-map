@@ -6,10 +6,12 @@ from typing import Annotated, Any
 import typer
 
 from climate_health_map.data.labels import LABELS_LOOKUP
-from climate_health_map.shared import get_logger
+from climate_health_map.shared import get_logger, ensure_directories
 from climate_health_map.data import Group, get_filtered_labels
 from climate_health_map.shared.types import OnConflict
-from .util import ensure_offline_nltk, ensure_offline_transformers, get_best_infos, ensure_directories
+from climate_health_map.shared.text import ensure_offline_nltk
+
+from .util import ensure_offline_transformers, get_best_infos
 
 logger = logging.getLogger('slurm-prep')
 app = typer.Typer(no_args_is_help=True)
@@ -23,7 +25,7 @@ def _compile_sbatch_script(
     array: list[str],
     params: list[str],
     command: str,
-):
+) -> str:
     logger.info(f'Number of array jobs: {len(array)}')
     awk_params = '\n'.join(
         [f"{param}=$(echo $param | awk -F'____' '{{print ${pi}}}')" for pi, param in enumerate(params, start=1)],
@@ -146,7 +148,7 @@ def _compile_tuning_sbatch_script(
     models: list[str],
     venv_path: Path,
     models_path: Path,
-):
+) -> str:
     array = [
         f'"{label.column}____{model}____{repeat}"'
         for group in schema.values()
@@ -192,7 +194,7 @@ def prepare_tuning_slurm(
     on_exists: Annotated[OnConflict, typer.Option(help='')] = OnConflict.SKIP.value,
     ensure_models_offline: Annotated[bool, typer.Option(help='')] = True,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
-):
+) -> None:
     logger.info('Ensuring that all paths and files are in place...')
     ensure_directories(
         logger=logger, venv_path=(venv_path, True), log_path=log_path, models_path=models_path, target_dir=target_dir, training_data=(training_data, True)
@@ -236,7 +238,7 @@ def prepare_tuning_slurm(
             'n-tuning-jobs': 1,
         },
         n_repeats=num_repeats,
-        models=MODELS_TRANS,
+        models=list(MODELS_TRANS.keys()),
         venv_path=venv_path,
         models_path=models_path,
         schema=schema,
@@ -264,7 +266,7 @@ def prepare_tuning_slurm(
             'n-tuning-jobs': 5,
         },
         n_repeats=num_repeats,
-        models=MODELS_TRAD,
+        models=list(MODELS_TRAD.keys()),
         venv_path=venv_path,
         models_path=models_path,
         schema=schema,
@@ -289,7 +291,7 @@ def prepare_training_slurm(
     on_exists: Annotated[OnConflict, typer.Option(help='')] = OnConflict.SKIP.value,
     ensure_models_offline: Annotated[bool, typer.Option(help='')] = True,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
-):
+) -> None:
     logger.info('Ensuring that all paths and files are in place...')
     ensure_directories(
         logger=logger,

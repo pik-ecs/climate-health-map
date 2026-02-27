@@ -10,7 +10,7 @@ import pandas as pd
 from nacsos_data.db.schemas import AcademicItem
 from nacsos_data.db.schemas.enhancements import Enhancement
 from nacsos_data.util import clear_empty
-from sqlalchemy import select, text
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from tqdm import tqdm
 
@@ -37,7 +37,7 @@ def places(
     """
     uv run codepile/ingest.py places --source data/2025/places.parquet --config config/secret.env
       Found 165,040 entries for 37,329 openalex ids
-      missed: 22 | skipped: 13 | added: 164,883 (2026-02-26)
+      Finished with final score of missed: 34 | skipped: 0 | added: 37,295
 
     SELECT e.*
     FROM enhancement e
@@ -48,7 +48,7 @@ def places(
     logger, settings, db_engine = essentials(config=config, loglevel=loglevel, logger_name='ingest', run_log_init=True)
 
     logger.info(f'Reading data from {source}')
-    df = pd.read_parquet(source).replace({np.nan:None})
+    df = pd.read_parquet(source).replace({np.nan: None})
     openalex_ids = df['doc_id'].unique()
     logger.info(f'Found {len(df):,} entries for {len(openalex_ids):,} openalex ids')
 

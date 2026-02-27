@@ -32,9 +32,9 @@ class _Label(BaseModel):
     shade1_rgb: tuple[float, float, float] = Field(default_factory=lambda data: hsv_to_rgb(*data['shade1']))
     shade2_rgb: tuple[float, float, float] = Field(default_factory=lambda data: hsv_to_rgb(*data['shade2']))
 
-    colour_hls: tuple[float, float, float] = Field(lambda data: rgb_to_hls(*data['colour_rgb']))
-    shade1_hls: tuple[float, float, float] = Field(lambda data: rgb_to_hls(*data['shade1_rgb']))
-    shade2_hls: tuple[float, float, float] = Field(lambda data: rgb_to_hls(*data['shade2_rgb']))
+    colour_hls: tuple[float, float, float] = Field(default_factory=lambda data: rgb_to_hls(*data['colour_rgb']))
+    shade1_hls: tuple[float, float, float] = Field(default_factory=lambda data: rgb_to_hls(*data['shade1_rgb']))
+    shade2_hls: tuple[float, float, float] = Field(default_factory=lambda data: rgb_to_hls(*data['shade2_rgb']))
 
     # Should this group or label be included on the literature hub
     incl_lithub: bool = True

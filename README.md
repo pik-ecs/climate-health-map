@@ -12,6 +12,7 @@ uv sync --extra classify --extra extract --extra notebook
 # Formatting and basic static check
 uv run ruff check
 uv run ruff format
+uv run mypy
 ```
 
 ## Documentation

@@ -1,6 +1,8 @@
-import re
+from pathlib import Path
 
 import pandas as pd
+
+from climate_health_map.shared import read_any_pd
 
 EXCLUDED_SEARCH_NAMES = {
     'B.V.',
@@ -46,48 +48,6 @@ EXCLUDED_SEARCH_NAMES = {
 EXCLUDED_NAMES = {
     'Pacific County',
 }
-
-TEXT_FILTER = re.compile(
-    # copyright boilerplate
-    r'Copyright \(C\)[^©]*|'
-    r'\([C-c]\) [1-2][0-9]{3} Elsevier|'
-    r'Published by Elsevier|'
-    r'\. \(C\) [1-2][0-9]{3} |'
-    r'\. \(C\) Copyright|'
-    # International climate agreements:
-    # Berlin
-    r'(berlin(?:\S* ){0,15}cop)|(cop(?:\S* ){0,15}berlin)|'
-    # Cancun
-    r'(cancun(?:\S* ){0,15}cop)|(cop(?:\S* ){0,15}cancun)|'
-    r'cancun pledge|'
-    # Copenhagen
-    r'(copenhagen(?:\S* ){0,15}cop)|(cop(?:\S* ){0,15}copenhagen)|'
-    r'(copenhagen(?:\S* ){0,3}accord)|(accord(?:\S* ){0,3}copenhagen)|'
-    # Glasgow
-    r'(glasgow(?:\S* ){0,15}cop)|(cop(?:\S* ){0,15}glasgow)|'
-    # Kyoto
-    r'kyoto agreement|'
-    r'kyoto commitments?|'
-    r'kyoto emission|'
-    r'kyoto framework|'
-    r'kyoto gas|'
-    r'kyoto process|'
-    r'kyoto protocol'
-    r'kyoto target|'
-    # London
-    r'london protocol|'
-    # Montreal
-    r'montreal protocol|'
-    r'(montreal(?:\S* ){0,15}cop)|(cop(?:\S* ){0,15}montreal)|'
-    # New Dehli
-    r'(framework convention on climate change(?:\S* ){0,15}new delhi)|(new delhi(?:\S* ){0,15}framework convention on climate change)|'
-    r'(unfccc(?:\S* ){0,15}new delhi)|(new delhi(?:\S* ){0,15}unfccc)'
-    # Paris
-    r'paris agreement|'
-    r'(paris(?:\S* ){0,15}agreement)|(cop(?:\S* ){0,15}agreement)|'
-    r'(paris(?:\S* ){0,15}cop)|(cop(?:\S* ){0,15}paris)',
-    flags=re.I,
-)  # ignore case
 
 
 def get_naming_mask(place_df: pd.DataFrame) -> pd.Series:
@@ -167,3 +127,26 @@ def fix_geographies(place_df: pd.DataFrame) -> pd.DataFrame:
     place_df.loc[place_df['search_name'] == 'Hudson Bay', geocolumns] = ['BAY', 60, -85, 'Hudson Bay', 'H', 5978134, 'CAN']
 
     return place_df
+
+
+def load_df_places(source: Path, index_column: str = 'item_id') -> tuple[pd.DataFrame, pd.Series]:
+    """Load a clean version of extracted places and a filter mask.
+
+    Don't forget to get the additional `get_publisher_mask` after merging df_places with df_base!
+    Example usage:
+
+    ```
+    df_base = pd.read(main-data)
+    df_places, mask_places = load_df_places(source)
+    df = df_base.merge(df_places, on='search_name')
+    ```
+
+    """
+    df = read_any_pd(
+        source,
+        kwargs={'dtype': str, 'keep_default_na': False},  # keep_default_na handles cells that contain "NA" (which is valid)
+        index_column=index_column,
+    )
+    df = fix_geographies(df)
+    mask = get_naming_mask(df)
+    return df, mask

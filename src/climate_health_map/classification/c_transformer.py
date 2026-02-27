@@ -16,6 +16,7 @@ from optuna.trial import Trial
 
 import torch
 from torch import tensor, nn
+from torch.utils.data import DataLoader
 
 from datasets import Dataset
 from transformers import Trainer, TrainingArguments, AutoModelForSequenceClassification, AutoTokenizer
@@ -27,7 +28,7 @@ from climate_health_map.data.dataset import downsampling_mask
 logger = logging.getLogger('trans-rank')
 logging.getLogger('urllib3').setLevel(logging.ERROR)
 warnings.filterwarnings('ignore', category=UndefinedMetricWarning)
-disable_progress_bar()
+disable_progress_bar()  # type:ignore [no-untyped-call]
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -47,7 +48,7 @@ def evaluate(
     y_true: np.ndarray | torch.Tensor,
     y_pred: np.ndarray | torch.Tensor,
     threshold: float = 0.5,
-):
+) -> dict[str, float]:
     y_pred_binary = np.where(y_pred > threshold, 1, 0)
 
     try:
@@ -66,7 +67,7 @@ def evaluate(
     return results
 
 
-def evaluate_trainer(predictions: PredictionOutput):
+def evaluate_trainer(predictions: PredictionOutput) -> dict[str, float]:
     with torch.no_grad():
         return evaluate(y_true=tensor(predictions.label_ids), y_pred=torch.softmax(tensor(predictions.predictions), dim=1)[:, 1])
 
@@ -82,12 +83,12 @@ class CustomTrainingArguments(TrainingArguments):
 class CustomTrainer(Trainer):
     args: CustomTrainingArguments
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.activation = nn.Softmax(dim=1)
         self.loss = nn.CrossEntropyLoss
 
-    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None) -> tuple[torch.Tensor, torch.Tensor] | torch.Tensor:
         y_true = inputs.pop('labels')
         if len(inputs['input_ids'].shape) == 1:
             for key, value in inputs.items():
@@ -96,18 +97,18 @@ class CustomTrainer(Trainer):
         outputs = model(**inputs)
         y_pred = self.activation(outputs.logits)
 
-        criterion = self.loss(weight=self.args.class_weights if self.args.use_class_weights else None)
+        criterion = self.loss(weight=self.args.class_weights if self.args.use_class_weights else None)  # type:ignore[arg-type]
         loss = criterion(y_pred, y_true)
 
         return (loss, outputs) if return_outputs else loss
 
-    def predict_proba(self, test_dataset: Dataset) -> np.array:
+    def predict_proba(self, test_dataset: Dataset) -> np.ndarray:
         predictions = self.predict(test_dataset).predictions
         logits = predictions if torch.is_tensor(predictions) else tensor(predictions)
         return self.activation(logits).numpy()
         # return logits.numpy()  # FIXME: does this still work? returning unscaled logits might enable prec/rec trade-off
 
-    def get_train_dataloader(self):
+    def get_train_dataloader(self) -> DataLoader:
         if self.args.downsampling is not None and 0 < self.args.downsampling < 1:
             y_true = np.array(getattr(self.train_dataset, 'labels') if hasattr(self.train_dataset, 'labels') else self.train_dataset['labels'])
             mask = downsampling_mask(y_true, self.args.downsampling)
@@ -209,7 +210,7 @@ class TransformerClassifier:
             }
         if not isinstance(base['class_weights'], torch.Tensor):
             base['class_weights'] = torch.tensor(base['class_weights'], device=device, dtype=torch.float)
-        return CustomTrainingArguments(**base)
+        return CustomTrainingArguments(**base)  # type: ignore[arg-type]
 
     def _train(self, args: CustomTrainingArguments, dataset: Dataset):
         logger.debug(f'Training fresh transformer model using "{args.model_name}"')
@@ -271,6 +272,8 @@ class TransformerClassifier:
         self._train(args, dataset)
 
     def predict(self, idxs: list[int] | None = None, data: pd.DataFrame | None = None, texts: list[str] | None = None) -> np.ndarray:
+        if not self.model:
+            raise RuntimeError('Model not loaded')
         y_true = None
         if texts is not None:
             idxs = np.arange(len(texts))
@@ -297,7 +300,7 @@ class TransformerClassifier:
         )
 
         logger.debug(f'Predicting on {len(idxs):,} samples ({y_true.sum() if y_true is not None else "??"} of which should be included)')
-        y_preds = self.model.predict_proba(dataset)
+        y_preds: np.ndarray = self.model.predict_proba(dataset)
         logger.debug(f'  > Predictions found {(y_preds > 0.5).sum():,} to be included (threshold > 0.5)')
         return y_preds[:, 1]
 
@@ -306,21 +309,22 @@ class TransformerClassifier:
             'model': self.name,
             'hyperparams': self.model_params
             | {
-                'class_weights': self.model.args.class_weights.cpu().tolist(),
-                'use_class_weights': self.model.args.use_class_weights,
-                'learning_rate': self.model.args.learning_rate,
-                'per_device_train_batch_size': self.model.args.per_device_train_batch_size,
-                'per_device_eval_batch_size': self.model.args.per_device_eval_batch_size,
-                'num_train_epochs': self.model.args.num_train_epochs,
-                'weight_decay': self.model.args.weight_decay,
-                'model_name': self.model.args.model_name,
-                'optim': self.model.args.optim,
-                'downsampling': self.model.args.downsampling,
+                'class_weights': self.model.args.class_weights.cpu().tolist(),  # type: ignore[union-attr]
+                'use_class_weights': self.model.args.use_class_weights,  # type: ignore[union-attr]
+                'learning_rate': self.model.args.learning_rate,  # type: ignore[union-attr]
+                'per_device_train_batch_size': self.model.args.per_device_train_batch_size,  # type: ignore[union-attr]
+                'per_device_eval_batch_size': self.model.args.per_device_eval_batch_size,  # type: ignore[union-attr]
+                'num_train_epochs': self.model.args.num_train_epochs,  # type: ignore[union-attr]
+                'weight_decay': self.model.args.weight_decay,  # type: ignore[union-attr]
+                'model_name': self.model.args.model_name,  # type: ignore[union-attr]
+                'optim': self.model.args.optim,  # type: ignore[union-attr]
+                'downsampling': self.model.args.downsampling,  # type: ignore[union-attr]
             },
         }
 
-    def store(self, target: Path):
-        self.model.save_model(target.resolve().as_posix())
+    def store(self, target: Path) -> None:
+        if self.model:
+            self.model.save_model(target.resolve().as_posix())
 
     @classmethod
     def load(cls, source: Path) -> 'TransformerClassifier':

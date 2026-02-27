@@ -1,8 +1,6 @@
-
 import re
 import uuid
 import logging
-from enum import Enum
 from pathlib import Path
 from typing import Annotated
 from itertools import batched
@@ -17,6 +15,8 @@ from nacsos_data.util.conf import Settings
 from nacsos_data.db import get_engine
 from nacsos_data.db.schemas import Enhancement, Item
 
+from climate_health_map.shared.types import OnConflict
+
 logging.basicConfig(format='%(asctime)s [%(levelname)s] %(name)s: %(message)s', level=logging.DEBUG)
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
 logging.getLogger('urllib3').setLevel(logging.WARNING)
@@ -28,14 +28,10 @@ logging.getLogger('elasticsearch').setLevel(logging.WARNING)
 logger = logging.getLogger('ingest')
 logger.setLevel(logging.INFO)
 
-
-class OnConflict(Enum):
-    KEEP = 'KEEP'  # Keep existing enhancement and ignore new enhancement
-    EXTEND = 'EXTEND'  # Keep existing and add new enhancement
-    REPLACE = 'REPLACE'  # Delete all existing item/key pairs that conflict with new enhancements
+raise NotImplementedError('just a copy')
 
 
-def func(
+def func(  # type:ignore[unreachable]
     config: Annotated[Path, typer.Option(help='Path to config.env')],
     on_conflict: Annotated[OnConflict, typer.Option(help='How to handle existing key/value pairs')],
     source_dir: Annotated[Path, typer.Option(help='Path to the predictions directory')],
@@ -53,8 +49,8 @@ def func(
 
         progress = tqdm(total=df.shape[0])
         with db_engine.session() as session:
-            for batch in batched(df.iterrows(), batch_size):
-                if on_conflict == OnConflict.REPLACE:
+            for batch in batched(df.iterrows(), batch_size, strict=False):
+                if on_conflict == OnConflict.IGNORE:
                     progress.set_postfix_str(f'Dropping existing item/key pairs for key="{label}"')
                     session.execute(
                         sa.delete(Enhancement).where(
@@ -82,7 +78,7 @@ def func(
                         sa.select(data)
                         .join(Item, Item.item_id == data.c.item_id)
                         .join(Enhancement, sa.and_(Enhancement.item_id == data.c.item_id, Enhancement.key == label), isouter=True)
-                        .where(Enhancement.key == None)
+                        .where(Enhancement.key == None)  # noqa: E711
                     )
                 else:  # on_conflict == OnConflict.EXTEND:
                     stmt_filter = sa.select(data).join(Item, Item.item_id == data.c.item_id)

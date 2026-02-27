@@ -34,7 +34,7 @@ class ExportContext:
         self.batch_size = batch_size
         if import_ids is None and self.params.get('import_ids') is None:
             self.params['import_ids'] = self.settings.IMPORTS
-        if project_id is None and self.params.get('import_ids') is None:
+        if project_id is None and self.params.get('project_id') is None:
             self.params['project_id'] = self.settings.PROJECT_ID
         self.query: sa.TextClause | None = None
 

@@ -6,35 +6,19 @@ import typer
 from tqdm import tqdm
 import sqlalchemy as sa
 
-
-from climate_health_map.shared.env import essentials
 from nacsos_data.util import clear_empty
 from nacsos_data.db.schemas import Enhancement
 
+from climate_health_map.shared.env import essentials
+from climate_health_map.shared.text import chunked_text, clean_text
 from .filters import TEXT_FILTER
 
 if TYPE_CHECKING:
     from mordecai3 import Geoparser
 
 
-def chunked_text(text: str, chunk_size: int = 500, overlap: int = 15) -> Generator[str, None, None]:
-    """
-    Split the text into tokens and then into overlapping chunks.
-
-    :param text: input text to be chunked
-    :param chunk_size: number of tokens per chunk should contain (512 is mordecai maximum, give it some headroom for slightly differing tokenisation though!)
-    :param overlap: number of tokens that overlap between consecutive chunks
-
-    Returns:
-    list: A list of chunks, where each chunk is a list of tokens.
-    """
-    tokens = text.split()
-    for pos_begin in range(0, len(tokens), chunk_size - overlap):
-        yield ' '.join(tokens[pos_begin : pos_begin + chunk_size + overlap])
-
-
 def apply_mordecai(text: str, geo: 'Geoparser') -> Generator[dict[str, Any], None, None]:
-    text_clean = TEXT_FILTER.sub('', text)
+    text_clean = clean_text(text, extra=[TEXT_FILTER])
     for chunk in chunked_text(text_clean, chunk_size=500, overlap=15):
         places = geo.geoparse_doc(chunk)
         yield places['geolocated_ents']
@@ -47,9 +31,9 @@ def mordecai(
     hosts: Annotated[list[str] | None, typer.Option(help='')] = None,
     port: Annotated[int, typer.Option(help='')] = 9200,
     device: Annotated[str, typer.Option(help='')] = 'gpu',
-    created_after: Annotated[str, typer.Option(help='Filter to only apply mordecai to items created after that date; format: YYYY-MM-DD')] = None,
+    created_after: Annotated[str | None, typer.Option(help='Filter to only apply mordecai to items created after that date; format: YYYY-MM-DD')] = None,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
-):
+) -> None:
     logger, settings, db_engine = essentials(config=config, loglevel=loglevel, logger_name='export', run_log_init=True)
 
     logger.info('Setting up geoparser...')

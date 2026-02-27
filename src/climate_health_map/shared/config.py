@@ -38,4 +38,4 @@ def load_settings(conf_file: Path | str | None = None) -> Settings:
         conf_file = os.environ.get('CH_CONFIG', 'config/default.env')
     if not Path(conf_file).is_file():
         raise FileNotFoundError(f'Configuration file not found: {conf_file}')
-    return Settings(_env_file=conf_file, _env_file_encoding='utf-8')  # type: ignore[call-arg]
+    return Settings(_env_file=conf_file, _env_file_encoding='utf-8')

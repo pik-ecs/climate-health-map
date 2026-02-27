@@ -31,7 +31,7 @@ def export(
     import_ids: Annotated[list[str] | None, typer.Option(help='Import ID override')] = None,
     on_exists: Annotated[OnConflict, typer.Option(help='How to react if the target file already exists')] = OnConflict.IGNORE,
     loglevel: Annotated[str, typer.Option(help='Loglevel')] = 'INFO',
-):
+) -> None:
     export_items(
         config=config,
         target=target / 'items.csv',
@@ -63,7 +63,7 @@ def export(
     for source in ['WOS', 'DIMENSIONS', 'OPENALEX']:
         export_topics(
             config=config,
-            source=source,
+            source=source,  # type:ignore [arg-type]
             target=target / f'topics_{source.lower()}.csv',
             batch_size=batch_size,
             project_id=project_id,

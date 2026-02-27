@@ -6,7 +6,7 @@ class Scope(NamedTuple):
     name: str
 
 
-IMPACT_SCOPES_1 = [
+IMPACT_SCOPES_1: list[Scope] = [
     # Scope('40e96f1a-9990-4e83-807e-c62c6fc91121', ' impact batch 8'),
     # Scope('ec32aef3-5f03-4e73-8c79-7a0666add688', 'impact batch 9'),
     # Scope('b18e616e-06e4-453c-9847-aed9f138a86e', 'impact batch 10'),
@@ -92,7 +92,7 @@ IMPACT_SCOPES_1 = [
     Scope('2aaf2bde-4a92-4c62-9e90-10479dcfe03f', '[BOT] Resolved_Impact batch 45'),
     Scope('dd9db5eb-22f8-400a-b75f-3a3d2372ba7f', '[BOT] Resolved_Impact batch 46'),
 ]
-IMPACT_SCOPES_2 = [
+IMPACT_SCOPES_2: list[Scope] = [
     # Scope('8ccd1b72-6309-4a09-b47a-dc8be6630e3c', 'Coded as Impact batch #1'),
     # Scope('414fc62a-8e50-493f-b304-e53aaad08794', 'Coded as Impact batch #2'),
     # Scope('2939212a-f547-4f86-b285-7e662bdfcac7', ' impact batch 3 (papers coded as impact before)'),
@@ -127,13 +127,13 @@ IMPACT_SCOPES_2 = [
     # Scope('77ac1a06-d713-402c-abcc-f3239e99dd43', '[BOT] impact 1'),
     # Scope('920f2068-4433-4378-87d0-1c22ed4ecc4d', '[BOT] impact_resolution 7'),
 ]
-IMPACT_SCOPES = IMPACT_SCOPES_1 + IMPACT_SCOPES_2
+IMPACT_SCOPES: list[Scope] = IMPACT_SCOPES_1 + IMPACT_SCOPES_2
 
-MAJOR_SCOPES_1 = [
+MAJOR_SCOPES_1: list[Scope] = [
     # Scope('5f391e28-e7d5-4684-8848-6280cb418c33', 'Import [caution - read description]'),
     # Scope('478f4564-75c8-43c8-b63b-1a6db4617188', '[BOT] Resolved_Import'),
 ]
-MAJOR_SCOPES_2 = [
+MAJOR_SCOPES_2: list[Scope] = [
     # Scope('241b8049-e15e-4f9d-9312-464cf20d7a58', 'Test batch 1'),
     # Scope('0e13813e-c38e-43ad-88eb-dbd91e00cfc3', 'Test batch 2'),
     # Scope('6e16e805-ee90-40a4-affe-2ffc0d429d3f', 'Test batch 3'),
@@ -359,4 +359,14 @@ MAJOR_SCOPES_2 = [
     Scope('d7e64ad1-7986-4c4b-bff4-3f3b2982b1ae', '[BOT] Resolved_Likely relevant 101'),
     Scope('85c88df0-b7a0-405f-b298-6a47c11ab82d', '[BOT] Resolved_Likely relevant 102'),
 ]
-MAJOR_SCOPES = MAJOR_SCOPES_1 + MAJOR_SCOPES_2
+MAJOR_SCOPES: list[Scope] = MAJOR_SCOPES_1 + MAJOR_SCOPES_2
+
+
+__all__ = [
+    'MAJOR_SCOPES',
+    'MAJOR_SCOPES_1',
+    'MAJOR_SCOPES_2',
+    'IMPACT_SCOPES',
+    'IMPACT_SCOPES_1',
+    'IMPACT_SCOPES_2',
+]
