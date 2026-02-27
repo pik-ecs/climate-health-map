@@ -93,8 +93,38 @@ rsync -avh --progress --include='stats.json' --include='*/' --exclude='*' -e ssh
 ```
 
 # Classification
-TODO: NACSOS missing classification exporter
-TODO: run classification
+TODO: describe
+
+```bash
+# Export records that have no major relevance classification
+uv run healthmap export items --config config/secret.env --target data/exports/items.csv --label-missing --label-filter "rel_major|1" 
+
+# need to replace {group}
+uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
+    healthmap classification classify \
+    --source="../data/exports/items.csv" \
+    --target="../data/enhanced/labels_{group}.csv" \
+    --group="{group}" \
+    --cache-dir="../data/offline_models" \
+    --models-dir="../data/trained" \
+    --on-exists="IGNORE" \
+    --on-missing-model="IGNORE" \
+    --loglevel="INFO"
+    
+# SLURM
+uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
+    healthmap classification slurm-classify-scripts \
+    --source="../data/exports/items.csv" \
+    --target="../data/enhanced/" \
+    --cache-dir="../data/offline_models" \
+    --models-dir="../data/trained" \
+    --on-exists="IGNORE" \
+    --on-missing-model="IGNORE" \
+    --venv-path=".venv/" \
+    --log-path="../data/logs/train/" \
+    --slurm-user="timrepke@pik-potsdam.de" \
+    --loglevel="INFO" 
+```
 
 
 # Persisting predictions to NACSOS

@@ -1794,6 +1794,7 @@ __all__ = [
     'Topic',
     'AggTopic',
     'AggAggTopic',
+    'Collection',
 ]
 
 if __name__ == '__main__':

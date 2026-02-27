@@ -5,7 +5,7 @@ from typing import Annotated, Any
 
 import typer
 
-from climate_health_map.data.labels import LABELS_LOOKUP
+from climate_health_map.data.labels import LABELS_LOOKUP, LABELS, Collection
 from climate_health_map.shared import get_logger, ensure_directories
 from climate_health_map.data import Group, get_filtered_labels
 from climate_health_map.shared.types import OnConflict
@@ -197,7 +197,12 @@ def prepare_tuning_slurm(
 ) -> None:
     logger.info('Ensuring that all paths and files are in place...')
     ensure_directories(
-        logger=logger, venv_path=(venv_path, True), log_path=log_path, models_path=models_path, target_dir=target_dir, training_data=(training_data, True)
+        logger=logger,
+        venv_path=(venv_path, True),
+        log_path=log_path,
+        models_path=models_path,
+        target_dir=target_dir,
+        training_data=(training_data, True),
     )
     _ensure_offline_models(ensure_models_offline=ensure_models_offline, models_path=models_path)
     from .c_transformer import MODELS_TRANS
@@ -369,6 +374,81 @@ def prepare_training_slurm(
     )
 
     _write_sbatch(sbatch_trad=sbatch_trad, sbatch_trans=sbatch_trans, command='train')
+
+
+@app.command('slurm-classify-scripts', help='Write slurm sbatch script for properly submitting classification job arrays')
+def prepare_classify_slurm(
+    source: Annotated[Path, typer.Option(help='Path to source data to classify')],
+    target: Annotated[Path, typer.Option(help='Path to write classifications to')],
+    models_dir: Annotated[Path, typer.Option(help='Path to trained models (not the huggingface `OFFLINE_MODEL_PATH`!)')],
+    venv_path: Annotated[Path, typer.Option(help='')],
+    log_path: Annotated[Path, typer.Option(help='')],
+    slurm_user: Annotated[str, typer.Option(help='email address to notify when done')],
+    cache_dir: Annotated[Path, typer.Option(help='Optional to override OFFLINE_MODEL_PATH')],
+    on_exists: Annotated[OnConflict, typer.Option(help='How to behave when the target file already exists')] = OnConflict.IGNORE,
+    on_missing_model: Annotated[OnConflict, typer.Option(help="How to behave when we don't have a model for this column")] = OnConflict.IGNORE,
+    slurm_hours: Annotated[int, typer.Option(help='')] = 2,
+    loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
+) -> None:
+    logger.info('Ensuring that all paths and files are in place...')
+    ensure_directories(
+        logger=logger,
+        venv_path=venv_path,
+        log_path=log_path,
+        models_dir=(models_dir, True),
+        cache_dir=(cache_dir, True),
+    )
+
+    logger.info('Preparing basic script parameters...')
+    sbatch_args = _sbatch_args(slurm_user=slurm_user, slurm_hours=slurm_hours, log_path=log_path)
+    script_args = {
+        'source': source.resolve(),
+        'target': target.resolve() / 'labels_${group}.arrow',
+        'models-dir': models_dir.resolve(),
+        'cache-dir': cache_dir.resolve(),
+        'group': '${group}',
+        'on-exists': on_exists.value,
+        'on-missing-model': on_missing_model.value,
+        'loglevel': loglevel,
+    }
+
+    logger.info('Compiling job array...')
+    array = []
+    for group in LABELS.values():
+        if group.collection in {Collection.MAJOR, Collection.IMPACTS}:
+            if len(list(models_dir.glob(f'{group.key}|*'))) > 0:
+                logger.debug(f'Queueing {group.key} ({group.collection} collection)')
+                array.append(f'"{group.key}"')
+            else:
+                logger.debug(f'Skipping {group.key}: no model at {models_dir}')
+        elif group.collection == Collection.EXTERNAL:
+            logger.debug(f'Queueing {group.key} ({group.collection} collection)')
+            array.append(f'"{group.key}"')
+        else:
+            logger.debug(f'Ignoring {group.key} ({group.collection} collection)')
+
+    logger.info('Compiling sbatch script for transformer model tuning...')
+    sbatch = _compile_sbatch_script(
+        slurm_params=sbatch_args
+        | {
+            'gres': 'gpu:1',  # number of GPUs
+            'partition': 'gpu',
+            'qos': 'gpumedium',  # or gpumedium (has MaxJobsPU=None but half priority, see `$ sacctmgr show qos`)
+            'cpus-per-task': 12,
+            'oversubscribe': None,  # use non-utilized GPUs on busy nodes
+        },
+        script_params=script_args,
+        venv_path=venv_path,
+        models_path=cache_dir,
+        array=array,
+        params=['group'],
+        command='classify',
+    )
+
+    logger.info('Writing classification script as `classify.slurm`')
+    with open('classify.slurm', 'w') as slurm_file:
+        slurm_file.write(sbatch)
+    logger.info('Run the following to tune transformer models: sbatch classify.slurm')
 
 
 if __name__ == '__main__':

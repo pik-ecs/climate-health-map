@@ -15,7 +15,7 @@ def ensure_directories(logger: logging.Logger, **paths: tuple[Path | None, bool]
     * tuple[Path, bool] -> if bool is true, check if file/path exists and throw exception otherwise.
     """
     path: Path
-    assert_exist: bool | None
+    assert_exist: bool
     for info, entry in paths.items():
         path, assert_exist = entry if type(entry) is tuple else (entry, False)
         if path is not None:
