@@ -1,6 +1,6 @@
 import uuid
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any, Generator, TYPE_CHECKING
 
 import typer
 from tqdm import tqdm
@@ -10,6 +10,34 @@ import sqlalchemy as sa
 from climate_health_map.shared.env import essentials
 from nacsos_data.util import clear_empty
 from nacsos_data.db.schemas import Enhancement
+
+from .filters import TEXT_FILTER
+
+if TYPE_CHECKING:
+    from mordecai3 import Geoparser
+
+
+def chunked_text(text: str, chunk_size: int = 500, overlap: int = 15) -> Generator[str, None, None]:
+    """
+    Split the text into tokens and then into overlapping chunks.
+
+    :param text: input text to be chunked
+    :param chunk_size: number of tokens per chunk should contain (512 is mordecai maximum, give it some headroom for slightly differing tokenisation though!)
+    :param overlap: number of tokens that overlap between consecutive chunks
+
+    Returns:
+    list: A list of chunks, where each chunk is a list of tokens.
+    """
+    tokens = text.split()
+    for pos_begin in range(0, len(tokens), chunk_size - overlap):
+        yield ' '.join(tokens[pos_begin : pos_begin + chunk_size + overlap])
+
+
+def apply_mordecai(text: str, geo: 'Geoparser') -> Generator[dict[str, Any], None, None]:
+    text_clean = TEXT_FILTER.sub('', text)
+    for chunk in chunked_text(text_clean, chunk_size=500, overlap=15):
+        places = geo.geoparse_doc(chunk)
+        yield places['geolocated_ents']
 
 
 def mordecai(
@@ -71,14 +99,15 @@ def mordecai(
             for item in batch:
                 tq.update()
                 try:
-                    places = geo.geoparse_doc(item['txt'])
-                    if len(places['geolocated_ents']) > 0:
+                    places: list[dict[str, Any]] | None = list(apply_mordecai(item['txt'], geo=geo))
+                    places = clear_empty(places)
+                    if places:
                         session.add(
                             Enhancement(
                                 enhancement_id=uuid.uuid4(),
                                 item_id=item['item_id'],
                                 key='mordecai3',
-                                payload=clear_empty(places['geolocated_ents']),
+                                payload=places,
                             ),
                         )
                         session.flush()

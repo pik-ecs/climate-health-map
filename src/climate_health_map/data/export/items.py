@@ -47,7 +47,10 @@ def export(
                  JOIN item i on i.item_id = ai.item_id
                  JOIN m2m_import_item ii ON ai.item_id = ii.item_id JOIN enhancement en ON ai.item_id = en.item_id
                  {enhancement_join}
-            WHERE ai.project_id = :project_id AND ii.import_id::text = ANY(:import_ids) {enhancement_where};
+            WHERE ai.project_id = :project_id 
+              AND ii.import_id::text = ANY(:import_ids)
+              AND ai.meta -> 'openalex' ->> 'source_id' <> 'S7407052681'  -- "source": "Data Planet"
+              {enhancement_where};
             """,
         )
 

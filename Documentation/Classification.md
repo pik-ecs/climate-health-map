@@ -114,6 +114,10 @@ squeue --job [jobid]
 less data/logs/[jobid]_[array].err
 tail -f data/logs/[jobid]_[array].err
 
+queue -t all -p gpu --format "%.18i %.9P %.8j %.8u %.8T %.12M %.14l %.10D %.20R %.20p %.15r %.20V"
+queue -t all -p standard --format "%.18i %.9P %.8j %.8u %.8T %.12M %.14l %.10D %.20R %.20p %.15r %.20V"
+queue --me -t all --format "%.18i %.9P %.8j %.8u %.8T %.12M %.14l %.10D %.20R %.20p %.15r %.20V"
+
 # kill all or one
 scancel --me
 scancel [jobid]
