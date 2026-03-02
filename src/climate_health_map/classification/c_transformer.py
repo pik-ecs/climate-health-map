@@ -157,7 +157,7 @@ class TransformerClassifier:
         models: list[str] | None = None,
         tuning_trials: int = 20,
         test_split: float = 0.1,
-        instance: AutoModelForSequenceClassification | None = None,
+        instance: AutoModelForSequenceClassification | Trainer | None = None,
     ):
         self.min_batch_size = min_batch_size
         self.max_batch_size = max_batch_size
@@ -165,8 +165,6 @@ class TransformerClassifier:
         self.model_params = model_params or {}
         self.final_params = {}
         self.model: CustomTrainer | None = instance
-        if self.model:
-            self.model.args = CustomTrainingArguments(**self.model_params)
         self.tuning_trials = tuning_trials
         self.test_split = test_split
         self.dataset = dataset
@@ -330,8 +328,11 @@ class TransformerClassifier:
 
     @classmethod
     def load(cls, source: Path, info: dict[str, Any]) -> 'TransformerClassifier':
+        hyperparams = info['params']['hyperparams']
+        train_args = CustomTrainingArguments( output_dir=model_data_path, **hyperparams)
         model = AutoModelForSequenceClassification.from_pretrained(source, cache_dir=model_data_path, num_labels=2, ignore_mismatched_sizes=True)
-        return cls(instance=model, model_params=info['params']['hyperparams'])
+        trainer = CustomTrainer(model=model, args=train_args)
+        return cls(instance=trainer, model_params=hyperparams)
 
 MODELS_TRANS = {
     'CLIMATEBERT': 'climatebert/distilroberta-base-climate-f',
