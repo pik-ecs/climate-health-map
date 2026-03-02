@@ -17,7 +17,7 @@ def export(
     only_first_author: Annotated[bool, typer.Option(help='Only include first authors, not all authors')] = False,
     on_exists: Annotated[OnConflict, typer.Option(help='How to react if the target file already exists')] = OnConflict.IGNORE,
     loglevel: Annotated[str, typer.Option(help='Loglevel')] = 'INFO',
-):
+) -> None:
     """Basic information about author affiliations from all the different sources"""
     with ExportContext(
         target=target,

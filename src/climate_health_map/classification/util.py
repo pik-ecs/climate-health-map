@@ -1,6 +1,7 @@
 import json
 import logging
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -62,7 +63,7 @@ def get_prediction_stats(
     return ds, stats
 
 
-def read_tuning_info(tuning_dir: Path):
+def read_tuning_info(tuning_dir: Path) -> pd.DataFrame:
     infos = []
     for file in tuning_dir.glob('*.json'):
         with open(file) as f:
@@ -71,11 +72,11 @@ def read_tuning_info(tuning_dir: Path):
     return pd.DataFrame.from_records(infos)
 
 
-def get_best_infos(tuning_dir: Path, metric: str = 'f1'):
+def get_best_infos(tuning_dir: Path, metric: str = 'f1') -> pd.DataFrame:
     return read_tuning_info(tuning_dir).sort_values(by=[f'{metric}_test'], ascending=False).groupby('column').first()
 
 
-def get_best_info(tuning_dir: Path, column: str, metric: str = 'f1'):
+def get_best_info(tuning_dir: Path, column: str, metric: str = 'f1') -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     df_tuning = get_best_infos(tuning_dir=tuning_dir, metric=metric)
     if column not in df_tuning.index:
         raise KeyError(f'No tuning data available for column "{column}" in tuning directory {tuning_dir}')

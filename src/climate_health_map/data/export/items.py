@@ -18,9 +18,10 @@ def export(
     label_threshold: Annotated[float, typer.Option(help='Add filter for this enhancement key above payload threshold')] = 0.5,
     label_missing: Annotated[bool, typer.Option(help='Combined with `label_filter`; only return records that do not have this label')] = False,
     limit: Annotated[int | None, typer.Option(help='Limit the number of records to export')] = None,
+    max_file_size: Annotated[int | None, typer.Option(help='For large exports, use chunks of this size')] = None,
     on_exists: Annotated[OnConflict, typer.Option(help='How to react if the target file already exists')] = OnConflict.IGNORE,
     loglevel: Annotated[str, typer.Option(help='Loglevel')] = 'INFO',
-):
+) -> None:
     """Export items (text + meta-data)"""
 
     with ExportContext(
@@ -32,6 +33,7 @@ def export(
         on_exists=on_exists,
         loglevel=loglevel,
         batch_size=batch_size,
+        max_file_size=max_file_size,
     ) as ctx:
         if label_filter is not None and label_missing:
             enhancement_join = 'LEFT OUTER JOIN enhancement en ON ai.item_id = en.item_id AND en.key = :key'

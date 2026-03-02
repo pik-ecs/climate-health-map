@@ -18,8 +18,9 @@ class ExportContext:
         params: dict[str, Any] | None = None,
         batch_size: int = 1000,
         project_id: str | None = None,
-        import_ids: str | None = None,
+        import_ids: list[str] | None = None,
         on_exists: OnConflict = OnConflict.IGNORE,
+        max_file_size: int | None = None,
         loglevel: str = 'INFO',
     ):
         self.logger, self.settings, self.db_engine = essentials(config=config, loglevel=loglevel, logger_name='export', run_log_init=True)
@@ -37,12 +38,13 @@ class ExportContext:
         if project_id is None and self.params.get('project_id') is None:
             self.params['project_id'] = self.settings.PROJECT_ID
         self.query: sa.TextClause | None = None
+        self.max_file_size = max_file_size
 
-    def __enter__(self):
+    def __enter__(self) -> 'ExportContext':
         # return the instance so it can be used inside the with-block
         return self
 
-    def __exit__(self, exc_type, exc, tb):
+    def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
         if self.query is None:
             raise RuntimeError('Query must be defined')
 
@@ -51,6 +53,8 @@ class ExportContext:
             rslt = session.execute(self.query.execution_options(yield_per=self.batch_size), self.params)
 
             columns: list[str] | None = None
+            # TODO: handle the case for `max_file_size`
+            # TODO: handle arbitrary file type like `write_any_pd` (and possibly push batch/chunk logic upstream)
             for batch in tqdm(rslt.mappings().partitions(self.batch_size)):
                 sub_df = pd.DataFrame(batch).replace({np.nan: None})
                 if columns is None:
@@ -60,4 +64,4 @@ class ExportContext:
                     sub_df.to_csv(self.target, index=False, header=False, columns=columns, mode='a')
 
         # return False to propagate exceptions
-        return False
+        return False  # type:ignore [return-value]

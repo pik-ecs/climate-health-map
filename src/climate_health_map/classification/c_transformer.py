@@ -2,7 +2,7 @@ import logging
 import os
 import warnings
 from pathlib import Path
-from typing import Callable, Any
+from typing import Callable, Any, Union, Optional
 from dataclasses import dataclass, field
 
 import pandas as pd
@@ -39,8 +39,8 @@ DEFAULT_MODELS = [
     # 'malteos/scincl',
     # 'distilbert-base',
 ]
-
-model_data_path = os.getenv('OFFLINE_MODEL_PATH')
+model_data_path_ = os.getenv('OFFLINE_MODEL_PATH')
+model_data_path = Path(model_data_path_) if model_data_path_ else None
 
 
 def evaluate(
@@ -76,19 +76,25 @@ def evaluate_trainer(predictions: PredictionOutput) -> dict[str, float]:
 class CustomTrainingArguments(TrainingArguments):
     use_class_weights: bool | int = field(default=False, metadata={'help': 'Whether to use class weights in loss function'})
     class_weights: list[float] | np.ndarray | None = field(default=None, metadata={'help': 'The weights for each class to be passed to the loss function'})
-    model_name: str | None = field(default=DEFAULT_MODELS[0], metadata={'help': 'Name of the huggingface model'})
+    model_name: str = field(default=DEFAULT_MODELS[0], metadata={'help': 'Name of the huggingface model'})
     downsampling: float | None = field(default=None, metadata={'help': 'Specify by how much the 0-class should be over- (>1) or undersampled (<1)'})
 
 
 class CustomTrainer(Trainer):
     args: CustomTrainingArguments
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: dict[str, Any]) -> None:
         super().__init__(*args, **kwargs)
         self.activation = nn.Softmax(dim=1)
         self.loss = nn.CrossEntropyLoss
 
-    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None) -> tuple[torch.Tensor, torch.Tensor] | torch.Tensor:
+    def compute_loss(
+        self,
+        model: nn.Module,
+        inputs: dict[str, Union[torch.Tensor, Any]],
+        return_outputs: bool = False,
+        num_items_in_batch: Optional[torch.Tensor] = None,
+    ) -> tuple[torch.Tensor, torch.Tensor] | torch.Tensor:
         y_true = inputs.pop('labels')
         if len(inputs['input_ids'].shape) == 1:
             for key, value in inputs.items():
@@ -105,14 +111,16 @@ class CustomTrainer(Trainer):
     def predict_proba(self, test_dataset: Dataset) -> np.ndarray:
         predictions = self.predict(test_dataset).predictions
         logits = predictions if torch.is_tensor(predictions) else tensor(predictions)
-        return self.activation(logits).numpy()
+        return self.activation(logits).numpy()  # type:ignore[no-any-return]
         # return logits.numpy()  # FIXME: does this still work? returning unscaled logits might enable prec/rec trade-off
 
-    def get_train_dataloader(self) -> DataLoader:
+    def get_train_dataloader(self) -> DataLoader:  # type:ignore[type-arg]
+        if self.train_dataset is None:
+            raise RuntimeError('You must call `get_train_dataloader()` before using this method.')
         if self.args.downsampling is not None and 0 < self.args.downsampling < 1:
             y_true = np.array(getattr(self.train_dataset, 'labels') if hasattr(self.train_dataset, 'labels') else self.train_dataset['labels'])
             mask = downsampling_mask(y_true, self.args.downsampling)
-            return self.train_dataset.select(np.arange(len(mask))[mask])
+            return self.train_dataset.select(np.arange(len(mask))[mask])  # type:ignore[no-any-return,union-attr]
 
         return super().get_train_dataloader()
 
@@ -128,12 +136,12 @@ def tokenize(texts: list[str], labels: np.ndarray, model: str, cache_dir: Path |
     :param cache_dir:
     :return:
     """
-    data = {'text': texts}
+    data: dict[str, list[str] | np.ndarray] = {'text': texts}
     if labels is not None:
         data['labels'] = labels
     dataset = Dataset.from_dict(data)
 
-    tokenizer = AutoTokenizer.from_pretrained(model, model_max_length=512, cache_dir=cache_dir)
+    tokenizer = AutoTokenizer.from_pretrained(model, model_max_length=512, cache_dir=cache_dir)  # type:ignore[no-untyped-call]
     dataset = dataset.map(lambda x: tokenizer(x['text'], padding='max_length', truncation=True), batched=True)
     dataset.set_format('torch')
 
@@ -163,8 +171,8 @@ class TransformerClassifier:
         self.max_batch_size = max_batch_size
         self.models = models or self.DEFAULT_MODELS
         self.model_params = model_params or {}
-        self.final_params = {}
-        self.model: CustomTrainer | None = instance
+        self.final_params: dict[str, Any] = {}
+        self.model: CustomTrainer | None = instance  # type:ignore [assignment]
         self.tuning_trials = tuning_trials
         self.test_split = test_split
         self.dataset = dataset
@@ -212,11 +220,11 @@ class TransformerClassifier:
             base['class_weights'] = torch.tensor(base['class_weights'], device=device, dtype=torch.float)
         return CustomTrainingArguments(**base)  # type: ignore[arg-type]
 
-    def _train(self, args: CustomTrainingArguments, dataset: Dataset):
+    def _train(self, args: CustomTrainingArguments, dataset: Dataset) -> None:
         logger.debug(f'Training fresh transformer model using "{args.model_name}"')
         model = AutoModelForSequenceClassification.from_pretrained(args.model_name, cache_dir=model_data_path, num_labels=2, ignore_mismatched_sizes=True)
 
-        self.model = CustomTrainer(model=model, args=args, train_dataset=dataset)
+        self.model = CustomTrainer(model=model, args=args, train_dataset=dataset)  # type:ignore [arg-type]
         result = self.model.train(resume_from_checkpoint=None)
 
         logger.debug(f'Time: {result.metrics["train_runtime"]:.2f}')
@@ -224,6 +232,9 @@ class TransformerClassifier:
 
     def objective(self, idxs: list[int]) -> Callable[[Trial], float]:
         def run_trial(trial: Trial) -> float:
+            if self.model is None or self.dataset is None:
+                raise RuntimeError('Model or Dataset not initialized')
+
             logger.debug(f'Running tuning trial {trial.number}')
             training_args = self.args(trial=trial, weights=compute_class_weights(self.dataset.loc[idxs]['label']))
             dataset = tokenize(
@@ -247,6 +258,8 @@ class TransformerClassifier:
         return run_trial
 
     def train(self, idxs: list[int] | None) -> None:
+        if not self.dataset:
+            raise RuntimeError('Need dataset for training!')
         if idxs is None:
             idxs = self.dataset.index
         y_true = self.dataset.loc[idxs]['label']
@@ -276,7 +289,7 @@ class TransformerClassifier:
             raise RuntimeError('Model not loaded')
         y_true = None
         if texts is not None:
-            idxs = np.arange(len(texts))
+            idxs = np.arange(len(texts))  # type: ignore[assignment]
             # texts = texts
         elif data is not None:
             idxs = idxs or data.index
@@ -289,12 +302,12 @@ class TransformerClassifier:
         else:
             raise RuntimeError('You must data either as part of the instance or you provide a dataframe or list of texts')
 
-        if len(idxs) == 0:
+        if idxs is None or len(idxs) == 0:
             return np.array([])
 
         dataset = tokenize(
             texts=texts,
-            labels=y_true,
+            labels=y_true,  # type: ignore[arg-type]
             model=self.model.args.model_name,
             cache_dir=model_data_path,
         )
@@ -329,10 +342,11 @@ class TransformerClassifier:
     @classmethod
     def load(cls, source: Path, info: dict[str, Any]) -> 'TransformerClassifier':
         hyperparams = info['params']['hyperparams']
-        train_args = CustomTrainingArguments( output_dir=model_data_path, **hyperparams)
+        train_args = CustomTrainingArguments(output_dir=model_data_path, **hyperparams)  # type:ignore [arg-type]
         model = AutoModelForSequenceClassification.from_pretrained(source, cache_dir=model_data_path, num_labels=2, ignore_mismatched_sizes=True)
-        trainer = CustomTrainer(model=model, args=train_args)
+        trainer = CustomTrainer(model=model, args=train_args)  # type:ignore [arg-type]
         return cls(instance=trainer, model_params=hyperparams)
+
 
 MODELS_TRANS = {
     'CLIMATEBERT': 'climatebert/distilroberta-base-climate-f',

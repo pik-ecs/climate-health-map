@@ -8,7 +8,7 @@ from .items import export as export_items
 from .annotations import export as export_annotations
 from .affiliations import export as export_affiliations
 from .places import export as export_places
-from .labels import export as export_labels
+from .classifications import export as export_classifications
 from .topics import export as export_topics
 
 app = typer.Typer(help='Commands to download data from NACSOS into csv files')
@@ -16,8 +16,8 @@ app = typer.Typer(help='Commands to download data from NACSOS into csv files')
 app.command('items', help='Export all base information')(export_items)
 app.command('affiliations', help='Export author affiliations')(export_affiliations)
 app.command('places', help='Export all geo-name information')(export_places)
-app.command('places', help='Export all topic information from sources')(export_topics)
-app.command('labels', help='Export all classifications')(export_labels)
+app.command('topics', help='Export all topic information from sources')(export_topics)
+app.command('classifications', help='Export all classifications')(export_classifications)
 
 app.command('annotations', help='Fetch all eligible human annotations from NACSOS and prepare a clean csv for training and evaluation')(export_annotations)
 
@@ -30,11 +30,12 @@ def export(
     project_id: Annotated[str | None, typer.Option(help='Project ID override')] = None,
     import_ids: Annotated[list[str] | None, typer.Option(help='Import ID override')] = None,
     on_exists: Annotated[OnConflict, typer.Option(help='How to react if the target file already exists')] = OnConflict.IGNORE,
+    filetype: Annotated[str, typer.Option(help='File type override')] = 'csv',
     loglevel: Annotated[str, typer.Option(help='Loglevel')] = 'INFO',
 ) -> None:
     export_items(
         config=config,
-        target=target / 'items.csv',
+        target=target / f'items.{filetype}',
         batch_size=batch_size,
         project_id=project_id,
         import_ids=import_ids,
@@ -43,7 +44,7 @@ def export(
     )
     export_affiliations(
         config=config,
-        target=target / 'affiliations.csv',
+        target=target / f'affiliations.{filetype}',
         only_first_author=False,
         batch_size=batch_size,
         project_id=project_id,
@@ -53,7 +54,7 @@ def export(
     )
     export_places(
         config=config,
-        target=target / 'places.csv',
+        target=target / f'places.{filetype}',
         batch_size=batch_size,
         project_id=project_id,
         import_ids=import_ids,
@@ -64,16 +65,16 @@ def export(
         export_topics(
             config=config,
             source=source,  # type:ignore [arg-type]
-            target=target / f'topics_{source.lower()}.csv',
+            target=target / f'topics_{source.lower()}.{filetype}',
             batch_size=batch_size,
             project_id=project_id,
             import_ids=import_ids,
             on_exists=on_exists,
             loglevel=loglevel,
         )
-    export_labels(
+    export_classifications(
         config=config,
-        target=target / 'labels.csv',
+        target=target / f'classifications.{filetype}',
         batch_size=batch_size,
         project_id=project_id,
         import_ids=import_ids,

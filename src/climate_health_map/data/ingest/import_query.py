@@ -57,7 +57,7 @@ def solr_ingest(
     logger.info('Fetching item count')
     num_new_items = solr_client.get_count(query).num_found
 
-    async def inner():
+    async def inner() -> tuple[str, int | None]:
 
         return await import_academic_items(
             db_engine=db_engine,

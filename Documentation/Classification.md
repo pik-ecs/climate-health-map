@@ -123,7 +123,7 @@ uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
     --venv-path=".venv/" \
     --log-path="../data/logs/classify/" \
     --slurm-user="timrepke@pik-potsdam.de" \
-    --slurm-hours=8
+    --slurm-hours=12 \
     --loglevel="INFO" 
 ```
 
@@ -148,6 +148,8 @@ tail -f data/logs/[jobid]_[array].err
 queue -t all -p gpu --format "%.18i %.9P %.8j %.8u %.8T %.12M %.14l %.10D %.20R %.20p %.15r %.20V"
 queue -t all -p standard --format "%.18i %.9P %.8j %.8u %.8T %.12M %.14l %.10D %.20R %.20p %.15r %.20V"
 queue --me -t all --format "%.18i %.9P %.8j %.8u %.8T %.12M %.14l %.10D %.20R %.20p %.15r %.20V"
+sacct -u timrepke
+seff <Jobid>
 
 # kill all or one
 scancel --me

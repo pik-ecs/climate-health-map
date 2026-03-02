@@ -36,10 +36,10 @@ def label_select(group: Group) -> list[str]:
 
 def dump(
     config: Annotated[Path, typer.Option(help='Path to config file')],
-    target: Annotated[Path, typer.Option(help='Target file')] = 'data/exports/annotations.csv',
+    target: Annotated[Path, typer.Option(help='Target file')] = 'data/exports/annotations.csv',  # type:ignore[assignment]
     overwrite: Annotated[bool, typer.Option(help='Overwrite target file if it already exists')] = False,
     loglevel: str = 'INFO',
-):
+) -> None:
     logger, settings, db_engine = essentials(config=config, loglevel=loglevel, logger_name='abstract-transfer', run_log_init=True)
 
     if target.exists() and not overwrite:

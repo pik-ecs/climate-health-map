@@ -73,7 +73,7 @@ class Group(_Label):
     collection: Collection
     labels: list[Label]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.key} ({self.nacsos_key}) | {self.type} -> {[lab.column for lab in self.labels]}'
 
 

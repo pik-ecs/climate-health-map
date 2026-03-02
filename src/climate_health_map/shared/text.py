@@ -35,7 +35,7 @@ def text_utils() -> tuple[Callable[[str, str], str], Callable[[str], str], Calla
     stopwords = sw.words('english')
     NOALPH = re.compile(r'[^A-Za-z]+')
 
-    def lemmatize(token, tag) -> str:
+    def lemmatize(token: str, tag: str) -> str:
         tag = {'N': wn.NOUN, 'V': wn.VERB, 'R': wn.ADV, 'J': wn.ADJ}.get(tag[0], wn.NOUN)
         return lemmatizer.lemmatize(token, tag)  # type:ignore[no-any-return]
 
@@ -65,9 +65,9 @@ def tokenize(text: str) -> list[str]:
 
 class snowball_stemmer(object):
     def __init__(self) -> None:
-        self.stemmer = SnowballStemmer('english')  # type:ignore[no-untyped-def]
+        self.stemmer = SnowballStemmer('english')
 
-    def __call__(self, doc) -> list[str]:
+    def __call__(self, doc: str) -> list[str]:
         return [self.stemmer.stem(t) for t in tokenize(doc)]
 
 
@@ -83,7 +83,7 @@ SUB = [
 ]
 
 
-def clean_text(text: str, extra: list[re.Pattern[str]] | None = None):
+def clean_text(text: str, extra: list[re.Pattern[str]] | None = None) -> str:
     for sub in SUB + (extra or []):
         text = sub.sub('', text)
     return text
@@ -99,7 +99,7 @@ def ensure_offline_nltk(logger: logging.Logger, target_dir: Path | None = None) 
     except AttributeError:
         pass
     else:
-        ssl._create_default_https_context = _create_unverified_https_context
+        ssl._create_default_https_context = _create_unverified_https_context  # type:ignore[assignment]
     download('stopwords', download_dir=str(target_dir))
     download('punkt', download_dir=str(target_dir))
     download('punkt_tab', download_dir=str(target_dir))

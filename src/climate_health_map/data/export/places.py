@@ -16,7 +16,7 @@ def export(
     import_ids: Annotated[list[str] | None, typer.Option(help='Import ID override')] = None,
     on_exists: Annotated[OnConflict, typer.Option(help='How to react if the target file already exists')] = OnConflict.IGNORE,
     loglevel: Annotated[str, typer.Option(help='Loglevel')] = 'INFO',
-):
+) -> None:
     """Export mordecai results
 
     payload = [

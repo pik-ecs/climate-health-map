@@ -7,7 +7,7 @@ import numpy as np
 
 
 class NumpyEncoder(json.JSONEncoder):
-    def default(self, obj):
+    def default(self, obj: Any) -> Any:
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         if math.isnan(obj) or obj == np.nan or (type(obj) is float and np.isnan(obj)):
@@ -19,6 +19,6 @@ class NumpyEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-def json_dump(file_path: Path, obj: dict[str, Any], **kwargs) -> None:
+def json_dump(file_path: Path, obj: dict[str, Any], **kwargs: Any) -> None:
     with open(file_path, 'w') as f:
         f.write(json.dumps(obj, cls=NumpyEncoder, **kwargs))

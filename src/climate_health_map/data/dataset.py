@@ -53,14 +53,14 @@ def is_label_eligible(df: pd.DataFrame, label: Label, min_minor_class: int = 10,
     logger.debug(f'Class balance: {column_stats.to_dict()}')
     if len(column_stats) != 2:
         return False
-    return min(column_stats) >= min_minor_class
+    return bool(min(column_stats) >= min_minor_class)
 
 
 def get_filtered_labels(
     dataset_path: Path | None = None,
     dataset_df: pd.DataFrame | None = None,
     min_minor_class: int = 10,
-):
+) -> dict[str, Label]:
     """Filter `LABELS` based on the available training data.
 
     Pass data through ONE of the following:

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, TYPE_CHECKING, Union
 
 import typer
 import numpy as np
@@ -12,6 +12,11 @@ from climate_health_map.data.labels import LABELS, LABELS_LOOKUP
 from climate_health_map.shared.encoder import json_dump
 from climate_health_map.shared.types import OnConflict
 from climate_health_map.shared.env import get_logger
+
+from sklearn.base import ClassifierMixin
+
+if TYPE_CHECKING:
+    from .c_transformer import TransformerClassifier
 
 
 def train(
@@ -67,7 +72,7 @@ def train(
         'folds': [],
     }
 
-    def _get_model(logger_name: str):
+    def _get_model(logger_name: str) -> Union['TransformerClassifier', 'ClassifierMixin']:
         return get_model(
             dataset=df,
             model=best['model'],

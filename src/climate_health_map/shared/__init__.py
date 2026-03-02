@@ -8,16 +8,16 @@ from .env import essentials, get_logger
 from .config import Settings, load_settings
 
 
-def ensure_directories(logger: logging.Logger, **paths: tuple[Path | None, bool] | Path) -> None:
+def ensure_directories(logger: logging.Logger, **paths: tuple[Path | None, bool] | Path | None) -> None:
     """Batch-test that all necessary paths exist.
 
     * Directory paths -> this method will make sure it exists.
     * tuple[Path, bool] -> if bool is true, check if file/path exists and throw exception otherwise.
     """
-    path: Path
+    path: Path | None
     assert_exist: bool
     for info, entry in paths.items():
-        path, assert_exist = entry if type(entry) is tuple else (entry, False)
+        path, assert_exist = entry if type(entry) is tuple else (entry, False)  # type:ignore [assignment]
         if path is not None:
             path = path.absolute().resolve()
         if assert_exist and (path is None or not path.exists()):

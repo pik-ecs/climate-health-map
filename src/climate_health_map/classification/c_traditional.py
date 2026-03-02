@@ -57,7 +57,7 @@ class _SimpleClassification(ABC):
     ):
         self.dataset = dataset
         self.model_params = model_params or {}
-        self.final_params = {}
+        self.final_params: dict[str, Any] = {}
         self.BaseModel = BaseModel
         self.scoring = scoring
         self.tuning_trials = tuning_trials
@@ -68,7 +68,7 @@ class _SimpleClassification(ABC):
         if instances is not None:
             self.scaler, self.vectorizer, self.model = instances
         elif self.dataset is not None:
-            stripped_texts = [process_text_aggressive(txt) for txt in tqdm(dataset['text'], desc='tokenising')]
+            stripped_texts = [process_text_aggressive(txt) for txt in tqdm(self.dataset['text'], desc='tokenising')]
             self.vectorizer = TfidfVectorizer(
                 # See https://github.com/AnneIsARealProgrammerNow/ClimateHealth_Wellcome/blob/v0.1/active_learning_with_evaluation.ipynb
                 ngram_range=ngram_range,
@@ -86,7 +86,7 @@ class _SimpleClassification(ABC):
         else:
             raise RuntimeError('You must provide either a dataset or a set of pre-trained vectorizer, scaler, and model')
 
-    @property
+    @property  # type:ignore [misc]
     @classmethod
     @abstractmethod
     def name(cls) -> str:
@@ -114,6 +114,9 @@ class _SimpleClassification(ABC):
         return 0 if np.isnan(mean) else mean
 
     def train(self, idxs: list[int] | None = None) -> None:
+        if not self.dataset:
+            raise RuntimeError('You must provide a dataset to train the model with')
+
         if idxs is None:
             idxs = self.dataset.index
         mask = self.dataset.index.isin(idxs)
@@ -138,20 +141,25 @@ class _SimpleClassification(ABC):
         self.model.fit(x[mask], y[mask])
 
     def vectorise(self, texts: list[str]) -> np.ndarray:
+        if not self.vectorizer:
+            raise RuntimeError('You must provide a vectorizer')
         stripped_texts = [process_text_aggressive(txt) for txt in tqdm(texts, desc='tokenising')]
         vectors = self.vectorizer.transform(stripped_texts)
-        return self.scaler.transform(vectors)
+        return self.scaler.transform(vectors)  # type:ignore [no-any-return]
 
     def predict(self, idxs: list[int] | None = None, data: pd.DataFrame | None = None, texts: list[str] | None = None) -> np.ndarray:
-        y_true = None
+        if not self.model:
+            raise RuntimeError('No model in this instance')
+
+        y_true: np.ndarray | None = None
         if texts is not None:
-            idxs = np.arange(len(texts))
+            idxs = np.arange(len(texts))  # type:ignore[assignment]
             vectors = self.vectorise(texts=texts)
         elif data is not None:
             idxs = idxs or data.index
             vectors = self.vectorise(texts=data.loc[idxs]['text'])
             y_true = data.loc[idxs]['label'].to_numpy() if 'label' in data.columns else None
-        elif self.vectors is not None:
+        elif self.vectors is not None and self.dataset is not None:
             idxs = idxs or self.dataset.index  # we assume that self.vectors never exists without self.dataset
             vectors = self.vectors[self.dataset.index.isin(idxs)]
             y_true = self.dataset.loc[idxs]['label'].to_numpy() if 'label' in self.dataset.columns else None
@@ -162,7 +170,7 @@ class _SimpleClassification(ABC):
         else:
             raise RuntimeError('You must data either as part of the classifier, a dataframe, or list of texts')
 
-        if len(idxs) == 0:
+        if idxs is None or len(idxs) == 0:
             return np.array([])
 
         logger.debug(f'Predicting on {len(idxs):,} samples ({y_true.sum() if y_true is not None else "??"} of which should be included)')
@@ -173,8 +181,8 @@ class _SimpleClassification(ABC):
 
         logger.debug(f'  > Predictions found {(y_preds > 0.5).sum():,} to be included (above 0.5 threshold)')
         if len(y_preds.shape) == 1:
-            return y_preds
-        return y_preds[:, 1]
+            return y_preds  # type:ignore [no-any-return]
+        return y_preds[:, 1]  # type:ignore [no-any-return]
 
     def get_params(self) -> dict[str, Any]:
         return {
@@ -187,7 +195,7 @@ class _SimpleClassification(ABC):
             'hyperparams': {k: getattr(self.model, k) if hasattr(self.model, k) else v for k, v in self.final_params.items()},
         }
 
-    def store(self, target: Path):
+    def store(self, target: Path) -> None:
         from joblib import dump
 
         with open(target / 'vectorizer.pkl', 'wb') as f_out:
@@ -246,7 +254,7 @@ class SVMClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,
+            **kwargs,  # type:ignore [arg-type]
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
@@ -289,7 +297,7 @@ class SGDClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,
+            **kwargs,  # type:ignore [arg-type]
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
@@ -337,7 +345,7 @@ class RegressionClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,
+            **kwargs,  # type:ignore [arg-type]
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
@@ -387,7 +395,7 @@ class RandomForestClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,
+            **kwargs,  # type:ignore [arg-type]
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
@@ -440,7 +448,7 @@ class IsolationForestClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,
+            **kwargs,  # type:ignore [arg-type]
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
@@ -487,7 +495,7 @@ class NaiveBayesClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,
+            **kwargs,  # type:ignore [arg-type]
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
@@ -537,7 +545,7 @@ class LightGBMClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,
+            **kwargs,  # type:ignore [arg-type]
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:

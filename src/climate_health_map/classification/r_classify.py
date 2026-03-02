@@ -55,10 +55,10 @@ def classify_local(texts: list[str], label: Label, models_dir: Path, on_missing_
     if not stats_file.exists() or not model_dir.exists():
         logger.warning(f'Could not find the expected stats file at {stats_file}')
         if on_missing_model == OnConflict.BREAK:
-            logger.warning(f'... escalating to parent.')
+            logger.warning('... escalating to parent.')
             raise FileNotFoundError(f'Could not find a model for "{label.column}" in {models_dir}')
         else:
-            logger.warning(f'... but ignoring it.')
+            logger.warning('... but ignoring it.')
             return None
 
     logger.info(f'Reading stats file of pre-trained model from {stats_file}')
@@ -67,9 +67,10 @@ def classify_local(texts: list[str], label: Label, models_dir: Path, on_missing_
 
     logger.info('Importing model dependencies...')
     from .c_transformer import MODELS_TRANS, TransformerClassifier
-    from .c_traditional import MODELS_TRAD
+    from .c_traditional import MODELS_TRAD, _SimpleClassification
 
-    logger.info(f'Loading model for "{info['model']} from {models_dir}')
+    classifier: TransformerClassifier | _SimpleClassification
+    logger.info(f'Loading model for "{info["model"]} from {models_dir}')
     if info['model'] in MODELS_TRAD:
         Model = MODELS_TRAD[info['model']]
         classifier = Model.load(model_dir)
@@ -136,7 +137,7 @@ def classify(
 
     logger.info(f'Writing classifications to {target.resolve()}')
     write_any_df(df_res.reset_index(), target=target, kwargs={'index': False})
-    logger.info(f'All done.')
+    logger.info('All done.')
 
 
 if __name__ == '__main__':
