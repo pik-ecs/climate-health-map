@@ -42,8 +42,7 @@ def solr_ingest(
         batch_size=batch_size,
         logger=logger,
     )
-    with open(query_file, 'r') as f:
-        query = f.read()
+    query = get_query(query_file)
 
     def from_source() -> Generator[AcademicItemModel, None, None]:
         yield from (
