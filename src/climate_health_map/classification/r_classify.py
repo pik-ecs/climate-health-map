@@ -51,7 +51,7 @@ def classify_huggingface(data: pd.DataFrame, group: HfGroup, cache_dir: Path, lo
 def classify_local(texts: list[str], label: Label, models_dir: Path, on_missing_model: OnConflict, logger: logging.Logger) -> np.ndarray | None:
     logger.info('Assuming this is a local model, checking...')
     model_dir = models_dir / f'{label.column}/model'
-    stats_file = model_dir / f'{label.column}/stats.json'
+    stats_file = models_dir / f'{label.column}/stats.json'
     if not stats_file.exists() or not model_dir.exists():
         logger.warning(f'Could not find the expected stats file at {stats_file}')
         if on_missing_model == OnConflict.BREAK:
