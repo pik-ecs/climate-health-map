@@ -17,7 +17,7 @@ from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 from climate_health_map.data.dataset import downsampling_mask
-from .util import text_utils
+from climate_health_map.shared.text import text_utils
 
 logger = logging.getLogger('classify-traditional')
 logging.getLogger('LightGBM').setLevel(logging.ERROR)
