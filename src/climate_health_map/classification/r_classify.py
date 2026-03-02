@@ -97,7 +97,7 @@ def classify(
     label_group = LABELS[group]
     logger.info(f'Found requested label group: {label_group}')
 
-    if target.exists() and on_exists == OnConflict.IGNORE:
+    if target.exists() and on_exists == OnConflict.BREAK:
         raise FileExistsError(f'Output already exists at {target}')
     if target.exists() and on_exists == OnConflict.SKIP:
         logger.warning(f'Output already exists at {target}')
