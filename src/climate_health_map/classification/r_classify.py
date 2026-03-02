@@ -53,14 +53,19 @@ def classify_local(texts: list[str], label: Label, models_dir: Path, on_missing_
     model_dir = models_dir / f'{label.column}/model'
     stats_file = model_dir / f'{label.column}/stats.json'
     if not stats_file.exists() or not model_dir.exists():
+        logger.warning(f'Could not find the expected stats file at {stats_file}')
         if on_missing_model == OnConflict.BREAK:
+            logger.warning(f'... escalating to parent.')
             raise FileNotFoundError(f'Could not find a model for "{label.column}" in {models_dir}')
         else:
+            logger.warning(f'... but ignoring it.')
             return None
 
+    logger.info(f'Reading stats file of pre-trained model from {stats_file}')
     with open(stats_file) as f_in:
         info = json.load(f_in)
 
+    logger.info('Importing model dependencies...')
     from .c_transformer import MODELS_TRANS
     from .c_traditional import MODELS_TRAD
 
@@ -68,9 +73,11 @@ def classify_local(texts: list[str], label: Label, models_dir: Path, on_missing_
     if info['model'] not in models:
         raise KeyError(f'The model `{info["model"]}` is not known!')
 
+    logger.info(f'Loading model for "{info['model']} from {models_dir}')
     Model = models[info['model']]
     classifier = Model.load(model_dir)  # type:ignore[union-attr]
 
+    logger.info(f'Predicting on {len(texts):,} texts...')
     return classifier.predict(texts=texts)
 
 
