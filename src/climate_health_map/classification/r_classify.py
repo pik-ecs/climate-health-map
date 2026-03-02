@@ -74,7 +74,7 @@ def classify_local(texts: list[str], label: Label, models_dir: Path, on_missing_
         Model = MODELS_TRAD[info['model']]
         classifier = Model.load(model_dir)
     elif info['model'] in MODELS_TRANS:
-        classifier = TransformerClassifier.load(model_dir)
+        classifier = TransformerClassifier.load(model_dir, info=info)
     else:
         raise KeyError(f'The model `{info["model"]}` is not known!')
 
