@@ -101,7 +101,7 @@ class Dataset:
     def is_label_eligible(self, label: Label, min_minor_class: int = 10) -> bool:
         return is_label_eligible(df=self.df, label=label, min_minor_class=min_minor_class)
 
-    def get_simplified_df(self, column: str, mask: pd.Series[bool] | None = None) -> pd.DataFrame:
+    def get_simplified_df(self, column: str, mask: pd.Series | None = None) -> pd.DataFrame:
         masked = self.df[mask] if mask is not None else self.df
         return pd.DataFrame(
             [
