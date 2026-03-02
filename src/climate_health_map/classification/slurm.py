@@ -6,7 +6,7 @@ from typing import Annotated, Any
 import typer
 
 from climate_health_map.data.labels import LABELS_LOOKUP, LABELS, Collection
-from climate_health_map.shared import get_logger, ensure_directories
+from climate_health_map.shared import get_logger, ensure_directories, estimate_pd_memory_needs
 from climate_health_map.data import Group, get_filtered_labels
 from climate_health_map.shared.types import OnConflict
 from climate_health_map.shared.text import ensure_offline_nltk
@@ -411,6 +411,11 @@ def prepare_classify_slurm(
         'on-missing-model': on_missing_model.value,
         'loglevel': loglevel,
     }
+
+    logger.info('Establishing memory needs')
+    pd_mem_size = estimate_pd_memory_needs(source)
+    script_args['mem'] = f'{int(pd_mem_size * 2)}G'
+    logger.info(f'Assuming {script_args['mem']}GB memory need')
 
     logger.info('Compiling job array...')
     array = []

@@ -63,6 +63,18 @@ def write_any_df(df: pd.DataFrame, target: Path, kwargs: dict[str, Any] | None =
     raise ValueError(f'Unsupported file type: {target.suffix}')
 
 
+def estimate_pd_memory_needs(source: Path) -> float:
+    size_factor = {
+        '.csv': 5,
+        '.feather': 10,
+        '.parquet': 10,
+    }
+    if source.suffix not in size_factor:
+        raise ValueError(f'Unsupported file type: {source.suffix}')
+    source_size_gb = source.stat().st_size / 1024 / 1024 / 1024
+    return source_size_gb * size_factor[source.suffix]
+
+
 __all__ = [
     'essentials',
     'get_logger',
