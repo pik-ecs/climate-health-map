@@ -327,11 +327,9 @@ class TransformerClassifier:
             self.model.save_model(target.resolve().as_posix())
 
     @classmethod
-    def load(cls, source: Path) -> 'TransformerClassifier':
+    def load(cls, source: Path, info: dict[str, Any]) -> 'TransformerClassifier':
         model = AutoModelForSequenceClassification.from_pretrained(source, cache_dir=model_data_path, num_labels=2, ignore_mismatched_sizes=True)
-
-        return cls(instance=model)
-
+        return cls(instance=model, model_params=info['params']['hyperparams'])
 
 MODELS_TRANS = {
     'CLIMATEBERT': 'climatebert/distilroberta-base-climate-f',
