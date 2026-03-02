@@ -126,8 +126,12 @@ def classify(
         results = {'item_id': df_source.index}
         texts = df_source['text'].to_list()
         for label in label_group.labels:
+            logger.info(f'Classifying {label.column} ({label.name})')
             results[label.column] = classify_local(texts=texts, label=label, models_dir=models_dir, on_missing_model=on_missing_model, logger=logger)
+        logger.info('Packaging classifications into dataframe...')
         df_res = pd.DataFrame.from_dict(results).set_index('item_id')
+
+    logger.info(f'Constructed predictions dataframe of shape {df_res.shape}')
 
     logger.info(f'Writing classifications to {target.resolve()}')
     write_any_df(df_res.reset_index(), target=target, kwargs={'index': False})

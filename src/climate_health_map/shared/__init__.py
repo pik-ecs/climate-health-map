@@ -54,21 +54,22 @@ def write_any_df(df: pd.DataFrame, target: Path, kwargs: dict[str, Any] | None =
     if target.suffix == '.csv':
         kwargs_ = {k: v for k, v in kwargs.items() if k in pd.DataFrame.to_csv.__annotations__}
         df.to_csv(target, **kwargs_)
-    if target.suffix == '.feather' or target.suffix == '.arrow':
+    elif target.suffix == '.feather' or target.suffix == '.arrow':
         kwargs_ = {k: v for k, v in kwargs.items() if k in pd.DataFrame.to_feather.__annotations__}
         df.to_feather(target, **kwargs_)
-    if target.suffix == '.parquet':
+    elif target.suffix == '.parquet':
         kwargs_ = {k: v for k, v in kwargs.items() if k in pd.DataFrame.to_parquet.__annotations__}
         df.to_parquet(target, **kwargs_)
-    raise ValueError(f'Unsupported file type: "{target.suffix}"')
+    else:
+        raise ValueError(f'Unsupported file type: "{target.suffix}"')
 
 
 def estimate_pd_memory_needs(source: Path) -> float:
     size_factor = {
         '.csv': 5,
-        '.feather': 10,
-        '.arrow': 10,
-        '.parquet': 10,
+        '.feather': 20,
+        '.arrow': 20,
+        '.parquet': 20,
     }
     if source.suffix not in size_factor:
         raise ValueError(f'Unsupported file type: {source.suffix}')
