@@ -4,6 +4,14 @@ Planning to transition to [API](https://developers.openalex.org/guides/searching
 
 Import via web interface seems to fail for some reason. Alternatively, try to run via nacsos package command:
 ```bash
+# via nacsos_data
 uv run  --no-sources-package nacsos_data nacsos import SOLR --import-id 5b18344c-6c30-40ba-92ad-48a2136efe6b --source src/climate_health_map/data/query/query_20241029.txt --project-id 52f62f17-cefb-4152-bcca-2fcb77541e83 --config-file /data/nacsos2/nacsos-core/config/server.env
+
+# via healthapp (this includes the "Data Planet" filter!)
+uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
+    healthmap ingest query \
+    --config="/data/nacsos2/nacsos-core/config/server.env" \
+    --batch_size=10000
+    --loglevel='INFO'
 ```
 Note, this needs milvus, connection to database on se164 and to solr on srv-mcc-apsis (10.10.12.41)
