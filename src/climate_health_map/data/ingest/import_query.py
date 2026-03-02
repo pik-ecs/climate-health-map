@@ -14,7 +14,7 @@ from climate_health_map.shared.env import base_essentials
 def get_query(query_file: Path | None) -> str:
     here = Path(__file__).parent.resolve()
     if query_file is None:
-        query_file = here / 'query_w0241029.txt'
+        query_file = here / 'query_20241029.txt'
     with open(query_file, 'r') as f:
         return f.read()
 
@@ -42,6 +42,7 @@ def solr_ingest(
         batch_size=batch_size,
         logger=logger,
     )
+    logger.info('Reading query...')
     query = get_query(query_file)
 
     def from_source() -> Generator[AcademicItemModel, None, None]:
