@@ -165,6 +165,8 @@ class TransformerClassifier:
         self.model_params = model_params or {}
         self.final_params = {}
         self.model: CustomTrainer | None = instance
+        if self.model:
+            self.model.args = CustomTrainingArguments(**self.model_params)
         self.tuning_trials = tuning_trials
         self.test_split = test_split
         self.dataset = dataset
