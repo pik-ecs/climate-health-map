@@ -1,9 +1,9 @@
-from .ingest import query
+from .ingest import get_query
 from .labels import LABELS, Label, Topic, AggTopic, AggAggTopic, Group, LABELS_IMPACTS, LABELS_MAJOR, LABELS_TOPICS
 from .dataset import get_filtered_labels
 
 __all__ = [
-    'query',
+    'get_query',
     'get_filtered_labels',
     'LABELS',
     'LABELS_MAJOR',

@@ -1,9 +1,10 @@
-from pathlib import Path
+import typer
+from import_query import get_query, solr_ingest
 
-here = Path(__file__).parent.resolve()
-with open(here / 'query_20241029.txt', 'r') as f:
-    query = f.read()
+app = typer.Typer()
+app.command('query', help='Run solr import with the latest query')(solr_ingest)
 
 __all__ = [
-    'query',
+    'get_query',
+    'app',
 ]
