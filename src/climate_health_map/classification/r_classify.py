@@ -66,16 +66,17 @@ def classify_local(texts: list[str], label: Label, models_dir: Path, on_missing_
         info = json.load(f_in)
 
     logger.info('Importing model dependencies...')
-    from .c_transformer import MODELS_TRANS
+    from .c_transformer import MODELS_TRANS, TransformerClassifier
     from .c_traditional import MODELS_TRAD
 
-    models = MODELS_TRANS | MODELS_TRAD
-    if info['model'] not in models:
-        raise KeyError(f'The model `{info["model"]}` is not known!')
-
     logger.info(f'Loading model for "{info['model']} from {models_dir}')
-    Model = models[info['model']]
-    classifier = Model.load(model_dir)  # type:ignore[union-attr]
+    if info['model'] in MODELS_TRAD:
+        Model = MODELS_TRAD[info['model']]
+        classifier = Model.load(model_dir)
+    elif info['model'] in MODELS_TRANS:
+        classifier = TransformerClassifier.load(model_dir)
+    else:
+        raise KeyError(f'The model `{info["model"]}` is not known!')
 
     logger.info(f'Predicting on {len(texts):,} texts...')
     return classifier.predict(texts=texts)
