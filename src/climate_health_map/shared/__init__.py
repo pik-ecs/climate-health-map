@@ -49,6 +49,7 @@ def read_any_pd(source: Path, kwargs: dict[str, Any] | None = None, index_column
 
 
 def write_any_df(df: pd.DataFrame, target: Path, kwargs: dict[str, Any] | None = None) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True)
     kwargs = {'index': False} | (kwargs or {})
     if target.suffix == '.csv':
         kwargs_ = {k: v for k, v in kwargs.items() if k in pd.DataFrame.to_csv.__annotations__}

@@ -8,6 +8,7 @@ import typer
 import numpy as np
 import pandas as pd
 
+from climate_health_map.shared import read_any_pd, write_any_df
 from climate_health_map.shared.types import OnConflict
 from climate_health_map.data.labels import Label, LABELS, HfGroup
 
@@ -100,10 +101,14 @@ def classify(
             raise AssertionError('You should either set the `OFFLINE_MODEL_PATH` environment variable or the `--cache-dir` argument')
         cache_dir = Path(cd)
 
-    df_source = pd.read_csv(source)
+    logger.info(f'Reading data from {source.resolve()}')
+    df_source = read_any_pd(source)
+
     if 'item_id' in df_source.columns:
-        df_source.set_index('item_id', inplace=True)
+        logger.info('Setting `item_id` column as index')
+        df_source.set_index('item_id', inplace=True, drop=False)
     if 'text' not in df_source.columns:
+        logger.info('Adding virtual text column...')
         df_source['text'] = df_source.apply(lambda row: f'{row["title"] or ""} {row["abstract"] or ""}', axis=1)
 
     if type(label_group) is HfGroup:
@@ -117,14 +122,9 @@ def classify(
             results[label.column] = classify_local(texts=texts, label=label, models_dir=models_dir, on_missing_model=on_missing_model, logger=logger)
         df_res = pd.DataFrame.from_dict(results).set_index('item_id')
 
-    target.parent.mkdir(parents=True, exist_ok=True)
-    if target.suffix == '.csv':
-        df_res.reset_index().to_csv(target, index=False)
-    elif target.suffix == '.feather':
-        df_res.reset_index().to_feather(target, index=False)
-    else:
-        raise ValueError(f'Unsupported output file type: {target.suffix}')
-    logger.info(f'Wrote to {target}')
+    logger.info(f'Writing classifications to {target.resolve()}')
+    write_any_df(df_res.reset_index(), target=target, kwargs={'index': False})
+    logger.info(f'All done.')
 
 
 if __name__ == '__main__':
