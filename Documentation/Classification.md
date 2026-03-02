@@ -123,6 +123,7 @@ uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
     --venv-path=".venv/" \
     --log-path="../data/logs/train/" \
     --slurm-user="timrepke@pik-potsdam.de" \
+    --slurm-hours=8
     --loglevel="INFO" 
 ```
 
