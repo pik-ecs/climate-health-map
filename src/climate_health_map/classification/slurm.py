@@ -415,7 +415,7 @@ def prepare_classify_slurm(
     logger.info('Establishing memory needs')
     pd_mem_size = estimate_pd_memory_needs(source)
     pd_mem_size_scaling = 2
-    logger.info(f'Assuming {pd_mem_size:2f}*{pd_mem_size_scaling:2f}={pd_mem_size * pd_mem_size_scaling:2f}GB memory need')
+    logger.info(f'Assuming {pd_mem_size:.2f}*{pd_mem_size_scaling:.2f}={pd_mem_size * pd_mem_size_scaling:.2f}GB memory need')
 
     logger.info('Compiling job array...')
     array = []
