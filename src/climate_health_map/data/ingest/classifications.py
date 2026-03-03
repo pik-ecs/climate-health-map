@@ -23,7 +23,7 @@ def _ingest_file(
     batch_size: int,
     logger: logging.Logger,
     on_conflict: OnConflict,
-):
+) -> None:
     if on_conflict == OnConflict.BREAK:
         raise NotImplementedError('Break on exist is not implemented.')
     logger.info(f'Reading data from {fn.resolve()}...')
@@ -67,7 +67,7 @@ def _ingest_file(
 
             progress.set_postfix_str(f'Inserting codes for key="{key}" in mode ({on_conflict.value})')
             session.execute(
-                sa.insert(Enhancement.__table__).from_select(['enhancement_id', 'item_id', 'key', 'payload'], stmt_filter),
+                sa.insert(Enhancement.__table__).from_select(['enhancement_id', 'item_id', 'key', 'payload'], stmt_filter),  # type:ignore[arg-type]
             )
             session.flush()
             progress.update(len(batch))
@@ -80,7 +80,7 @@ def ingest_file(
     on_conflict: Annotated[OnConflict, typer.Option(help='How to handle existing key/value pairs')],
     batch_size: Annotated[int, typer.Option(help='Batch size for import')] = 200,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
-):
+) -> None:
     logger, settings, db_engine = essentials(config=config, logger_name='ingest', loglevel=loglevel, run_log_init=True)
 
     with db_engine.session() as session:
@@ -101,7 +101,7 @@ def ingest_dir(
     batch_size: Annotated[int, typer.Option(help='Batch size for import')] = 200,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
     filetype: Annotated[str, typer.Option(help='File type')] = 'arrow',
-):
+) -> None:
     logger, settings, db_engine = essentials(config=config, logger_name='ingest', loglevel=loglevel, run_log_init=True)
 
     with db_engine.session() as session:
