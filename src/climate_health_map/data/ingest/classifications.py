@@ -77,7 +77,7 @@ def _ingest_file(
 def ingest_file(
     config: Annotated[Path, typer.Option(help='Path to config.env')],
     source: Annotated[Path, typer.Option(help='Path to the predictions file')],
-    on_conflict: Annotated[OnConflict, typer.Option(help='How to handle existing key/value pairs')],
+    on_conflict: Annotated[OnConflict, typer.Option(help='How to handle existing key/value pairs')]=OnConflict.SKIP,
     batch_size: Annotated[int, typer.Option(help='Batch size for import')] = 200,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ) -> None:
@@ -96,8 +96,8 @@ def ingest_file(
 
 def ingest_dir(
     config: Annotated[Path, typer.Option(help='Path to config.env')],
-    source_dir: Annotated[Path, typer.Option(help='Path to the predictions directory')],
-    on_conflict: Annotated[OnConflict, typer.Option(help='How to handle existing key/value pairs')],
+    source: Annotated[Path, typer.Option(help='Path to the predictions directory')],
+    on_conflict: Annotated[OnConflict, typer.Option(help='How to handle existing key/value pairs')]=OnConflict.SKIP,
     batch_size: Annotated[int, typer.Option(help='Batch size for import')] = 200,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
     filetype: Annotated[str, typer.Option(help='File type')] = 'arrow',
@@ -105,7 +105,7 @@ def ingest_dir(
     logger, settings, db_engine = essentials(config=config, logger_name='ingest', loglevel=loglevel, run_log_init=True)
 
     with db_engine.session() as session:
-        for fn in source_dir.glob(f'*.{filetype}'):
+        for fn in source.glob(f'*.{filetype}'):
             _ingest_file(
                 fn=fn,
                 logger=logger,
