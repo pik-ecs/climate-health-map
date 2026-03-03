@@ -108,7 +108,7 @@ def topic_model(
     result = model.apply(df, batch_size=batch_size)
 
     logger.info(f'Writing data to {target.resolve()}')
-    write_any_df(df=result, target=target, kwargs={'compression': 'gzip', 'existing_data_behavior': 'delete_matching'})
+    write_any_df(df=result, target=target, compression='gzip', existing_data_behavior='delete_matching')
 
     logger.info('All done.')
 

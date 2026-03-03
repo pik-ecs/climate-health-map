@@ -144,8 +144,9 @@ def load_df_places(source: Path, index_column: str = 'item_id') -> tuple[pd.Data
     """
     df = read_any_pd(
         source,
-        kwargs={'dtype': str, 'keep_default_na': False},  # keep_default_na handles cells that contain "NA" (which is valid)
         index_column=index_column,
+        dtype=str,
+        keep_default_na=False,  # keep_default_na handles cells that contain "NA" (which is valid)
     )
     df = fix_geographies(df)
     mask = get_naming_mask(df)

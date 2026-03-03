@@ -136,7 +136,7 @@ def classify(
     logger.info(f'Constructed predictions dataframe of shape {df_res.shape}')
 
     logger.info(f'Writing classifications to {target.resolve()}')
-    write_any_df(df_res.reset_index(), target=target, kwargs={'index': False})
+    write_any_df(df_res.reset_index(), target=target, index=False)
     logger.info('All done.')
 
 

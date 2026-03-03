@@ -130,7 +130,10 @@ uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
 
 # Persisting predictions to NACSOS
 TODO: push classifications upstream to platform
+```bash
+rsync -avh --progress -e ssh foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/enhanced data/
 
+```
 # Additional classifiers
 We also have our [policy instruments sector](https://huggingface.co/evidence-for-climate-solutions/climatebert-policyinstruments-sector) classifier on huggingface.
 This is loaded separately and applied.

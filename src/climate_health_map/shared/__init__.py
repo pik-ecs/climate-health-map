@@ -29,7 +29,7 @@ def ensure_directories(logger: logging.Logger, **paths: tuple[Path | None, bool]
         logger.info(f'Will use {info} at {path}')
 
 
-def read_any_pd(source: Path, kwargs: dict[str, Any] | None = None, index_column: str | None = None) -> pd.DataFrame:
+def read_any_pd(source: Path, index_column: str | None = None, **kwargs: Any) -> pd.DataFrame:
     kwargs = kwargs or {}
     if source.suffix == '.csv':
         kwargs_ = {k: v for k, v in kwargs.items() if k in pd.read_csv.__annotations__}
@@ -48,7 +48,7 @@ def read_any_pd(source: Path, kwargs: dict[str, Any] | None = None, index_column
     return df
 
 
-def write_any_df(df: pd.DataFrame, target: Path, kwargs: dict[str, Any] | None = None) -> None:
+def write_any_df(df: pd.DataFrame, target: Path, **kwargs: Any) -> None:
     target.parent.mkdir(parents=True, exist_ok=True)
     kwargs = {'index': False} | (kwargs or {})
     if target.suffix == '.csv':
