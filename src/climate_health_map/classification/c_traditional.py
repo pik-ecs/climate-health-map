@@ -237,6 +237,8 @@ class SVMClassifier(_SimpleClassification):
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
         max_df: float = 0.8,
+        BaseModel: Type[ClassifierMixin] | None = None,  # ignored, just to handle `Model.load()` context
+        instances: Any | None = None,
         **kwargs: dict[str, Any],
     ):
         from sklearn.svm import SVC
@@ -254,7 +256,8 @@ class SVMClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,  # type:ignore [arg-type]
+            instances=instances,
+            **kwargs,
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
@@ -281,6 +284,8 @@ class SGDClassifier(_SimpleClassification):
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
         max_df: float = 0.8,
+        BaseModel: Type[ClassifierMixin] | None = None,  # ignored, just to handle `Model.load()` context
+        instances: Any | None = None,
         **kwargs: dict[str, Any],
     ):
         from sklearn.linear_model import SGDClassifier
@@ -297,7 +302,8 @@ class SGDClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,  # type:ignore [arg-type]
+            instances=instances,
+            **kwargs,
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
@@ -322,6 +328,8 @@ class RegressionClassifier(_SimpleClassification):
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
         max_df: float = 0.8,
+        BaseModel: Type[ClassifierMixin] | None = None,  # ignored, just to handle `Model.load()` context
+        instances: Any | None = None,
         **kwargs: dict[str, Any],
     ):
         from sklearn.linear_model import LogisticRegression
@@ -345,7 +353,8 @@ class RegressionClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,  # type:ignore [arg-type]
+            instances=instances,
+            **kwargs,
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
@@ -371,6 +380,8 @@ class RandomForestClassifier(_SimpleClassification):
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
         max_df: float = 0.8,
+        BaseModel: Type[ClassifierMixin] | None = None,  # ignored, just to handle `Model.load()` context
+        instances: Any | None = None,
         **kwargs: dict[str, Any],
     ):
         from sklearn.ensemble import RandomForestClassifier as RandomForestClassifier_
@@ -395,7 +406,8 @@ class RandomForestClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,  # type:ignore [arg-type]
+            instances=instances,
+            **kwargs,
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
@@ -421,6 +433,8 @@ class IsolationForestClassifier(_SimpleClassification):
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
         max_df: float = 0.8,
+        BaseModel: Type[ClassifierMixin] | None = None,  # ignored, just to handle `Model.load()` context
+        instances: Any | None = None,
         **kwargs: dict[str, Any],
     ):
         from sklearn.ensemble import IsolationForest
@@ -448,7 +462,8 @@ class IsolationForestClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,  # type:ignore [arg-type]
+            instances=instances,
+            **kwargs,
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
@@ -474,6 +489,8 @@ class NaiveBayesClassifier(_SimpleClassification):
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
         max_df: float = 0.8,
+        BaseModel: Type[ClassifierMixin] | None = None,  # ignored, just to handle `Model.load()` context
+        instances: Any | None = None,
         **kwargs: dict[str, Any],
     ):
         from sklearn.naive_bayes import MultinomialNB
@@ -495,7 +512,8 @@ class NaiveBayesClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,  # type:ignore [arg-type]
+            instances=instances,
+            **kwargs,
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
@@ -521,6 +539,8 @@ class LightGBMClassifier(_SimpleClassification):
         ngram_range: tuple[int, int] = (1, 3),
         min_df: int | float = 3,
         max_df: float = 0.8,
+        BaseModel: Type[ClassifierMixin] | None = None,  # ignored, just to handle `Model.load()` context
+        instances: Any | None = None,
         **kwargs: dict[str, Any],
     ):
         from lightgbm import LGBMClassifier
@@ -545,7 +565,8 @@ class LightGBMClassifier(_SimpleClassification):
             ngram_range=ngram_range,
             min_df=min_df,
             max_df=max_df,
-            **kwargs,  # type:ignore [arg-type]
+            instances=instances,
+            **kwargs,
         )
 
     def _hp_space(self, trial: optuna.Trial) -> dict[str, Any]:
