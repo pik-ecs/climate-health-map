@@ -22,7 +22,7 @@ def classify_huggingface(data: pd.DataFrame, group: HfGroup, cache_dir: Path, lo
     logger.info('Loading tokenizer')
     tokenizer = AutoTokenizer.from_pretrained(group.token_model, model_max_length=512, cache_dir=cache_dir)  # type: ignore[no-untyped-call]
     logger.info('Loading model')
-    model = AutoModelForSequenceClassification.from_pretrained(group.model)
+    model = AutoModelForSequenceClassification.from_pretrained(group.model, cache_dir=cache_dir)
     logger.info('Constructing pipe')
     pipe = TextClassificationPipeline(  # type: ignore[no-untyped-call]
         model=model,
