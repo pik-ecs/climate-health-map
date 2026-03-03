@@ -209,11 +209,11 @@ class _SimpleClassification(ABC):
     def load(cls: Type[T], source: Path) -> T:
         from joblib import load
 
-        with open(source / 'vectorizer.pk', 'rb') as f_in:
+        with open(source / 'vectorizer.pkl', 'rb') as f_in:
             vectoriser = load(f_in)
-        with open(source / 'scaler.pk', 'rb') as f_in:
+        with open(source / 'scaler.pkl', 'rb') as f_in:
             scaler = load(f_in)
-        with open(source / 'model.pk', 'rb') as f_in:
+        with open(source / 'model.pkl', 'rb') as f_in:
             model = load(f_in)
 
         return cls(
