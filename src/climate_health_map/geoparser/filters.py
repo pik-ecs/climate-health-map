@@ -39,5 +39,5 @@ TEXT_FILTER = re.compile(
     r'paris agreement|'
     r'(paris(?:\S* ){0,15}agreement)|(cop(?:\S* ){0,15}agreement)|'
     r'(paris(?:\S* ){0,15}cop)|(cop(?:\S* ){0,15}paris)',
-    flags=re.I,
-)  # ignore case
+    flags=re.I,  # ignore case
+)

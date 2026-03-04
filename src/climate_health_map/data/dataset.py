@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -58,7 +59,7 @@ def is_label_eligible(df: pd.DataFrame, label: Label, min_minor_class: int = 10,
 
 def get_filtered_labels(
     dataset_path: Path | None = None,
-    dataset_df: pd.DataFrame | None = None,
+    dataset_df: Optional[pd.DataFrame] = None,
     min_minor_class: int = 10,
 ) -> dict[str, Label]:
     """Filter `LABELS` based on the available training data.
@@ -101,7 +102,7 @@ class Dataset:
     def is_label_eligible(self, label: Label, min_minor_class: int = 10) -> bool:
         return is_label_eligible(df=self.df, label=label, min_minor_class=min_minor_class)
 
-    def get_simplified_df(self, column: str, mask: pd.Series | None = None) -> pd.DataFrame:
+    def get_simplified_df(self, column: str, mask: Optional[pd.Series] = None) -> pd.DataFrame:
         masked = self.df[mask] if mask is not None else self.df
         return pd.DataFrame(
             [

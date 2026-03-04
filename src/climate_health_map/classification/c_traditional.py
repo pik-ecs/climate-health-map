@@ -2,7 +2,7 @@ import os
 import logging
 import warnings
 from pathlib import Path
-from typing import Any, Type, TypeVar
+from typing import Any, Type, TypeVar, Optional
 from abc import abstractmethod, ABC
 
 import optuna
@@ -43,7 +43,7 @@ class _SimpleClassification(ABC):
         self,
         BaseModel: Type[ClassifierMixin],
         model_params: dict[str, Any] | None = None,
-        dataset: pd.DataFrame | None = None,
+        dataset: Optional[pd.DataFrame] = None,
         tuning_trials: int = 35,
         scoring: str | None = None,
         random_seed: int | None = None,
@@ -147,7 +147,7 @@ class _SimpleClassification(ABC):
         vectors = self.vectorizer.transform(stripped_texts)
         return self.scaler.transform(vectors)  # type:ignore [no-any-return]
 
-    def predict(self, idxs: list[int] | None = None, data: pd.DataFrame | None = None, texts: list[str] | None = None) -> np.ndarray:
+    def predict(self, idxs: list[int] | None = None, data: Optional[pd.DataFrame] = None, texts: list[str] | None = None) -> np.ndarray:
         if not self.model:
             raise RuntimeError('No model in this instance')
 
@@ -227,7 +227,7 @@ class SVMClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame | None = None,
+        dataset: Optional[pd.DataFrame] = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,
@@ -274,7 +274,7 @@ class SGDClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame | None = None,
+        dataset: Optional[pd.DataFrame] = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,
@@ -318,7 +318,7 @@ class RegressionClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame | None = None,
+        dataset: Optional[pd.DataFrame] = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,
@@ -370,7 +370,7 @@ class RandomForestClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame | None = None,
+        dataset: Optional[pd.DataFrame] = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,
@@ -423,7 +423,7 @@ class IsolationForestClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame | None = None,
+        dataset: Optional[pd.DataFrame] = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,
@@ -479,7 +479,7 @@ class NaiveBayesClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame | None = None,
+        dataset: Optional[pd.DataFrame] = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,
@@ -529,7 +529,7 @@ class LightGBMClassifier(_SimpleClassification):
 
     def __init__(
         self,
-        dataset: pd.DataFrame | None = None,
+        dataset: Optional[pd.DataFrame] = None,
         tuning_trials: int = 35,
         model_params: dict[str, Any] | None = None,
         random_seed: int | None = None,

@@ -31,6 +31,9 @@ def mordecai(
     hosts: Annotated[list[str] | None, typer.Option(help='')] = None,
     port: Annotated[int, typer.Option(help='')] = 9200,
     device: Annotated[str, typer.Option(help='')] = 'gpu',
+    only_incl: Annotated[bool, typer.Option(help='Only apply mordecai to included records')] = True,
+    incl_threshold: Annotated[float, typer.Option(help='Only apply mordecai to records with "rel_major|1" > THRESHOLD')] = 0.5,
+    min_text_len: Annotated[int, typer.Option(help='Minimum length of title+abstract (in characters)')] = 100,
     created_after: Annotated[str | None, typer.Option(help='Filter to only apply mordecai to items created after that date; format: YYYY-MM-DD')] = None,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ) -> None:
@@ -41,42 +44,48 @@ def mordecai(
 
     geo = Geoparser(debug=verbose, hosts=hosts, port=port, device=device)
 
+    extra_joins = []
+    extra_wheres = []
+
+    if only_incl:
+        extra_joins.append("JOIN enhancement incl ON i.item_id = incl.item_id AND incl.key = 'rel_major|1' AND payload::float > :threshold")
     if created_after:
-        stmt = """
-            SELECT DISTINCT m2mii.item_id,
-                   (coalesce(ai.title, '') || '. ' || coalesce(i.text, '')) as txt
-            FROM m2m_import_item m2mii
-                 JOIN import_revision ir ON m2mii.import_id = ir.import_id AND m2mii.first_revision = ir.import_revision_counter
-                 JOIN item i ON m2mii.item_id = i.item_id
-                 JOIN academic_item ai ON m2mii.item_id = ai.item_id
-                 LEFT OUTER JOIN enhancement e ON i.item_id = e.item_id AND e.key = 'mordecai3'
-            WHERE ai.project_id = :project_id
-              AND m2mii.import_id::text = ANY(:import_ids)
-              AND ir.time_created > :created_after
-              AND length((coalesce(ai.title, '') || '. ' || coalesce(i.text, ''))) > 60
-              AND e.key IS NULL;"""
-    else:
-        stmt = """
-            SELECT DISTINCT ai.item_id,
-                   (coalesce(ai.title, '') || '. ' || coalesce(i.text, '')) as txt
-            FROM academic_item ai
-                 JOIN item i ON i.item_id = ai.item_id
-                 JOIN m2m_import_item ii ON ai.item_id = ii.item_id
-                 LEFT OUTER JOIN enhancement e ON i.item_id = e.item_id AND e.key = 'mordecai3'
-            WHERE ai.project_id = :project_id
-              AND ii.import_id::text = ANY(:import_ids)
-              AND length((coalesce(ai.title, '') || '. ' || coalesce(i.text, ''))) > 60
-              AND e.key IS NULL;
-        """
+        extra_joins.append('JOIN import_revision ir ON m2mii.import_id = ir.import_id AND m2mii.first_revision = ir.import_revision_counter')
+        extra_wheres.append('ir.time_created > :created_after')
+    extra_wheres_ = ''
+    if len(extra_wheres) > 0:
+        extra_wheres_ = ' AND '.join(extra_wheres)
+        extra_wheres_ = f'AND {extra_wheres_}'
+
+    stmt = f"""
+        SELECT DISTINCT m2mii.item_id,
+               (coalesce(ai.title, '') || '. ' || coalesce(i.text, '')) as txt
+        FROM m2m_import_item m2mii
+             JOIN item i ON m2mii.item_id = i.item_id
+             JOIN academic_item ai ON m2mii.item_id = ai.item_id
+             {'\n '.join(extra_joins)}
+             LEFT OUTER JOIN enhancement e ON i.item_id = e.item_id AND e.key = 'mordecai3'
+        WHERE ai.project_id = :project_id
+          AND m2mii.import_id::text = ANY(:import_ids)
+          AND length((coalesce(ai.title, '') || '. ' || coalesce(i.text, ''))) > :min_len
+          AND e.key IS NULL {extra_wheres_};
+    """
+
     with db_engine.session() as session:
         logger.info('Running query...')
         rslt = session.execute(
             sa.text(stmt).execution_options(yield_per=batch_size),
-            {'project_id': settings.PROJECT_ID, 'import_ids': settings.IMPORTS, 'created_after': created_after},
+            {
+                'project_id': settings.PROJECT_ID,
+                'import_ids': settings.IMPORTS,
+                'created_after': created_after,
+                'min_len': min_text_len,
+                'threshold': incl_threshold,
+            },
         )
 
         tq = tqdm()
-        cnt = 0
+        counters = {'n_processed': 0, 'n_without_place': 0}
 
         logger.info('Start batched processing...')
         for batch in rslt.mappings().partitions():
@@ -85,21 +94,20 @@ def mordecai(
                 try:
                     places: list[dict[str, Any]] | None = list(apply_mordecai(item['txt'], geo=geo))
                     places = clear_empty(places)
-                    if places:
-                        session.add(
-                            Enhancement(
-                                enhancement_id=uuid.uuid4(),
-                                item_id=item['item_id'],
-                                key='mordecai3',
-                                payload=places,
-                            ),
-                        )
-                        session.flush()
-                        cnt += 1
+                    session.add(
+                        Enhancement(
+                            enhancement_id=uuid.uuid4(),
+                            item_id=item['item_id'],
+                            key='mordecai3',
+                            payload=places,
+                        ),
+                    )
+                    counters['n_processed'] += 1
+                    counters['n_without_place'] += int(places is not None)
                 except Exception as e:
                     logger.error(e)
-                session.commit()
-            tq.set_description(f'Updated {cnt:,} items')
+            session.commit()
+            tq.set_postfix(counters)
 
         tq.close()
         logger.info('Finished processing!')

@@ -99,6 +99,9 @@ TODO: describe
 # Export records that have no major relevance classification
 uv run healthmap export items --config config/secret.env --target data/exports/items.csv --label-missing --label-filter "rel_major|1" 
 
+# Transfer to HPC
+scp data/exports/items_20260304.csv foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/climate-health-map/data/exports
+
 # need to replace {group}
 uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
     healthmap classification classify \
@@ -110,7 +113,7 @@ uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
     --on-exists="IGNORE" \
     --on-missing-model="IGNORE" \
     --loglevel="INFO"
-    
+
 # SLURM
 uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
     healthmap classification slurm-classify-scripts \
@@ -127,12 +130,12 @@ uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
     --loglevel="INFO" 
 ```
 
-
 # Persisting predictions to NACSOS
 TODO: push classifications upstream to platform
+
 ```bash
 rsync -avh --progress -e ssh foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/enhanced data/
-uv run ruff ingest healthmap classifications-dir \
+uv run healthmap ingest classifications-dir \
     --source="data/enhanced/" \
     --on-conflict="IGNORE" \
     --batch-size=1000 \
@@ -156,6 +159,8 @@ tail -f data/logs/[jobid]_[array].err
 queue -t all -p gpu --format "%.18i %.9P %.8j %.8u %.8T %.12M %.14l %.10D %.20R %.20p %.15r %.20V"
 queue -t all -p standard --format "%.18i %.9P %.8j %.8u %.8T %.12M %.14l %.10D %.20R %.20p %.15r %.20V"
 queue --me -t all --format "%.18i %.9P %.8j %.8u %.8T %.12M %.14l %.10D %.20R %.20p %.15r %.20V"
+
+# measure resource utilisation and efficiency fo jobs
 sacct -u timrepke
 seff <Jobid>
 

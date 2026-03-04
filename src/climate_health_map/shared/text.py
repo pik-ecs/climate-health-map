@@ -4,10 +4,8 @@ import string
 from pathlib import Path
 from typing import Generator, Callable
 
-import nltk
 import numpy as np
 import pandas as pd
-from nltk.stem import SnowballStemmer
 
 
 def chunked_text(text: str, chunk_size: int = 500, overlap: int = 15) -> Generator[str, None, None]:
@@ -56,15 +54,19 @@ def text_utils() -> tuple[Callable[[str, str], str], Callable[[str], str], Calla
 
 
 def tokenize(text: str) -> list[str]:
+    from nltk import word_tokenize
+
     translation_table = {ord(c): None for c in string.punctuation + string.digits}
     # Remove punctuation and digits
-    tokens = nltk.word_tokenize(text.translate(translation_table))
+    tokens = word_tokenize(text.translate(translation_table))
     # Remove tokens with more than 2 and less than 100 characters
     return [tok for tok in tokens if 2 < len(tok) < 100]
 
 
-class snowball_stemmer(object):
+class SnowballStemmerClass(object):
     def __init__(self) -> None:
+        from nltk.stem import SnowballStemmer
+
         self.stemmer = SnowballStemmer('english')
 
     def __call__(self, doc: str) -> list[str]:

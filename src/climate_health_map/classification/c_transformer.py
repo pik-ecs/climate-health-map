@@ -158,7 +158,7 @@ class TransformerClassifier:
 
     def __init__(
         self,
-        dataset: pd.DataFrame | None = None,
+        dataset: Optional[pd.DataFrame] = None,
         model_params: dict[str, Any] | None = None,
         min_batch_size: int = 2,
         max_batch_size: int = 32,
@@ -284,7 +284,7 @@ class TransformerClassifier:
         )
         self._train(args, dataset)
 
-    def predict(self, idxs: list[int] | None = None, data: pd.DataFrame | None = None, texts: list[str] | None = None) -> np.ndarray:
+    def predict(self, idxs: list[int] | None = None, data: Optional[pd.DataFrame] = None, texts: list[str] | None = None) -> np.ndarray:
         if not self.model:
             raise RuntimeError('Model not loaded')
         y_true = None

@@ -1,7 +1,7 @@
-from .keywords import cluster_label_points
+from .keywords import project_topic_names
 from .util import rescale_projection
 
 __all__ = [
     'rescale_projection',
-    'cluster_label_points',
+    'project_topic_names',
 ]
