@@ -15,7 +15,7 @@ dependencies = [
 
 [project.optional-dependencies]
 classify = [
-    "transformers[torch]==4.57.6",  #  mordecai3==3.4.0 depends on transformers>=4.2.2,<5.0
+    "transformers[torch]==4.57.6", #  mordecai3==3.4.0 depends on transformers>=4.2.2,<5.0
     "datasets==4.5.0",
     "evaluate==0.4.6",
     "accelerate==1.12.0",
@@ -24,7 +24,8 @@ classify = [
     "nltk==3.9.3",
 ]
 extract = [
-   "mordecai3==3.4.0",
+    "mordecai3==3.4.0",
+    "en_core_web_trf",
 ]
 notebook = [
     "cartopy==0.25.0",
@@ -40,6 +41,7 @@ notebook = [
 prerelease = "allow"
 
 [tool.uv.sources]
+en_core_web_trf = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl" }
 mordecai3 = { git = "git+https://github.com/ahalterman/mordecai3" }
 nacsos_data = { path = "../nacsos_data", editable = true }
 #nacsos_data = { git = "git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git", tag = "v0.24.24" }
