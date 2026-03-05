@@ -44,7 +44,6 @@ prerelease = "allow"
 en_core_web_trf = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl" }
 mordecai3 = { git = "git+https://github.com/ahalterman/mordecai3" }
 nacsos_data = { path = "../nacsos_data", editable = true }
-#nacsos_data = { git = "git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git", tag = "v0.24.24" }
 
 [project.scripts]
 healthmap = "climate_health_map:main"
@@ -56,7 +55,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "ruff>=0.15.2",
+    "ruff>=0.15.4",
     "mypy[faster-cache]==1.19.1",
 ]
 [tool.ruff]

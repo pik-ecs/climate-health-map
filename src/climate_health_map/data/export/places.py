@@ -60,7 +60,8 @@ WITH
             JOIN m2m_import_item ii ON i.item_id = ii.item_id
         WHERE i.project_id::text  = :project_id
           AND ii.import_id::text = ANY(:import_ids)
-          AND e.key = 'mordecai3')
+          AND e.key = 'mordecai3'
+          AND e.payload IS NOT NULL)
 SELECT item_id::text,
        place ->> 'lat'           AS lat,
        place ->> 'lat'           AS lat,

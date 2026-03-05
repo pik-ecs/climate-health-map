@@ -8,6 +8,7 @@ from climate_health_map.data.ingest import app as ingest_app
 from climate_health_map.shared import get_logger
 from climate_health_map.geoparser import mordecai
 from climate_health_map.topics import topic_model
+from climate_health_map.gap_filling import abstracts_app
 
 
 def command_tree(app: typer.Typer) -> Tree:
@@ -38,6 +39,7 @@ def main() -> None:
     app.add_typer(export_app, name='export')
     app.add_typer(classifier_app, name='classification')
     app.add_typer(ingest_app, name='ingest')
+    app.add_typer(abstracts_app, name='abstracts')
     app.command('geoparser', help='Extract geolocations using mordecai where the information is missing in the database')(mordecai)
     app.command('topicmodel', help='Apply topic model to unseen records')(topic_model)
 
