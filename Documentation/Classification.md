@@ -96,6 +96,8 @@ rsync -avh --progress --include='stats.json' --include='*/' --exclude='*' -e ssh
 TODO: describe
 
 ```bash
+export UV_NO_SOURCES_PACKAGE=nacsos_data,openalex_ingest
+
 # Export records that have no major relevance classification
 uv run healthmap export items --config config/secret.env --target data/exports/items.csv --label-missing --label-filter "rel_major|1" 
 
@@ -103,7 +105,7 @@ uv run healthmap export items --config config/secret.env --target data/exports/i
 scp data/exports/items_20260304.csv foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/climate-health-map/data/exports
 
 # need to replace {group}
-uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
+uv run --extra classify--prerelease=allow \
     healthmap classification classify \
     --source="../data/exports/items.csv" \
     --target="../data/enhanced/labels_{group}.csv" \
@@ -115,7 +117,7 @@ uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
     --loglevel="INFO"
 
 # SLURM
-uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
+uv run --extra classify --prerelease=allow \
     healthmap classification slurm-classify-scripts \
     --source="../data/exports/items.csv" \
     --target="../data/enhanced/" \
