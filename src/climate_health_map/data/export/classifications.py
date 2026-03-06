@@ -40,7 +40,7 @@ SELECT i.item_id::text,
        {',\n'.join(filter_selects)}
 FROM enhancement e
      JOIN item i ON i.item_id = e.item_id
-     JOIN m2m_import_item ii ON ai.item_id = ii.item_id
+     JOIN m2m_import_item ii ON e.item_id = ii.item_id
 WHERE i.project_id::text = :project_id AND ii.import_id::text = ANY(:import_ids)
 GROUP BY i.item_id;
             """,

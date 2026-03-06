@@ -21,7 +21,7 @@ def apply_mordecai(text: str, geo: 'Geoparser') -> Generator[dict[str, Any], Non
     text_clean = clean_text(text, extra=[TEXT_FILTER])
     for chunk in chunked_text(text_clean, chunk_size=500, overlap=15):
         places = geo.geoparse_doc(chunk)
-        yield places['geolocated_ents']
+        yield from places['geolocated_ents']
 
 
 def mordecai(

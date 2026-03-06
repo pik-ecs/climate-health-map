@@ -110,12 +110,14 @@ def ensure_offline_nltk(logger: logging.Logger, target_dir: Path | None = None) 
 
 
 def text_from_table(df: pd.DataFrame) -> pd.Series:
+    if 'title' in df.columns and 'text' in df.columns and df.iloc[0]['title'].str.startswith(f'{df.iloc[0]["title"]}.'):
+        return df['text']
     # We have title and abstract, but no dedicated text column
     if 'title' in df.columns and 'abstract' in df.columns and 'text' not in df.columns:
-        return df.replace({np.nan: '', None: ''}).apply(lambda row: f'{row["title"]}. {row["abstract"]}')
+        return df.replace({np.nan: '', None: ''}).apply(lambda row: f'{row["title"]}. {row["abstract"]}', axis=1)
     # We have title and abstract (called `text`), but no dedicated text column
     if 'title' in df.columns and 'abstract' not in df.columns and 'text' in df.columns:
-        return df.replace({np.nan: '', None: ''}).apply(lambda row: f'{row["title"]}. {row["text"]}')
+        return df.replace({np.nan: '', None: ''}).apply(lambda row: f'{row["title"]}. {row["text"]}', axis=1)
     # We already seem to have a prepared text column, use that one
     if 'title' in df.columns and 'abstract' in df.columns and 'text' in df.columns:
         return df['text']

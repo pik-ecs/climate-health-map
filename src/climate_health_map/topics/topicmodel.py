@@ -7,32 +7,40 @@ from pathlib import Path
 import typer
 import numpy as np
 import pandas as pd
-from sklearn.decomposition import NMF
-from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm import tqdm
 
+from climate_health_map import get_logger
 from climate_health_map.shared import read_any_pd, write_any_df
-from climate_health_map.shared.env import base_essentials
 from climate_health_map.shared.text import SnowballStemmerClass, clean_text, text_from_table, ensure_offline_nltk
 
 
 class TopicModel:
-    VOCAB_FILE = 'vocab.csv'
+    VOCAB_FILE = 'vocabulary.csv'
     SCORES_FILE = 'term_topic_scores.csv'
     TOPIC_INFOS_FILE = 'topic_infos.csv'
-    FALLBACK_PATH = Path(__file__).parent.resolve() / 'models'
+    FALLBACK_PATH = Path(__file__).parent.resolve() / '_model'
 
     TOPIC_INFOS: Optional[pd.DataFrame] = None
 
     def __init__(self, model_path: Path | None = None, logger: logging.Logger | None = None):
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.decomposition import NMF
+
         self.logger = logger or logging.getLogger('topic-model')
         model_path = model_path or self.FALLBACK_PATH
 
         self.logger.info(f'Loading vocabulary from {model_path / self.VOCAB_FILE}')
         # The terms in our vocabulary list correspond with those found in the term-topic scores dataframe
         # Note: topic model and vectorizer vocab have different indexing!!
-        self.vocabulary = pd.read_csv(model_path / self.VOCAB_FILE)
-        self.vocabulary_tm = {row['token']: row['token_id_tm'] for _, row in self.vocabulary[self.vocabulary['token_id_tm'].notna()].iterrows()}
+        self.vocabulary = (
+            pd
+            .read_csv(model_path / self.VOCAB_FILE, keep_default_na=False)
+            .replace({'': np.nan})
+            .astype({'token_id_vec': 'Int32', 'token_id_tm': 'Int32'})
+        )
+
+        vocab = self.vocabulary[self.vocabulary['token_id_vec'].notna()].fillna(0).groupby('token_id_vec').first().reset_index()
+        self.vocabulary_tm = {row['token']: row['token_id_vec'] for _, row in vocab.iterrows()}
         self.vectorizer = TfidfVectorizer(
             max_df=0.95,
             min_df=10,
@@ -43,9 +51,14 @@ class TopicModel:
             smooth_idf=True,
             use_idf=True,
             tokenizer=SnowballStemmerClass(),
-            vocabulary={row['token']: row['token_id_vec'] for _, row in self.vocabulary[self.vocabulary['token_id_vec'].notna()].iterrows()},
+            vocabulary=self.vocabulary_tm,
         )
-        self.vectorizer.idf_ = self.vocabulary[self.vocabulary['idf'].notna()].sort_values('token_id_vec')['idf'].tolist()
+        self.vectorizer.idf_ = vocab.sort_values('token_id_vec')['idf'].to_numpy().astype('float64')
+
+        # Mapping to address the vectorizer token IDs are different to the topic model token IDs
+        self.vec2tm_ids = {row['token_id_vec']: row['token_id_tm'] for _, row in self.vocabulary[self.vocabulary['token_id_vec'].notna() & self.vocabulary['token_id_tm'].notna()].iterrows()}
+        # Topic model token IDs are not continuous, hence we need a mapping to offset gaps
+        self.tm_id2idx = {tok_id: tok_idx for tok_idx, tok_id in enumerate(self.vocabulary[self.vocabulary['token_id_tm'].notna()].sort_values('token_id_tm')['token_id_tm'])}
 
         self.logger.info(f'Loading topic scores from {model_path / self.SCORES_FILE}')
         # Get the topic-term scores associated with the run_id from our database
@@ -72,53 +85,62 @@ class TopicModel:
         return cls.TOPIC_INFOS
 
     def vectorize(self, texts: list[str], min_len: int = 10) -> tuple[np.ndarray, pd.Series]:
-        self.logger.info('Cleaning and filtering texts...')
+        self.logger.debug('Cleaning and filtering texts...')
         mask = [len(re.findall(r'(\w+)', text)) > min_len for text in texts]
         texts = [clean_text(text) for incl, text in zip(mask, texts, strict=True)]
 
-        self.logger.info('Vectorizing cleaned texts...')
+        self.logger.debug('Vectorizing cleaned texts...')
         tfidf = self.vectorizer.transform(texts).todense()
 
         # Initialise an empty matrix with size determined by the number of docs and the number of terms with term-topic scores
         doc_topics = np.matrix(np.zeros((len(texts), self.priors.shape[1])))
 
-        self.logger.info('Applying topic model...')
+        self.logger.debug('Translating into topic model indexes...')
         # Fill this matrix with our data from the new documents
         # Terms not found in our pre-existing vocabulary list are discarded
-        for token_id_vec, token in enumerate(self.vectorizer.get_feature_names_out()):
-            if token in self.vocabulary_tm:
-                token_id_tm = self.vocabulary_tm[token]
-                doc_topics[:, token_id_tm] = tfidf[:, token_id_vec]
+        for token_id_vec, token_id_tm in self.vec2tm_ids.items():
+            doc_topics[:, self.tm_id2idx[token_id_tm]] = tfidf[:, token_id_vec]
+
         return np.asarray(doc_topics), pd.Series(mask)
 
     def apply(self, df: pd.DataFrame, batch_size: int = 5000) -> pd.DataFrame:
         chunks = []
-        for pos in tqdm(range(0, len(df), batch_size), desc=f'Applying topic model to batches ({(batch_size,)} each, total {len(df):,})'):
-            batch = df.iloc[pos : pos + batch_size]
-            texts = text_from_table(batch)
-            doc_topics, mask = self.vectorize(list(texts))
+        for pos in tqdm(range(0, len(df), batch_size), desc=f'Applying topic model to batches ({batch_size:,} each, total {len(df):,})'):
+            # bite off a chunk from the big dataframe
+            batch = df.iloc[pos: pos + batch_size]
+            index = batch.index.set_names('item_id')
 
-            dtm = pd.DataFrame(doc_topics)
-            dtm.columns = self.tts.topic_id.unique()
-            dtm.index = batch[mask].index
+            # Clean and vectorize text
+            texts = text_from_table(batch)
+            vectors, mask = self.vectorize(texts.tolist())
+
+            # Apply topic model
+            topic_scores = self.nmf.transform(vectors[mask])
+
+            # Prepare pretty return format
+            dtm = pd.DataFrame(topic_scores, index=index[mask], columns=self.tts.topic_id.unique())
+
+            # Append to our memory
             chunks.append(dtm.reset_index().melt(id_vars='item_id', var_name='topic_id', value_name='score').query('score>0'))
+
         return pd.concat(chunks)
 
 
 def topic_model(
     source: Annotated[Path, typer.Option(help='Path to file to apply topic model to')],
     target: Annotated[Path, typer.Option(help='Path to output file')],
-    models_path: Annotated[Path, typer.Option(help='Path to offline model store')],
-    config: Annotated[Path, typer.Option(help='Path to config.env')],
+    offline_models_path: Annotated[Path, typer.Option(help='Path to offline model store')],
+    topic_models_path: Annotated[Path, typer.Option(help='Path to offline model store')] | None = None,
     batch_size: Annotated[int, typer.Option(help='')] = 5000,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ) -> None:
-    logger, settings = base_essentials(config=config, loglevel=loglevel, logger_name='export', run_log_init=True)
+    logger = get_logger(loglevel=loglevel, logger_name='export', run_log_init=True)
 
-    ensure_offline_nltk(target_dir=(models_path / 'nltk_data').resolve(), logger=logger)
+    ensure_offline_nltk(target_dir=(offline_models_path / 'nltk_data').resolve(), logger=logger)
 
-    logger.info(f'Initialising topic model from {models_path.resolve()}')
-    model = TopicModel((models_path / 'topic_model').resolve(), logger=logger)
+    topic_models_path = topic_models_path or TopicModel.FALLBACK_PATH
+    logger.info(f'Initialising topic model from {topic_models_path.resolve()}')
+    model = TopicModel(topic_models_path, logger=logger)
 
     logger.info(f'Reading data from {source.resolve()}')
     df = read_any_pd(source)

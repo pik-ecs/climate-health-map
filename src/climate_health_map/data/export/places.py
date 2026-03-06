@@ -61,7 +61,8 @@ WITH
         WHERE i.project_id::text  = :project_id
           AND ii.import_id::text = ANY(:import_ids)
           AND e.key = 'mordecai3'
-          AND e.payload IS NOT NULL)
+          AND e.payload IS NOT NULL
+          AND e.payload <> '[]'::jsonb)
 SELECT item_id::text,
        place ->> 'lat'           AS lat,
        place ->> 'lat'           AS lat,
