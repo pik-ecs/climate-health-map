@@ -57,6 +57,7 @@ def solr_ingest(
 
     logger.info('Fetching item count')
     num_new_items = solr_client.get_count(query).num_found
+    logger.info(f'Query will return {num_new_items:,} records')
 
     async def inner() -> tuple[str, int | None]:
 
