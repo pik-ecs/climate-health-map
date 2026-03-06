@@ -146,7 +146,7 @@ def topic_model(
     model = TopicModel(topic_models_path, logger=logger)
 
     logger.info(f'Reading data from {source.resolve()}')
-    df = read_any_pd(source, index_column='item_id').iloc[:500]
+    df = read_any_pd(source, index_column='item_id')
 
     logger.info(f'Applying topic model to data of shape {df.shape}...')
     result = model.apply(df, batch_size=batch_size)
