@@ -1,7 +1,7 @@
 ```bash
-uv run --extra extract --no-sources-package nacsos_data --prerelease=allow spacy download en_core_web_trf
+export UV_NO_SOURCES_PACKAGE="nacsos_data openalex_ingest"
 
-uv run --extra extract --no-sources-package nacsos_data --prerelease=allow \
+uv run --extra extract --prerelease=allow \
     healthmap geoparser \
     --batch-size=1000 \
     --loglevel="INFO" \

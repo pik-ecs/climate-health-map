@@ -1,3 +1,4 @@
+import re
 import asyncio
 from pathlib import Path
 from typing import Annotated, Generator
@@ -16,7 +17,7 @@ def get_query(query_file: Path | None) -> str:
     if query_file is None:
         query_file = here / 'query_20241029.txt'
     with open(query_file, 'r') as f:
-        return f.read()
+        return re.sub(r'\s+', ' ', f.read())
 
 
 def solr_ingest(

@@ -74,6 +74,8 @@ export HF_HUB_OFFLINE=1
 export OFFLINE_MODEL_PATH={models_path.resolve()}
 export NLTK_DATA={models_path.resolve()}/nltk_data
 
+export UV_NO_SOURCES_PACKAGE=nacsos_data,openalex_ingest
+
 echo "Using python from $(which python)"
 echo "Python version is $(python --version)"
 
@@ -88,7 +90,7 @@ param=${{PARAMS[$job]}}
 echo "array_task_id" $SLURM_ARRAY_TASK_ID " --> job" $job
 {env_vars}
 
-uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \\
+uv run --extra classify --prerelease=allow \\
     healthmap classification {command} \\
 """
     for k, v in script_params.items():

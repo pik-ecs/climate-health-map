@@ -27,10 +27,11 @@ cp ~/.local/bin/uv* .
 python -m venv venv
 source venv/bin/activate
 pip install uv
+export UV_NO_SOURCES_PACKAGE="nacsos_data openalex_ingest"
 # ignore the warning, we want a separate environment!
-uv sync --no-sources --extra classify --prerelease=allow 
+uv sync --extra classify --prerelease=allow 
 #source .venv/bin/activate
-uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
+uv run --extra classify --prerelease=allow \
     healthmap classification slurm-tuning-scripts \
     --training-data="../data/exports/annotations_20260213.csv" \
     --target-dir="../data/tuning" \
@@ -63,8 +64,10 @@ uv run healthmap classification tuning-quality --source=data/tuning --target=qua
 TODO: elaborate on what this does, requires, and produces
 
 ```bash
+export UV_NO_SOURCES_PACKAGE="nacsos_data openalex_ingest"
+
 # prepare job scripts
-uv run --extra classify --no-sources-package nacsos_data --prerelease=allow \
+uv run --extra classify --prerelease=allow \
     healthmap classification slurm-train-scripts \
     --training-data="../data/exports/annotations_20260213.csv" \
     --tuning-dir="../data/tuning" \
@@ -96,7 +99,7 @@ rsync -avh --progress --include='stats.json' --include='*/' --exclude='*' -e ssh
 TODO: describe
 
 ```bash
-export UV_NO_SOURCES_PACKAGE=nacsos_data,openalex_ingest
+export UV_NO_SOURCES_PACKAGE="nacsos_data openalex_ingest"
 
 # Export records that have no major relevance classification
 uv run healthmap export items --config config/secret.env --target data/exports/items.csv --label-missing --label-filter "rel_major|1" 
@@ -136,6 +139,8 @@ uv run --extra classify --prerelease=allow \
 TODO: push classifications upstream to platform
 
 ```bash
+export UV_NO_SOURCES_PACKAGE="nacsos_data openalex_ingest"
+
 rsync -avh --progress -e ssh foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/enhanced data/
 uv run healthmap ingest classifications-dir \
     --source="data/enhanced/" \

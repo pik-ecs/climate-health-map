@@ -1,4 +1,6 @@
 ```bash
+export UV_NO_SOURCES_PACKAGE="nacsos_data openalex_ingest"
+
 # Ask OpenAlex API which abstracts we might be missing abstracts for
 uv run healthmap abstracts fetch-ids --config config/secret.env --target data/gap_filling/ids.csv
 # Check that list of OpenAlex IDs against our local snapshot and prepare a list to queue for abstract fixing
