@@ -12,13 +12,13 @@
 -- Number of records with mordecai info
 -- Count as of Mar 05, 2026: 101,443
 SELECT count(distinct e.item_id)
-        FROM enhancement e
-            JOIN item i ON i.item_id = e.item_id
-            JOIN m2m_import_item ii ON i.item_id = ii.item_id
-        WHERE i.project_id::text  = '52f62f17-cefb-4152-bcca-2fcb77541e83'
-          AND ii.import_id::text = '5b18344c-6c30-40ba-92ad-48a2136efe6b'
-          AND e.key = 'mordecai3'
-          AND e.payload IS NOT NULL;
+FROM enhancement e
+     JOIN item i ON i.item_id = e.item_id
+     JOIN m2m_import_item ii ON i.item_id = ii.item_id
+WHERE i.project_id::text = '52f62f17-cefb-4152-bcca-2fcb77541e83'
+  AND ii.import_id::text = '5b18344c-6c30-40ba-92ad-48a2136efe6b'
+  AND e.key = 'mordecai3'
+  AND e.payload IS NOT NULL;
 
 -- Unrolled mordecai places
 WITH
@@ -26,9 +26,9 @@ WITH
         SELECT e.item_id,
                jsonb_array_elements(e.payload) as place
         FROM enhancement e
-            JOIN item i ON i.item_id = e.item_id
-            JOIN m2m_import_item ii ON i.item_id = ii.item_id
-        WHERE i.project_id::text  = '52f62f17-cefb-4152-bcca-2fcb77541e83'
+             JOIN item i ON i.item_id = e.item_id
+             JOIN m2m_import_item ii ON i.item_id = ii.item_id
+        WHERE i.project_id::text = '52f62f17-cefb-4152-bcca-2fcb77541e83'
           AND ii.import_id::text = '5b18344c-6c30-40ba-92ad-48a2136efe6b'
           AND e.key = 'mordecai3'
           AND e.payload IS NOT NULL)
@@ -50,3 +50,15 @@ SELECT item_id::text,
        place ->> 'country_code3' AS country_code3,
        place ->> 'feature_class' AS feature_class
 FROM unrolled;
+
+-- Number of xpac records
+-- num_xpac,num_total (2026-03-06)
+-- 201,322    1,723,893
+SELECT count(distinct ai.item_id) FILTER (
+    WHERE ai.meta -> 'openalex' ->> 'is_xpac' is not null
+        AND (ai.meta -> 'openalex' ->> 'is_xpac')::bool = TRUE) as num_xpac,
+       count(distinct ai.item_id)                               as num_total
+FROM academic_item ai
+     JOIN m2m_import_item ii ON ai.item_id = ii.item_id
+WHERE ai.project_id::text = '52f62f17-cefb-4152-bcca-2fcb77541e83'
+  AND ii.import_id::text = '5b18344c-6c30-40ba-92ad-48a2136efe6b';
