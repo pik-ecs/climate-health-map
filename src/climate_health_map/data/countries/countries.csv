@@ -1,12 +1,12 @@
 iso2,iso3,iso_num,Name (Lancet 2025),Name (Lancet 2026),Name (ISO short),Name (ISO long),Name (UN),Group (Lancet 2025),Group (Lancet 2026),Region (WHO 2025),Group (WHO 2026),Group (HDI 2025),Group (HDI 2026),"Region (IPCC AR6, 6)","Region (IPCC AR6, 10)",Continent (Name),Continent (Code),population
-AW,ABW,533.0,Aruba,Aruba,Aruba,Aruba,Aruba,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,,107995.0
+AW,ABW,533.0,Aruba,Aruba,Aruba,Aruba,Aruba,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,107995.0
 AF,AFG,4.0,Afghanistan,Afghanistan,Afghanistan,Afghanistan,"Afghanistan, Islamic Republic of",Asia,Asia,Eastern Mediterranean,Eastern Mediterranean,Low,Low,Asia and developing Pacific,Southern Asia,Asia,AS,42647492.0
 AO,AGO,24.0,Angola,Angola,Angola,Angola,"Angola, Republic of",Africa,Africa,Africa,Africa,Medium,Medium,Africa,Africa,Africa,AF,37885849.0
-AI,AIA,660.0,Anguilla,Anguilla,Anguilla,Anguilla,Anguilla,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,,
+AI,AIA,660.0,Anguilla,Anguilla,Anguilla,Anguilla,Anguilla,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,
 AX,ALA,248.0,,,Åland Islands,Åland Islands,Åland Islands,,,,,,,Developed Countries,Europe,Europe,EU,
 AL,ALB,8.0,Albania,Albania,Albania,Albania,"Albania, Republic of",Europe,Europe,Europe,Europe,High,Very High,Developed Countries,Europe,Europe,EU,2377128.0
 AD,AND,20.0,Andorra,Andorra,Andorra,Andorra,"Andorra, Principality of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,81938.0
-AN,ANT,530.0,,,Netherlands Antilles,Netherlands Antilles,Netherlands Antilles,,,,,,,Latin America and Caribbean,Latin America and Caribbean,North America,,
+AN,ANT,530.0,,,Netherlands Antilles,Netherlands Antilles,Netherlands Antilles,,,,,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,
 AE,ARE,784.0,United Arab Emirates,United Arab Emirates,United Arab Emirates,United Arab Emirates,United Arab Emirates,Asia,Asia,Eastern Mediterranean,Eastern Mediterranean,Very High,Very High,Middle East,Middle East,Asia,AS,10986400.0
 AR,ARG,32.0,Argentina,Argentina,Argentina,Argentina,"Argentina, Argentine Republic",Latin America,Latin America,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,South America,SA,45696159.0
 AM,ARM,51.0,Armenia,Armenia,Armenia,Armenia,"Armenia, Republic of",Asia,Asia,Europe,Europe,High,Very High,Eastern Europe and Central Asia,Eastern Europe and Central Asia,Europe,EU,3033500.0
@@ -14,7 +14,7 @@ AM,ARM,51.0,Armenia,Armenia,Armenia,Armenia,"Armenia, Republic of",Asia,Asia,Eur
 AS,ASM,16.0,American Samoa (USA),American Samoa (USA),American Samoa,American Samoa,American Samoa,SIDS,SIDS,Western Pacific,Western Pacific,,,Asia and developing Pacific,South-East Asia and Pacific,Oceania,OC,46765.0
 AQ,ATA,10.0,,,Antarctica,Antarctica,Antarctica (the territory South of 60 deg S),,,,,,,,,Antarctica,AN,
 TF,ATF,260.0,,,French Southern Territories,French Southern Territories,French Southern Territories,,,,,,,Africa,Africa,Antarctica,AN,
-AG,ATG,28.0,Antigua and Barbuda,Antigua and Barbuda,Antigua and Barbuda,Antigua and Barbuda,Antigua and Barbuda,SIDS,SIDS,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,,93772.0
+AG,ATG,28.0,Antigua and Barbuda,Antigua and Barbuda,Antigua and Barbuda,Antigua and Barbuda,Antigua and Barbuda,SIDS,SIDS,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,93772.0
 AU,AUS,36.0,Australia,Australia,Australia,Australia,"Australia, Commonwealth of",Oceania,Oceania,Western Pacific,Western Pacific,Very High,Very High,Developed Countries,"Australia, Japan, New Zealand",Oceania,OC,27196812.0
 AT,AUT,40.0,Austria,Austria,Austria,Austria,"Austria, Republic of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,9177982.0
 AZ,AZE,31.0,Azerbaijan,Azerbaijan,Azerbaijan,Azerbaijan,"Azerbaijan, Republic of",Asia,Asia,Europe,Europe,High,High,Eastern Europe and Central Asia,Eastern Europe and Central Asia,Europe,EU,10202830.0
@@ -22,26 +22,26 @@ AZ,AZE,31.0,Azerbaijan,Azerbaijan,Azerbaijan,Azerbaijan,"Azerbaijan, Republic of
 BI,BDI,108.0,Burundi,Burundi,Burundi,Burundi,"Burundi, Republic of",Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,14047786.0
 BE,BEL,56.0,Belgium,Belgium,Belgium,Belgium,"Belgium, Kingdom of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,11858610.0
 BJ,BEN,204.0,Benin,Benin,Benin,Benin,"Benin, Republic of",Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,14462724.0
-BQ,BES,535.0,,,"Bonaire, Sint Eustatius and Saba","Bonaire, Sint Eustatius and Saba","Bonaire, Sint Eustatius and Saba",,,,,,,Latin America and Caribbean,Latin America and Caribbean,North America,,
+BQ,BES,535.0,,,"Bonaire, Sint Eustatius and Saba","Bonaire, Sint Eustatius and Saba","Bonaire, Sint Eustatius and Saba",,,,,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,
 BF,BFA,854.0,Burkina Faso,Burkina Faso,Burkina Faso,Burkina Faso,Burkina Faso,Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,23548781.0
 BD,BGD,50.0,Bangladesh,Bangladesh,Bangladesh,Bangladesh,"Bangladesh, People's Republic of",Asia,Asia,South-East Asia,South-East Asia,Medium,Medium,Asia and developing Pacific,Southern Asia,Asia,AS,173562364.0
 BG,BGR,100.0,Bulgaria,Bulgaria,Bulgaria,Bulgaria,"Bulgaria, Republic of",Europe,Europe,Europe,Europe,High,Very High,Developed Countries,Europe,Europe,EU,6441421.0
 BH,BHR,48.0,Bahrain,Bahrain,Bahrain,Bahrain,"Bahrain, Kingdom of",Asia,Asia,Eastern Mediterranean,Eastern Mediterranean,Very High,Very High,Middle East,Middle East,Asia,AS,1588670.0
-BS,BHS,44.0,Bahamas,Bahamas,Bahamas,Bahamas (the),"Bahamas, Commonwealth of the",SIDS,SIDS,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,,401283.0
+BS,BHS,44.0,Bahamas,Bahamas,Bahamas,Bahamas (the),"Bahamas, Commonwealth of the",SIDS,SIDS,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,401283.0
 BA,BIH,70.0,Bosnia and Herzegovina,Bosnia and Herzegovina,Bosnia and Herzegovina,Bosnia and Herzegovina,Bosnia and Herzegovina,Europe,Europe,Europe,Europe,High,Very High,Developed Countries,Europe,Europe,EU,3164253.0
-BL,BLM,652.0,,,Saint Barthélemy,Saint Barthélemy,Saint Barthelemy,,,,,,,Latin America and Caribbean,Latin America and Caribbean,North America,,
+BL,BLM,652.0,,,Saint Barthélemy,Saint Barthélemy,Saint Barthelemy,,,,,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,
 BY,BLR,112.0,Belarus,Belarus,Belarus,Belarus,"Belarus, Republic of",Europe,Europe,Europe,Europe,Very High,Very High,Eastern Europe and Central Asia,Eastern Europe and Central Asia,Europe,EU,9132629.0
-BZ,BLZ,84.0,Belize,Belize,Belize,Belize,Belize,SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,,417072.0
-BM,BMU,60.0,Bermuda,Bermuda,Bermuda,Bermuda,Bermuda,SIDS,SIDS,Americas,Americas,,,Developed Countries,North America,North America,,64636.0
+BZ,BLZ,84.0,Belize,Belize,Belize,Belize,Belize,SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,417072.0
+BM,BMU,60.0,Bermuda,Bermuda,Bermuda,Bermuda,Bermuda,SIDS,SIDS,Americas,Americas,,,Developed Countries,North America,North America,NA,64636.0
 BO,BOL,68.0,Bolivia,Bolivia,Bolivia,Bolivia (Plurinational State of),"Bolivia, Republic of",Latin America,Latin America,Americas,Americas,Medium,High,Latin America and Caribbean,Latin America and Caribbean,South America,SA,12413315.0
 BR,BRA,76.0,Brazil,Brazil,Brazil,Brazil,"Brazil, Federative Republic of",Latin America,Latin America,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,South America,SA,211998573.0
-BB,BRB,52.0,Barbados,Barbados,Barbados,Barbados,Barbados,SIDS,SIDS,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,,282467.0
+BB,BRB,52.0,Barbados,Barbados,Barbados,Barbados,Barbados,SIDS,SIDS,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,282467.0
 BN,BRN,96.0,Brunei Darussalam,Brunei Darussalam,Brunei Darussalam,Brunei Darussalam,Brunei Darussalam,Asia,Asia,Western Pacific,Western Pacific,Very High,Very High,Asia and developing Pacific,South-East Asia and Pacific,Asia,AS,462721.0
 BT,BTN,64.0,Bhutan,Bhutan,Bhutan,Bhutan,"Bhutan, Kingdom of",Asia,Asia,South-East Asia,South-East Asia,Medium,Medium,Asia and developing Pacific,Southern Asia,Asia,AS,791524.0
 BV,BVT,74.0,,,Bouvet Island,Bouvet Island,Bouvet Island (Bouvetoya),,,,,,,Latin America and Caribbean,Latin America and Caribbean,Antarctica,AN,
 BW,BWA,72.0,Botswana,Botswana,Botswana,Botswana,"Botswana, Republic of",Africa,Africa,Africa,Africa,High,High,Africa,Africa,Africa,AF,2521139.0
 CF,CAF,140.0,Central African Republic,Central African Republic,Central African Republic,Central African Republic (the),Central African Republic,Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,5330690.0
-CA,CAN,124.0,Canada,Canada,Canada,Canada,Canada,Northern America,Northern America,Americas,Americas,Very High,Very High,Developed Countries,North America,North America,,41288599.0
+CA,CAN,124.0,Canada,Canada,Canada,Canada,Canada,Northern America,Northern America,Americas,Americas,Very High,Very High,Developed Countries,North America,North America,NA,41288599.0
 CC,CCK,166.0,,,Cocos (Keeling) Islands,Cocos (Keeling) Islands (the),Cocos (Keeling) Islands,,,,,,,Developed Countries,"Australia, Japan, New Zealand",Asia,AS,
 CH,CHE,756.0,Switzerland,Switzerland,Switzerland,Switzerland,"Switzerland, Swiss Confederation",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,9005582.0
 CL,CHL,152.0,Chile,Chile,Chile,Chile,"Chile, Republic of",Latin America,Latin America,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,South America,SA,19764771.0
@@ -54,19 +54,19 @@ CK,COK,184.0,Cook Islands,Cook Islands,Cook Islands,Cook Islands (the),Cook Isla
 CO,COL,170.0,Colombia,Colombia,Colombia,Colombia,"Colombia, Republic of",Latin America,Latin America,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,South America,SA,52886363.0
 KM,COM,174.0,Comoros,Comoros,Comoros,Comoros (the),"Comoros, Union of the",SIDS,SIDS,Africa,Africa,Medium,Medium,Africa,Africa,Africa,AF,866628.0
 CV,CPV,132.0,Cabo Verde,Cabo Verde,Cabo Verde,Cabo Verde,"Cape Verde, Republic of",SIDS,SIDS,Africa,Africa,Medium,Medium,Africa,Africa,Africa,AF,524877.0
-CR,CRI,188.0,Costa Rica,Costa Rica,Costa Rica,Costa Rica,"Costa Rica, Republic of",Latin America,Latin America,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,,5129910.0
-CU,CUB,192.0,Cuba,Cuba,Cuba,Cuba,"Cuba, Republic of",SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,,10979783.0
-CW,CUW,531.0,Curaçao,Curaçao,Curaçao,Curaçao,Curaçao,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,,155967.0
+CR,CRI,188.0,Costa Rica,Costa Rica,Costa Rica,Costa Rica,"Costa Rica, Republic of",Latin America,Latin America,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,5129910.0
+CU,CUB,192.0,Cuba,Cuba,Cuba,Cuba,"Cuba, Republic of",SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,10979783.0
+CW,CUW,531.0,Curaçao,Curaçao,Curaçao,Curaçao,Curaçao,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,155967.0
 CX,CXR,162.0,,,Christmas Island,Christmas Island,Christmas Island,,,,,,,Developed Countries,"Australia, Japan, New Zealand",Asia,AS,
-KY,CYM,136.0,Cayman Islands,Cayman Islands,Cayman Islands,Cayman Islands (the),Cayman Islands,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,,74457.0
+KY,CYM,136.0,Cayman Islands,Cayman Islands,Cayman Islands,Cayman Islands (the),Cayman Islands,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,74457.0
 CY,CYP,196.0,Cyprus,Cyprus,Cyprus,Cyprus,"Cyprus, Republic of",Asia,Asia,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,1358282.0
 CY,CYP,196.0,Cyprus,Cyprus,Cyprus,Cyprus,"Cyprus, Republic of",Asia,Asia,Europe,Europe,Very High,Very High,Developed Countries,Europe,Asia,AS,1358282.0
 CZ,CZE,203.0,Czechia,Czechia,Czechia,Czech Republic,Czech Republic,Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,10905028.0
 DE,DEU,276.0,Germany,Germany,Germany,Germany,"Germany, Federal Republic of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,83516593.0
 DJ,DJI,262.0,Djibouti,Djibouti,Djibouti,Djibouti,"Djibouti, Republic of",Africa,Africa,Eastern Mediterranean,Eastern Mediterranean,Low,Low,Africa,Africa,Africa,AF,1168722.0
-DM,DMA,212.0,Dominica,Dominica,Dominica,Dominica,"Dominica, Commonwealth of",SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,,66205.0
+DM,DMA,212.0,Dominica,Dominica,Dominica,Dominica,"Dominica, Commonwealth of",SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,66205.0
 DK,DNK,208.0,Denmark,Denmark,Denmark,Denmark,"Denmark, Kingdom of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,5976992.0
-DO,DOM,214.0,Dominican Republic,Dominican Republic,Dominican Republic,Dominican Republic (the),Dominican Republic,SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,,11427557.0
+DO,DOM,214.0,Dominican Republic,Dominican Republic,Dominican Republic,Dominican Republic (the),Dominican Republic,SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,11427557.0
 DZ,DZA,12.0,Algeria,Algeria,Algeria,Algeria,"Algeria, People's Democratic Republic of",Africa,Africa,Africa,Africa,High,High,Africa,Africa,Africa,AF,46814308.0
 EC,ECU,218.0,Ecuador,Ecuador,Ecuador,Ecuador,"Ecuador, Republic of",Latin America,Latin America,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,South America,SA,18135478.0
 EG,EGY,818.0,Egypt,Egypt,Egypt,"Egypt, Arab Republic","Egypt, Arab Republic of",Africa,Africa,Eastern Mediterranean,Eastern Mediterranean,High,High,Africa,Africa,Africa,AF,116538258.0
@@ -89,22 +89,22 @@ GG,GGY,831.0,,,Guernsey,Guernsey,"Guernsey, Bailiwick of",,,,,,,Developed Countr
 GH,GHA,288.0,Ghana,Ghana,Ghana,Ghana,"Ghana, Republic of",Africa,Africa,Africa,Africa,Medium,Medium,Africa,Africa,Africa,AF,34427414.0
 GI,GIB,292.0,,,Gibraltar,Gibraltar,Gibraltar,,,,,,,Developed Countries,Europe,Europe,EU,39329.0
 GN,GIN,324.0,Guinea,Guinea,Guinea,Guinea,"Guinea, Republic of",Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,14754785.0
-GP,GLP,312.0,Guadeloupe,Guadeloupe,Guadeloupe,Guadeloupe,Guadeloupe,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,,
+GP,GLP,312.0,Guadeloupe,Guadeloupe,Guadeloupe,Guadeloupe,Guadeloupe,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,
 GM,GMB,270.0,Gambia,Gambia,Gambia,Gambia (the),"Gambia, Republic of the",Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,2759988.0
 GW,GNB,624.0,Guinea Bissau,Guinea Bissau,Guinea-Bissau,Guinea-Bissau,"Guinea-Bissau, Republic of",SIDS,SIDS,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,2201352.0
 GQ,GNQ,226.0,Equatorial Guinea,Equatorial Guinea,Equatorial Guinea,Equatorial Guinea,"Equatorial Guinea, Republic of",Africa,Africa,Africa,Africa,Medium,Medium,Africa,Africa,Africa,AF,1892516.0
 GR,GRC,300.0,Greece,Greece,Greece,Greece,"Greece, Hellenic Republic",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,10405134.0
-GD,GRD,308.0,Grenada,Grenada,Grenada,Grenada,Grenada,SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,,117207.0
-GL,GRL,304.0,,,Greenland,Greenland,Greenland,,,,,,,Developed Countries,North America,North America,,56836.0
-GT,GTM,320.0,Guatemala,Guatemala,Guatemala,Guatemala,"Guatemala, Republic of",Latin America,Latin America,Americas,Americas,Medium,Medium,Latin America and Caribbean,Latin America and Caribbean,North America,,18406359.0
+GD,GRD,308.0,Grenada,Grenada,Grenada,Grenada,Grenada,SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,117207.0
+GL,GRL,304.0,,,Greenland,Greenland,Greenland,,,,,,,Developed Countries,North America,North America,NA,56836.0
+GT,GTM,320.0,Guatemala,Guatemala,Guatemala,Guatemala,"Guatemala, Republic of",Latin America,Latin America,Americas,Americas,Medium,Medium,Latin America and Caribbean,Latin America and Caribbean,North America,NA,18406359.0
 GF,GUF,254.0,French Guiana,French Guiana,French Guiana,French Guiana,French Guiana,Latin America,Latin America,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,South America,SA,
 GU,GUM,316.0,Guam (USA),Guam (USA),Guam,Guam,Guam,SIDS,SIDS,Western Pacific,Western Pacific,,,Asia and developing Pacific,South-East Asia and Pacific,Oceania,OC,167777.0
 GY,GUY,328.0,Guyana,Guyana,Guyana,Guyana,"Guyana, Co-operative Republic of",SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,South America,SA,831087.0
 HK,HKG,344.0,Hong Kong SAR (China),Hong Kong SAR (China),Hong Kong,"Hong Kong SAR, China","Hong Kong, Special Administrative Region of China",Asia,Asia,Western Pacific,Western Pacific,,,Asia and developing Pacific,Eastern Asia,Asia,AS,7524100.0
 HM,HMD,334.0,,,Heard Island and McDonald Islands,Heard Island and McDonald Islands,Heard Island and McDonald Islands,,,,,,,Developed Countries,"Australia, Japan, New Zealand",Antarctica,AN,
-HN,HND,340.0,Honduras,Honduras,Honduras,Honduras,"Honduras, Republic of",Latin America,Latin America,Americas,Americas,Medium,Medium,Latin America and Caribbean,Latin America and Caribbean,North America,,10825703.0
+HN,HND,340.0,Honduras,Honduras,Honduras,Honduras,"Honduras, Republic of",Latin America,Latin America,Americas,Americas,Medium,Medium,Latin America and Caribbean,Latin America and Caribbean,North America,NA,10825703.0
 HR,HRV,191.0,Croatia,Croatia,Croatia,Croatia,"Croatia, Republic of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,3866200.0
-HT,HTI,332.0,Haiti,Haiti,Haiti,Haiti,"Haiti, Republic of",SIDS,SIDS,Americas,Americas,Medium,Medium,Latin America and Caribbean,Latin America and Caribbean,North America,,11772557.0
+HT,HTI,332.0,Haiti,Haiti,Haiti,Haiti,"Haiti, Republic of",SIDS,SIDS,Americas,Americas,Medium,Medium,Latin America and Caribbean,Latin America and Caribbean,North America,NA,11772557.0
 HU,HUN,348.0,Hungary,Hungary,Hungary,Hungary,"Hungary, Republic of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,9562065.0
 ID,IDN,360.0,Indonesia,Indonesia,Indonesia,Indonesia,"Indonesia, Republic of",Asia,Asia,South-East Asia,Western Pacific,High,High,Asia and developing Pacific,South-East Asia and Pacific,Asia,AS,283487931.0
 IM,IMN,833.0,,,Isle of Man,Isle of Man,Isle of Man,,,,,,,Developed Countries,Europe,Europe,EU,84160.0
@@ -116,7 +116,7 @@ IQ,IRQ,368.0,Iraq,Iraq,Iraq,Iraq,"Iraq, Republic of",Asia,Asia,Eastern Mediterra
 IS,ISL,352.0,Iceland,Iceland,Iceland,Iceland,"Iceland, Republic of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,386506.0
 IL,ISR,376.0,Israel,Israel,Israel,Israel,"Israel, State of",Asia,Asia,Europe,Europe,Very High,Very High,Middle East,Middle East,Asia,AS,9974400.0
 IT,ITA,380.0,Italy,Italy,Italy,Italy,"Italy, Italian Republic",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,58952704.0
-JM,JAM,388.0,Jamaica,Jamaica,Jamaica,Jamaica,Jamaica,SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,,2839175.0
+JM,JAM,388.0,Jamaica,Jamaica,Jamaica,Jamaica,Jamaica,SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,2839175.0
 JE,JEY,832.0,,,Jersey,Jersey,"Jersey, Bailiwick of",,,,,,,Developed Countries,Europe,Europe,EU,
 JO,JOR,400.0,Jordan,Jordan,Jordan,Jordan,"Jordan, Hashemite Kingdom of",Asia,Asia,Eastern Mediterranean,Eastern Mediterranean,High,High,Middle East,Middle East,Asia,AS,11552876.0
 JP,JPN,392.0,Japan,Japan,Japan,Japan,Japan,Asia,Asia,Western Pacific,Western Pacific,Very High,Very High,Developed Countries,"Australia, Japan, New Zealand",Asia,AS,123975371.0
@@ -126,14 +126,14 @@ KE,KEN,404.0,Kenya,Kenya,Kenya,Kenya,"Kenya, Republic of",Africa,Africa,Africa,A
 KG,KGZ,417.0,Kyrgyzstan,Kyrgyzstan,Kyrgyz Republic,Kyrgyzstan,Kyrgyz Republic,Asia,Asia,Europe,Europe,High,High,Eastern Europe and Central Asia,Eastern Europe and Central Asia,Asia,AS,7221868.0
 KH,KHM,116.0,Cambodia,Cambodia,Cambodia,Cambodia,"Cambodia, Kingdom of",Asia,Asia,Western Pacific,Western Pacific,Medium,Medium,Asia and developing Pacific,South-East Asia and Pacific,Asia,AS,17638801.0
 KI,KIR,296.0,Kiribati,Kiribati,Kiribati,Kiribati,"Kiribati, Republic of",SIDS,SIDS,Western Pacific,Western Pacific,Medium,Medium,Asia and developing Pacific,South-East Asia and Pacific,Oceania,OC,134518.0
-KN,KNA,659.0,Saint Kitts and Nevis,Saint Kitts and Nevis,St. Kitts and Nevis,Saint Kitts and Nevis,"Saint Kitts and Nevis, Federation of",SIDS,SIDS,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,,46843.0
+KN,KNA,659.0,Saint Kitts and Nevis,Saint Kitts and Nevis,St. Kitts and Nevis,Saint Kitts and Nevis,"Saint Kitts and Nevis, Federation of",SIDS,SIDS,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,46843.0
 KR,KOR,410.0,Republic of Korea,Republic of Korea,"Korea, Rep.",Korea (the Republic of),"Korea, Republic of",Asia,Asia,Western Pacific,Western Pacific,Very High,Very High,Asia and developing Pacific,Eastern Asia,Asia,AS,51751065.0
 KW,KWT,414.0,Kuwait,Kuwait,Kuwait,Kuwait,"Kuwait, State of",Asia,Asia,Eastern Mediterranean,Eastern Mediterranean,Very High,Very High,Middle East,Middle East,Asia,AS,4897263.0
 LA,LAO,418.0,Lao People's Democratic Republic,Lao People's Democratic Republic,Lao PDR,Lao People's Democratic Republic (the),Lao People's Democratic Republic,Asia,Asia,Western Pacific,Western Pacific,Medium,Medium,Asia and developing Pacific,South-East Asia and Pacific,Asia,AS,7769819.0
 LB,LBN,422.0,Lebanon,Lebanon,Lebanon,Lebanon,"Lebanon, Lebanese Republic",Asia,Asia,Eastern Mediterranean,Eastern Mediterranean,High,High,Middle East,Middle East,Asia,AS,5805962.0
 LR,LBR,430.0,Liberia,Liberia,Liberia,Liberia,"Liberia, Republic of",Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,5612817.0
 LY,LBY,434.0,Libya,Libya,Libya,Libya,Libyan Arab Jamahiriya,Africa,Africa,Eastern Mediterranean,Eastern Mediterranean,High,High,Africa,Africa,Africa,AF,7381023.0
-LC,LCA,662.0,Saint Lucia,Saint Lucia,St. Lucia,Saint Lucia,Saint Lucia,SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,,179744.0
+LC,LCA,662.0,Saint Lucia,Saint Lucia,St. Lucia,Saint Lucia,Saint Lucia,SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,179744.0
 LI,LIE,438.0,Liechtenstein,Liechtenstein,Liechtenstein,Liechtenstein,"Liechtenstein, Principality of",Europe,Europe,,,Very High,Very High,Developed Countries,Europe,Europe,EU,40450.0
 LK,LKA,144.0,Sri Lanka,Sri Lanka,Sri Lanka,Sri Lanka,"Sri Lanka, Democratic Socialist Republic of",Asia,Asia,South-East Asia,South-East Asia,High,High,Asia and developing Pacific,Southern Asia,Asia,AS,21916000.0
 LS,LSO,426.0,Lesotho,Lesotho,Lesotho,Lesotho,"Lesotho, Kingdom of",Africa,Africa,Africa,Africa,Low,Medium,Africa,Africa,Africa,AF,2337423.0
@@ -141,13 +141,13 @@ LT,LTU,440.0,Lithuania,Lithuania,Lithuania,Lithuania,"Lithuania, Republic of",Eu
 LU,LUX,442.0,Luxembourg,Luxembourg,Luxembourg,Luxembourg,"Luxembourg, Grand Duchy of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,677012.0
 LV,LVA,428.0,Latvia,Latvia,Latvia,Latvia,"Latvia, Republic of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,1866124.0
 MO,MAC,446.0,Macao SAR (China),Macao SAR (China),Macao,"Macao SAR, China","Macao, Special Administrative Region of China",Asia,Asia,Western Pacific,Western Pacific,,,Asia and developing Pacific,Eastern Asia,Asia,AS,687000.0
-MF,MAF,663.0,,,St. Martin (French part),Saint Martin (French part),Saint Martin,,,,,,,Latin America and Caribbean,Latin America and Caribbean,North America,,26129.0
+MF,MAF,663.0,,,St. Martin (French part),Saint Martin (French part),Saint Martin,,,,,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,26129.0
 MA,MAR,504.0,Morocco,Morocco,Morocco,Morocco,"Morocco, Kingdom of",Africa,Africa,Eastern Mediterranean,Eastern Mediterranean,Medium,High,Africa,Africa,Africa,AF,38081173.0
 MC,MCO,492.0,Monaco,Monaco,Monaco,Monaco,"Monaco, Principality of",Europe,Europe,Europe,Europe,,,Developed Countries,Europe,Europe,EU,38631.0
 MD,MDA,498.0,Republic of Moldova,Republic of Moldova,Moldova,Moldova (the Republic of),"Moldova, Republic of",Europe,Europe,Europe,Europe,High,High,Eastern Europe and Central Asia,Eastern Europe and Central Asia,Europe,EU,2402306.0
 MG,MDG,450.0,Madagascar,Madagascar,Madagascar,Madagascar,"Madagascar, Republic of",Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,31964956.0
 MV,MDV,462.0,Maldives,Maldives,Maldives,Maldives,"Maldives, Republic of",SIDS,SIDS,South-East Asia,South-East Asia,High,High,Asia and developing Pacific,Southern Asia,Asia,AS,527799.0
-MX,MEX,484.0,Mexico,Mexico,Mexico,Mexico,"Mexico, United Mexican States",Latin America,Latin America,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,,130861007.0
+MX,MEX,484.0,Mexico,Mexico,Mexico,Mexico,"Mexico, United Mexican States",Latin America,Latin America,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,130861007.0
 MH,MHL,584.0,Marshall Islands,Marshall Islands,Marshall Islands,Marshall Islands (the),"Marshall Islands, Republic of the",SIDS,SIDS,Western Pacific,Western Pacific,High,High,Asia and developing Pacific,South-East Asia and Pacific,Oceania,OC,37548.0
 MK,MKD,807.0,North Macedonia,North Macedonia,North Macedonia,Republic of North Macedonia,"Macedonia, The Former Yugoslav Republic of",Europe,Europe,Europe,Europe,High,Very High,Developed Countries,Europe,Europe,EU,1824359.0
 ML,MLI,466.0,Mali,Mali,Mali,Mali,"Mali, Republic of",Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,24478595.0
@@ -158,8 +158,8 @@ MN,MNG,496.0,Mongolia,Mongolia,Mongolia,Mongolia,Mongolia,Asia,Asia,Western Paci
 MP,MNP,580.0,Commonwealth of the Northern Mariana Islands (USA),Commonwealth of the Northern Maria,Northern Mariana Islands,Northern Mariana Islands (the),"Northern Mariana Islands, Commonwealth of the",SIDS,SIDS,Western Pacific,Western Pacific,,,Asia and developing Pacific,South-East Asia and Pacific,Oceania,OC,44278.0
 MZ,MOZ,508.0,Mozambique,Mozambique,Mozambique,Mozambique,"Mozambique, Republic of",Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,34631766.0
 MR,MRT,478.0,Mauritania,Mauritania,Mauritania,Mauritania,"Mauritania, Islamic Republic of",Africa,Africa,Africa,Africa,Low,Medium,Africa,Africa,Africa,AF,5169395.0
-MS,MSR,500.0,Montserrat,Montserrat,Montserrat,Montserrat,Montserrat,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,,
-MQ,MTQ,474.0,Martinique,Martinique,Martinique,Martinique,Martinique,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,,
+MS,MSR,500.0,Montserrat,Montserrat,Montserrat,Montserrat,Montserrat,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,
+MQ,MTQ,474.0,Martinique,Martinique,Martinique,Martinique,Martinique,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,
 MU,MUS,480.0,Mauritius,Mauritius,Mauritius,Mauritius,"Mauritius, Republic of",SIDS,SIDS,Africa,Africa,High,Very High,Africa,Africa,Africa,AF,1245779.0
 MW,MWI,454.0,Malawi,Malawi,Malawi,Malawi,"Malawi, Republic of",Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,21655286.0
 MY,MYS,458.0,Malaysia,Malaysia,Malaysia,Malaysia,Malaysia,Asia,Asia,Western Pacific,Western Pacific,Very High,Very High,Asia and developing Pacific,South-East Asia and Pacific,Asia,AS,35557673.0
@@ -169,7 +169,7 @@ NC,NCL,540.0,New Caledonia (France),New Caledonia (France),New Caledonia,New Cal
 NE,NER,562.0,Niger,Niger,Niger,Niger (the),"Niger, Republic of",Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,27032412.0
 NF,NFK,574.0,,,Norfolk Island,Norfolk Island,Norfolk Island,,,,,,,Developed Countries,"Australia, Japan, New Zealand",Oceania,OC,
 NG,NGA,566.0,Nigeria,Nigeria,Nigeria,Nigeria,"Nigeria, Federal Republic of",Africa,Africa,Africa,Africa,Low,Medium,Africa,Africa,Africa,AF,232679478.0
-NI,NIC,558.0,Nicaragua,Nicaragua,Nicaragua,Nicaragua,"Nicaragua, Republic of",Latin America,Latin America,Americas,Americas,Medium,High,Latin America and Caribbean,Latin America and Caribbean,North America,,6916140.0
+NI,NIC,558.0,Nicaragua,Nicaragua,Nicaragua,Nicaragua,"Nicaragua, Republic of",Latin America,Latin America,Americas,Americas,Medium,High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,6916140.0
 NU,NIU,570.0,Niue,Niue,Niue,Niue,Niue,SIDS,SIDS,Western Pacific,Western Pacific,,,Asia and developing Pacific,South-East Asia and Pacific,Oceania,OC,
 NL,NLD,528.0,Netherlands,Netherlands,Netherlands,Netherlands (the),"Netherlands, Kingdom of the",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,17993485.0
 NO,NOR,578.0,Norway,Norway,Norway,Norway,"Norway, Kingdom of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,5572279.0
@@ -178,14 +178,14 @@ NR,NRU,520.0,Nauru,Nauru,Nauru,Nauru,"Nauru, Republic of",SIDS,SIDS,Western Paci
 NZ,NZL,554.0,New Zealand,New Zealand,New Zealand,New Zealand,New Zealand,Oceania,Oceania,Western Pacific,Western Pacific,Very High,Very High,Developed Countries,"Australia, Japan, New Zealand",Oceania,OC,5287500.0
 OM,OMN,512.0,Oman,Oman,Oman,Oman,"Oman, Sultanate of",Asia,Asia,Eastern Mediterranean,Eastern Mediterranean,Very High,Very High,Middle East,Middle East,Asia,AS,5281538.0
 PK,PAK,586.0,Pakistan,Pakistan,Pakistan,Pakistan,"Pakistan, Islamic Republic of",Asia,Asia,Eastern Mediterranean,Eastern Mediterranean,Low,Low,Asia and developing Pacific,Southern Asia,Asia,AS,251269164.0
-PA,PAN,591.0,Panama,Panama,Panama,Panama,"Panama, Republic of",Latin America,Latin America,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,,4515577.0
+PA,PAN,591.0,Panama,Panama,Panama,Panama,"Panama, Republic of",Latin America,Latin America,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,4515577.0
 PN,PCN,612.0,Pitcairn Island (UK),Pitcairn Island (UK),Pitcairn,Pitcairn,Pitcairn Islands,Oceania,Oceania,Western Pacific,Western Pacific,,,Asia and developing Pacific,South-East Asia and Pacific,Oceania,OC,
 PE,PER,604.0,Peru,Peru,Peru,Peru,"Peru, Republic of",Latin America,Latin America,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,South America,SA,34217848.0
 PH,PHL,608.0,Philippines,Philippines,Philippines,Philippines (the),"Philippines, Republic of the",Asia,Asia,Western Pacific,Western Pacific,High,High,Asia and developing Pacific,South-East Asia and Pacific,Asia,AS,115843670.0
 PW,PLW,585.0,Palau,Palau,Palau,Palau,"Palau, Republic of",SIDS,SIDS,Western Pacific,Western Pacific,High,High,Asia and developing Pacific,South-East Asia and Pacific,Oceania,OC,17695.0
 PG,PNG,598.0,Papua New Guinea,Papua New Guinea,Papua New Guinea,Papua New Guinea,"Papua New Guinea, Independent State of",SIDS,SIDS,Western Pacific,Western Pacific,Medium,Medium,Asia and developing Pacific,South-East Asia and Pacific,Oceania,OC,10576502.0
 PL,POL,616.0,Poland,Poland,Poland,Poland,"Poland, Republic of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,36559233.0
-PR,PRI,630.0,Puerto Rico,Puerto Rico,Puerto Rico,Puerto Rico,"Puerto Rico, Commonwealth of",SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,,3203295.0
+PR,PRI,630.0,Puerto Rico,Puerto Rico,Puerto Rico,Puerto Rico,"Puerto Rico, Commonwealth of",SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,3203295.0
 KP,PRK,408.0,Democratic People's Republic of Korea,Democratic People's Republic of Kore,"Korea, Dem. People's Rep.",Korea (the Democratic People's Republic of),"Korea, Democratic People's Republic of",Asia,Asia,South-East Asia,South-East Asia,,,Asia and developing Pacific,Eastern Asia,Asia,AS,26498823.0
 PT,PRT,620.0,Portugal,Portugal,Portugal,Portugal,"Portugal, Portuguese Republic",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,10694681.0
 PY,PRY,600.0,Paraguay,Paraguay,Paraguay,Paraguay,"Paraguay, Republic of",Latin America,Latin America,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,South America,SA,6929153.0
@@ -207,10 +207,10 @@ SH,SHN,654.0,,,"Saint Helena, Ascension and Tristan da Cunha","Saint Helena, Asc
 SJ,SJM,744.0,,,Svalbard and Jan Mayen,Svalbard and Jan Mayen,Svalbard & Jan Mayen Islands,,,,,,,Developed Countries,Europe,Europe,EU,
 SB,SLB,90.0,Solomon Islands,Solomon Islands,Solomon Islands,Solomon Islands,Solomon Islands,SIDS,SIDS,Western Pacific,Western Pacific,Medium,Medium,Asia and developing Pacific,South-East Asia and Pacific,Oceania,OC,819198.0
 SL,SLE,694.0,Sierra Leone,Sierra Leone,Sierra Leone,Sierra Leone,"Sierra Leone, Republic of",Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,8642022.0
-SV,SLV,222.0,El Salvador,El Salvador,El Salvador,El Salvador,"El Salvador, Republic of",Latin America,Latin America,Americas,Americas,Medium,Medium,Latin America and Caribbean,Latin America and Caribbean,North America,,6338193.0
+SV,SLV,222.0,El Salvador,El Salvador,El Salvador,El Salvador,"El Salvador, Republic of",Latin America,Latin America,Americas,Americas,Medium,Medium,Latin America and Caribbean,Latin America and Caribbean,North America,NA,6338193.0
 SM,SMR,674.0,San Marino,San Marino,San Marino,San Marino,"San Marino, Republic of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,33977.0
 SO,SOM,706.0,Somalia,Somalia,Somalia,Somalia,"Somalia, Somali Republic",Africa,Africa,Eastern Mediterranean,Eastern Mediterranean,Low,Low,Africa,Africa,Africa,AF,19009151.0
-PM,SPM,666.0,,,Saint Pierre and Miquelon,Saint Pierre and Miquelon,Saint Pierre and Miquelon,,,,,,,Developed Countries,North America,North America,,
+PM,SPM,666.0,,,Saint Pierre and Miquelon,Saint Pierre and Miquelon,Saint Pierre and Miquelon,,,,,,,Developed Countries,North America,North America,NA,
 RS,SRB,688.0,Serbia,Serbia,Serbia,Serbia,"Serbia, Republic of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,6586476.0
 SS,SSD,728.0,South Sudan,South Sudan,South Sudan,South Sudan,South Sudan,Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,11943408.0
 ST,STP,678.0,Sao Tome and Principe,Sao Tome and Principe,São Tomé and Principe,Sao Tome and Principe,"Sao Tome and Principe, Democratic Republic of",SIDS,SIDS,Africa,Africa,Medium,Medium,Africa,Africa,Africa,AF,235536.0
@@ -219,10 +219,10 @@ SK,SVK,703.0,Slovakia,Slovakia,Slovak Republic,Slovakia,Slovakia (Slovak Republi
 SI,SVN,705.0,Slovenia,Slovenia,Slovenia,Slovenia,"Slovenia, Republic of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,2127400.0
 SE,SWE,752.0,Sweden,Sweden,Sweden,Sweden,"Sweden, Kingdom of",Europe,Europe,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,10569709.0
 SZ,SWZ,748.0,Eswatini,Eswatini,Swaziland,Eswatini,"Swaziland, Kingdom of",Africa,Africa,Africa,Africa,Medium,Medium,Africa,Africa,Africa,AF,1242822.0
-SX,SXM,534.0,Sint Maarten,Sint Maarten,Sint Maarten (Dutch part),Sint Maarten (Dutch part),Sint Maarten (Netherlands),SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,,43350.0
+SX,SXM,534.0,Sint Maarten,Sint Maarten,Sint Maarten (Dutch part),Sint Maarten (Dutch part),Sint Maarten (Netherlands),SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,43350.0
 SC,SYC,690.0,Seychelles,Seychelles,Seychelles,Seychelles,"Seychelles, Republic of",SIDS,SIDS,Africa,Africa,Very High,Very High,Africa,Africa,Africa,AF,121354.0
 SY,SYR,760.0,Syrian Arab Republic,Syrian Arab Republic,Syrian Arab Republic,Syrian Arab Republic,Syrian Arab Republic,Asia,Asia,Eastern Mediterranean,Eastern Mediterranean,Medium,Medium,Middle East,Middle East,Asia,AS,24672760.0
-TC,TCA,796.0,Turks and Caicos,Turks and Caicos,Turks and Caicos Islands,Turks and Caicos Islands (the),Turks and Caicos Islands,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,,46535.0
+TC,TCA,796.0,Turks and Caicos,Turks and Caicos,Turks and Caicos Islands,Turks and Caicos Islands (the),Turks and Caicos Islands,SIDS,SIDS,Americas,Americas,,,Latin America and Caribbean,Latin America and Caribbean,North America,NA,46535.0
 TD,TCD,148.0,Chad,Chad,Chad,Chad,"Chad, Republic of",Africa,Africa,Africa,Africa,Low,Low,Africa,Africa,Africa,AF,20299123.0
 TG,TGO,768.0,Togo,Togo,Togo,Togo,"Togo, Togolese Republic",Africa,Africa,Africa,Africa,Low,Medium,Africa,Africa,Africa,AF,9515236.0
 TH,THA,764.0,Thailand,Thailand,Thailand,Thailand,"Thailand, Kingdom of",Asia,Asia,South-East Asia,South-East Asia,Very High,High,Asia and developing Pacific,South-East Asia and Pacific,Asia,AS,71668011.0
@@ -231,7 +231,7 @@ TK,TKL,772.0,Tokelau (New Zealand),Tokelau (New Zealand),Tokelau,Tokelau,Tokelau
 TM,TKM,795.0,Turkmenistan,Turkmenistan,Turkmenistan,Turkmenistan,Turkmenistan,Asia,Asia,Europe,Europe,High,High,Eastern Europe and Central Asia,Eastern Europe and Central Asia,Asia,AS,7494498.0
 TL,TLS,626.0,Timor-Leste,Timor-Leste,Timor-Leste,Timor-Leste,"Timor-Leste, Democratic Republic of",SIDS,SIDS,South-East Asia,South-East Asia,Medium,Medium,Asia and developing Pacific,South-East Asia and Pacific,Asia,AS,1400638.0
 TO,TON,776.0,Tonga,Tonga,Tonga,Tonga,"Tonga, Kingdom of",SIDS,SIDS,Western Pacific,Western Pacific,High,High,Asia and developing Pacific,South-East Asia and Pacific,Oceania,OC,104175.0
-TT,TTO,780.0,Trinidad and Tobago,Trinidad and Tobago,Trinidad and Tobago,Trinidad and Tobago,"Trinidad and Tobago, Republic of",SIDS,SIDS,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,,1368333.0
+TT,TTO,780.0,Trinidad and Tobago,Trinidad and Tobago,Trinidad and Tobago,Trinidad and Tobago,"Trinidad and Tobago, Republic of",SIDS,SIDS,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,North America,NA,1368333.0
 TN,TUN,788.0,Tunisia,Tunisia,Tunisia,Tunisia,"Tunisia, Tunisian Republic",Africa,Africa,Eastern Mediterranean,Eastern Mediterranean,High,High,Africa,Africa,Africa,AF,12277109.0
 TR,TUR,792.0,Türkiye,Türkiye,Turkey,Turkey,"Turkey, Republic of",Asia,Asia,Europe,Europe,Very High,Very High,Developed Countries,Europe,Europe,EU,85518661.0
 TR,TUR,792.0,Türkiye,Türkiye,Turkey,Turkey,"Turkey, Republic of",Asia,Asia,Europe,Europe,Very High,Very High,Developed Countries,Europe,Asia,AS,85518661.0
@@ -240,9 +240,9 @@ TW,TWN,158.0,,,"Taiwan, China",Taiwan (Province of China),Taiwan,,,,,,,Asia and 
 TZ,TZA,834.0,United Republic of Tanzania,United Republic of Tanzania,Tanzania,"Tanzania, United Republic of","Tanzania, United Republic of",Africa,Africa,Africa,Africa,Low,Medium,Africa,Africa,Africa,AF,68560157.0
 UG,UGA,800.0,Uganda,Uganda,Uganda,Uganda,"Uganda, Republic of",Africa,Africa,Africa,Africa,Medium,Medium,Africa,Africa,Africa,AF,50015092.0
 UA,UKR,804.0,Ukraine,Ukraine,Ukraine,Ukraine,Ukraine,Europe,Europe,Europe,Europe,High,High,Eastern Europe and Central Asia,Eastern Europe and Central Asia,Europe,EU,37860221.0
-UM,UMI,581.0,,,United States Minor Outlying Islands,United States Minor Outlying Islands (the),United States Minor Outlying Islands,,,,,,,Asia and developing Pacific,South-East Asia and Pacific,North America,,
+UM,UMI,581.0,,,United States Minor Outlying Islands,United States Minor Outlying Islands (the),United States Minor Outlying Islands,,,,,,,Asia and developing Pacific,South-East Asia and Pacific,North America,NA,
 UY,URY,858.0,Uruguay,Uruguay,Uruguay,Uruguay,"Uruguay, Eastern Republic of",Latin America,Latin America,Americas,Americas,Very High,Very High,Latin America and Caribbean,Latin America and Caribbean,South America,SA,3386588.0
-US,USA,840.0,United States of America,United States of America,United States,United States of America (the),United States of America,Northern America,Northern America,Americas,Americas,Very High,Very High,Developed Countries,North America,North America,,340110988.0
+US,USA,840.0,United States of America,United States of America,United States,United States of America (the),United States of America,Northern America,Northern America,Americas,Americas,Very High,Very High,Developed Countries,North America,North America,NA,340110988.0
 UZ,UZB,860.0,Uzbekistan,Uzbekistan,Uzbekistan,Uzbekistan,"Uzbekistan, Republic of",Asia,Asia,Europe,Europe,High,High,Eastern Europe and Central Asia,Eastern Europe and Central Asia,Asia,AS,36361859.0
 VA,VAT,336.0,,,Holy See,Holy See (the),Holy See (Vatican City State),,,,,,,Developed Countries,Europe,Europe,EU,
 VC,VCT,670.0,Saint Vincent and the Grenadines,Saint Vincent and the Grenadines,St. Vincent and the Grenadines,Saint Vincent and the Grenadines,Saint Vincent and the Grenadines,SIDS,SIDS,Americas,Americas,High,High,Latin America and Caribbean,Latin America and Caribbean,North America,,100616.0
