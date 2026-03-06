@@ -591,11 +591,11 @@ requires-dist = [
     { name = "datasets", marker = "extra == 'classify'", specifier = "==4.5.0" },
     { name = "en-core-web-trf", marker = "extra == 'extract'", url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl" },
     { name = "evaluate", marker = "extra == 'classify'", specifier = "==0.4.6" },
-    { name = "geopandas", marker = "extra == 'notebook'", specifier = "==1.1.1" },
+    { name = "geopandas", marker = "extra == 'notebook'", specifier = "==1.1.2" },
     { name = "jupyter", marker = "extra == 'notebook'", specifier = "==1.1.1" },
     { name = "jupyter-contrib-nbextensions", marker = "extra == 'notebook'", specifier = "==0.7.0" },
     { name = "jupyter-server-fileid", marker = "extra == 'notebook'", specifier = "==0.9.3" },
-    { name = "jupyter-server-ydoc", marker = "extra == 'notebook'", specifier = "==2.1.0rc0" },
+    { name = "jupyter-server-ydoc", marker = "extra == 'notebook'", specifier = "==2.2.1" },
     { name = "lightgbm", marker = "extra == 'classify'", specifier = "==4.6.0" },
     { name = "matplotlib", specifier = "==3.10.8" },
     { name = "mordecai3", marker = "extra == 'extract'", git = "https://github.com/ahalterman/mordecai3" },
@@ -605,7 +605,7 @@ requires-dist = [
     { name = "openalex-ingest", editable = "../nacsos-academic-search" },
     { name = "optuna", marker = "extra == 'classify'", specifier = "==4.7.0" },
     { name = "pyarrow", specifier = "==23.0.1" },
-    { name = "tabulate", specifier = "==0.9.0" },
+    { name = "tabulate", specifier = "==0.10.0" },
     { name = "tqdm", specifier = "==4.67.3" },
     { name = "transformers", extras = ["torch"], marker = "extra == 'classify'", specifier = "==4.57.6" },
     { name = "xlsxwriter", specifier = "==3.2.9" },
@@ -1138,7 +1138,7 @@ http = [
 
 [[package]]
 name = "geopandas"
-version = "1.1.1"
+version = "1.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
@@ -1148,9 +1148,9 @@ dependencies = [
     { name = "pyproj" },
     { name = "shapely" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8c/76/e1960ba846f153ab109575242abf89dc98f8e057faa32f3decf4cce9247a/geopandas-1.1.1.tar.gz", hash = "sha256:1745713f64d095c43e72e08e753dbd271678254b24f2e01db8cdb8debe1d293d", size = 332655, upload-time = "2025-06-26T21:04:56.57Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8d/24/5eb5685d7bf89d64218919379f882d19a60f8219d66d833c83b1cf264c95/geopandas-1.1.2.tar.gz", hash = "sha256:33f7b33565c46a45b8459a2ab699ec943fdbb5716e58e251b3c413cf7783106c", size = 336037, upload-time = "2025-12-22T21:06:13.749Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0b/70/d5cd0696eff08e62fdbdebe5b46527facb4e7220eabe0ac6225efab50168/geopandas-1.1.1-py3-none-any.whl", hash = "sha256:589e61aaf39b19828843df16cb90234e72897e2579be236f10eee0d052ad98e8", size = 338365, upload-time = "2025-06-26T21:04:55.139Z" },
+    { url = "https://files.pythonhosted.org/packages/54/e4/fac19dc34cb686c96011388b813ff7b858a70681e5ce6ce7698e5021b0f4/geopandas-1.1.2-py3-none-any.whl", hash = "sha256:2bb0b1052cb47378addb4ba54c47f8d4642dcbda9b61375638274f49d9f0bb0d", size = 341734, upload-time = "2025-12-22T21:06:12.498Z" },
 ]
 
 [[package]]
@@ -1783,7 +1783,7 @@ wheels = [
 
 [[package]]
 name = "jupyter-server-ydoc"
-version = "2.1.0rc0"
+version = "2.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jsonschema" },
@@ -1794,9 +1794,9 @@ dependencies = [
     { name = "pycrdt" },
     { name = "pycrdt-websocket" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3b/eb/ec93dc4845a9b0eb9c44e08703887df8334650053dc28ccd3aeef1e6cd97/jupyter_server_ydoc-2.1.0rc0.tar.gz", hash = "sha256:8d094f2a0143d85c2b34db993dab3b7f04f96b73ac98597a2e3c5c89f370f626", size = 27326, upload-time = "2025-05-28T16:12:29.03Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/83/196dba6b7fdee990f2416da3027a24300252d6356c5d8c5fce4ae6c89572/jupyter_server_ydoc-2.2.1.tar.gz", hash = "sha256:6957f6a66a8794c4265494bba27067a4b09b2936af9916792c20d137a703be46", size = 29515, upload-time = "2026-02-05T15:31:03.26Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/69/511c683f4dc76db10091a64d4e3c07bf231e2c7367dd1eef395a4a2233ff/jupyter_server_ydoc-2.1.0rc0-py3-none-any.whl", hash = "sha256:844cdaa1b9f8077a1aec1d8dae8621465be75852112abdd31b1e008cf2898a16", size = 30504, upload-time = "2025-05-28T16:12:27.603Z" },
+    { url = "https://files.pythonhosted.org/packages/6a/3b/fa15b077df41f599760fce863c4cb5caee5f1519fcfaa649f001c97d9266/jupyter_server_ydoc-2.2.1-py3-none-any.whl", hash = "sha256:37a5b6dfb7ab39db50f758a0ba2443d0b99016be38bf6a49b9f67d1923196c1b", size = 31520, upload-time = "2026-02-05T15:31:01.46Z" },
 ]
 
 [[package]]
@@ -2442,7 +2442,7 @@ wheels = [
 
 [[package]]
 name = "nacsos-data"
-version = "0.24.32"
+version = "0.24.33"
 source = { editable = "../nacsos_data" }
 dependencies = [
     { name = "email-validator" },
@@ -3442,17 +3442,31 @@ wheels = [
 ]
 
 [[package]]
-name = "pycrdt-websocket"
-version = "0.15.5"
+name = "pycrdt-store"
+version = "0.1.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
     { name = "pycrdt" },
     { name = "sqlite-anyio" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/25/97/96f3a984a897f0406c66c54c790e5522879443d1f59a6d5c9563a6dabdd1/pycrdt_websocket-0.15.5.tar.gz", hash = "sha256:aff8c07693ab43b98102ccdaf421738c7d0893db376815de824ea4b4e533de7e", size = 18972, upload-time = "2025-04-15T15:08:02.144Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/35/61/dfecafdc0c23f56d5bacc67de620b77a68f86085df21a8007628d6045248/pycrdt_store-0.1.3.tar.gz", hash = "sha256:12a0e263b2c07eb18bbe7203c828b88ba953cb93094ad37d22aeb6c619df2ef0", size = 14847, upload-time = "2025-12-11T13:29:11.454Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c9/b8/7b2cef47f423d5e1daed3e81515fb07a74aeb9b9148033e8085de451773e/pycrdt_websocket-0.15.5-py3-none-any.whl", hash = "sha256:215c2139503dc1a4559ce8a1553239dd484ecff077429f5433658dfce35432ee", size = 20277, upload-time = "2025-04-15T15:08:00.288Z" },
+    { url = "https://files.pythonhosted.org/packages/b9/2d/85a1b3d6e65048c0553e0d06e21b235610ff4db0ea94cbae1bd34de385d7/pycrdt_store-0.1.3-py3-none-any.whl", hash = "sha256:2e74afc856c162706d178d23d57fd3706accbe79d849e73dd413646a7025afba", size = 11948, upload-time = "2025-12-11T13:29:10.522Z" },
+]
+
+[[package]]
+name = "pycrdt-websocket"
+version = "0.16.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "pycrdt" },
+    { name = "pycrdt-store" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4f/91/a412af8792af22e7e67a7424e7b6c64baada4897777fed885a2cb825155d/pycrdt_websocket-0.16.0.tar.gz", hash = "sha256:89d4d830f41028c55cc9877635f73f94f49131ca73ffac7353d0be421150d0fd", size = 23152, upload-time = "2025-06-11T07:15:54.298Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f4/b7/a1dd4d149fa6279f321bd7dacab66ac31e728fbae175a7d75cf8211b1f30/pycrdt_websocket-0.16.0-py3-none-any.whl", hash = "sha256:4b9ffe47c40867b7e637922680e93471fd801b6e8d6c9f6aa688fd2a17351141", size = 14568, upload-time = "2025-06-11T07:15:52.364Z" },
 ]
 
 [[package]]
@@ -4540,11 +4554,11 @@ wheels = [
 
 [[package]]
 name = "tabulate"
-version = "0.9.0"
+version = "0.10.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ec/fe/802052aecb21e3797b8f7902564ab6ea0d60ff8ca23952079064155d1ae1/tabulate-0.9.0.tar.gz", hash = "sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c", size = 81090, upload-time = "2022-10-06T17:21:48.54Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/46/58/8c37dea7bbf769b20d58e7ace7e5edfe65b849442b00ffcdd56be88697c6/tabulate-0.10.0.tar.gz", hash = "sha256:e2cfde8f79420f6deeffdeda9aaec3b6bc5abce947655d17ac662b126e48a60d", size = 91754, upload-time = "2026-03-04T18:55:34.402Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/40/44/4a5f08c96eb108af5cb50b41f76142f0afa346dfa99d5296fe7202a11854/tabulate-0.9.0-py3-none-any.whl", hash = "sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f", size = 35252, upload-time = "2022-10-06T17:21:44.262Z" },
+    { url = "https://files.pythonhosted.org/packages/99/55/db07de81b5c630da5cbf5c7df646580ca26dfaefa593667fc6f2fe016d2e/tabulate-0.10.0-py3-none-any.whl", hash = "sha256:f0b0622e567335c8fabaaa659f1b33bcb6ddfe2e496071b743aa113f8774f2d3", size = 39814, upload-time = "2026-03-04T18:55:31.284Z" },
 ]
 
 [[package]]

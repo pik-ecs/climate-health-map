@@ -46,17 +46,19 @@ def solr_ingest(
     logger.info('Reading query...')
     query = get_query(query_file)
 
+    extra_solr_params = {'fq': '-(source_id:  "S7407052681")'}  # Drop "Data Planet" stuff (~30k+ as of February 2026)
+
     def from_source() -> Generator[AcademicItemModel, None, None]:
         yield from (
             solr_client.fetch_translated(
                 query=query,
                 project_id=settings.PROJECT_ID,
-                params={'fq': '-(source_id:  "S7407052681")'},  # Drop "Data Planet" stuff (~30k+ as of February 2026)
+                params=extra_solr_params,
             )
         )
 
     logger.info('Fetching item count')
-    num_new_items = solr_client.get_count(query).num_found
+    num_new_items = solr_client.get_count(query, params=extra_solr_params).num_found  # FIXME: add params!
     logger.info(f'Query will return {num_new_items:,} records')
 
     async def inner() -> tuple[str, int | None]:
