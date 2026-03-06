@@ -153,6 +153,18 @@ uv run healthmap ingest classifications-dir \
 We also have our [policy instruments sector](https://huggingface.co/evidence-for-climate-solutions/climatebert-policyinstruments-sector) classifier on huggingface.
 This is loaded separately and applied.
 
+# Topic models
+```bash
+uv run healthmap topicmodel --source data/exports/2026/items.csv --target data/enhanced/topicmodel.csv --offline-models-path data/offline_models
+
+uv run healthmap ingest classifications-file \
+    --source data/enhanced/topicmodel.csv \ 
+    --on-conflict="IGNORE" \
+    --batch-size=1000 \
+    --loglevel="INFO" \
+    --config="config/secret.env"  
+```
+
 # Some SLURM tips
 TODO: elaborate
 
