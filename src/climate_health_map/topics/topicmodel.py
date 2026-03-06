@@ -10,6 +10,8 @@ import pandas as pd
 from tqdm import tqdm
 
 from climate_health_map import get_logger
+from climate_health_map.data import LABELS, Topic
+
 from climate_health_map.shared import read_any_pd, write_any_df
 from climate_health_map.shared.text import SnowballStemmerClass, clean_text, text_from_table, ensure_offline_nltk
 
@@ -18,6 +20,7 @@ class TopicModel:
     VOCAB_FILE = 'vocabulary.csv'
     SCORES_FILE = 'term_topic_scores.csv'
     TOPIC_INFOS_FILE = 'topic_infos.csv'
+    ID2COL = {label.topic_id: label.column for group in LABELS.values() for label in group.labels if type(label) == Topic}
     FALLBACK_PATH = Path(__file__).parent.resolve() / '_model'
 
     TOPIC_INFOS: Optional[pd.DataFrame] = None
@@ -103,7 +106,7 @@ class TopicModel:
 
         return np.asarray(doc_topics), pd.Series(mask)
 
-    def apply(self, df: pd.DataFrame, batch_size: int = 5000) -> pd.DataFrame:
+    def apply(self, df: pd.DataFrame, batch_size: int = 5000, clear_below:float=0.001) -> pd.DataFrame:
         chunks = []
         for pos in tqdm(range(0, len(df), batch_size), desc=f'Applying topic model to batches ({batch_size:,} each, total {len(df):,})'):
             # bite off a chunk from the big dataframe
@@ -118,10 +121,10 @@ class TopicModel:
             topic_scores = self.nmf.transform(vectors[mask])
 
             # Prepare pretty return format
-            dtm = pd.DataFrame(topic_scores, index=index[mask], columns=self.tts.topic_id.unique())
+            dtm = pd.DataFrame(topic_scores, index=index[mask], columns=self.tts.topic_id.unique()).rename(columns=self.ID2COL)
 
-            # Append to our memory
-            chunks.append(dtm.reset_index().melt(id_vars='item_id', var_name='topic_id', value_name='score').query('score>0'))
+            # Append to our result set; clear all low sores first
+            chunks.append(dtm.mask(dtm < clear_below, pd.NA))
 
         return pd.concat(chunks)
 
@@ -143,13 +146,13 @@ def topic_model(
     model = TopicModel(topic_models_path, logger=logger)
 
     logger.info(f'Reading data from {source.resolve()}')
-    df = read_any_pd(source)
+    df = read_any_pd(source, index_column='item_id').iloc[:500]
 
     logger.info(f'Applying topic model to data of shape {df.shape}...')
     result = model.apply(df, batch_size=batch_size)
 
     logger.info(f'Writing data to {target.resolve()}')
-    write_any_df(df=result, target=target, compression='gzip', existing_data_behavior='delete_matching')
+    write_any_df(df=result.reset_index(), target=target)#, compression='gzip', existing_data_behavior='delete_matching')
 
     logger.info('All done.')
 
