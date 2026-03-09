@@ -90,7 +90,7 @@ def classify(
     source: Annotated[Path, typer.Option(help='Path to source data to classify')],
     target: Annotated[Path, typer.Option(help='Path to write classifications to')],
     models_dir: Annotated[Path, typer.Option(help='Path to trained models (not the huggingface `OFFLINE_MODEL_PATH`!)')],
-    cache_dir: Annotated[Path, typer.Option(help='Optional parameter to overwrite `OFFLINE_MODEL_PATH`')]=None,
+    cache_dir: Annotated[Path, typer.Option(help='Optional parameter to overwrite `OFFLINE_MODEL_PATH`')] = None,
     on_exists: Annotated[OnConflict, typer.Option(help='How to behave when the target file already exists')] = OnConflict.IGNORE,
     run_major_incl: Annotated[bool, typer.Option(help='Run C&H inclusion classifier')] = True,
     run_major_categories: Annotated[bool, typer.Option(help='Run major category classifier (mitigation, adaptation, impacts)')] = True,
@@ -123,8 +123,8 @@ def classify(
     logger.info(f'Classifying {df_source.shape[0]:,} items...')
     progress = tqdm(total=df_source.shape[0] // batch_size)
     df_predictions = pd.DataFrame()
-    for idx_begin, idx_end in range(0, len(df_source), batch_size):
-        batch = df_source.iloc[idx_begin:idx_end]
+    for idx_begin in range(0, len(df_source), batch_size):
+        batch = df_source.iloc[idx_begin:idx_begin + batch_size]
         predictions = {'item_id': batch['item_id'].tolist()}
         texts = text_from_table(df=batch)
         if run_major_incl:
@@ -141,13 +141,13 @@ def classify(
             predictions['cat|2'] = y_pred[:, 2]
 
         df_predictions = pd.concat([df_predictions, pd.DataFrame(predictions).set_index('item_id')])
-        progress.update(idx_end - idx_begin)
+        progress.update(len(batch))
     progress.close()
 
     if run_impacts:
         for key, mapping in LABEL_MAPPING.items():
             logger.info(f'Applying {key} classifier...')
-            df_pred = classify_transformer(text_from_table(df=df_source), mapping, model_dir=models_dir/key, cache_dir=cache_dir, logger=logger)
+            df_pred = classify_transformer(text_from_table(df=df_source), mapping, model_dir=models_dir / key, cache_dir=cache_dir, logger=logger)
             df_predictions = df_predictions.merge(df_pred)
 
     write_any_df(df_predictions, target=target, index=True)

@@ -108,7 +108,7 @@ uv run healthmap export items --config config/secret.env --target data/exports/i
 scp data/exports/items_20260304.csv foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/climate-health-map/data/exports
 
 # need to replace {group}
-uv run --extra classify--prerelease=allow \
+uv run --extra classify --prerelease=allow \
     healthmap classification classify \
     --source="../data/exports/items.csv" \
     --target="../data/enhanced/labels_{group}.csv" \
@@ -149,6 +149,18 @@ uv run healthmap ingest classifications-dir \
     --loglevel="INFO" \
     --config="config/secret.env"  
 ```
+
+# Legacy classifiers
+```bash
+uv run --extra classify healthmap classification classify-legacy \
+   --source '/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/exports/items.csv' \
+   --target '../data/enhanced/incl.csv' \
+   --models-dir '../data/trained/' \
+   --cache-dir '../data/offline_models/' \
+   --run-major-incl --run-major-categories
+```
+
+
 # Additional classifiers
 We also have our [policy instruments sector](https://huggingface.co/evidence-for-climate-solutions/climatebert-policyinstruments-sector) classifier on huggingface.
 This is loaded separately and applied.
