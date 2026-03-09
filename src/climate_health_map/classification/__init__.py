@@ -5,6 +5,7 @@ from .r_train import train
 from .q_tuning import main as tuning_quality
 from .q_train import main as training_quality
 from .r_classify import classify
+from .r_legacy import classify as classify_legacy
 
 app = typer.Typer(help='Commands to tune, train, or apply classifiers')
 app.command('tuning', help='Run hyper-parameter tuning and store best parameters and statistics')(tune)
@@ -12,6 +13,7 @@ app.command('train', help='Using a model-info file, train and store a classifier
 app.command('tuning-quality', help='Produce summary statistics of tuning qualities')(tuning_quality)
 app.command('training-quality', help='Produce summary statistics of tuning qualities')(training_quality)
 app.command('classify', help='Apply a fitted classifier to a dataset')(classify)
+app.command('classify-legacy', help='Apply a fitted legacy classifier to a dataset')(classify_legacy)
 
 # This adds all the slurmify-commands for tuning, training, classification
 app.add_typer(slurm_app)
