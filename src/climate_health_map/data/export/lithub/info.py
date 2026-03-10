@@ -1,3 +1,47 @@
+from datetime import date
+from climate_health_map.data.labels import LABELS
+from .types import DatasetInfoWeb, SchemeLabel, SchemeGroup
+
+
+info = DatasetInfoWeb(
+    key='healthmap',
+    name='Climate and Health Map',
+    teaser='Explore scientific papers by subject and place of study',
+    authors=['Max Callaghan'],
+    contributors=['Tim Repke'],
+    contact=['maxcal@pik-potsdam.de'],
+    created_date=date(year=2020, month=7, day=13),
+    last_update=date.today(),
+    figure='teaser.jpg',  # @fietzfotos, pixabay: https://pixabay.com/photos/forest-trees-autumn-nature-season-6765636/
+    hidden=False,
+    db_filename='documents.sqlite',
+    arrow_filename='slim.arrow',
+    keywords_filename='keywords.arrow',
+    slim_geo_filename='geocodes.minimal.arrow',
+    full_geo_filename='geocodes.full.arrow',
+    start_year=1990,
+    end_year=2025,
+    default_colour='t3',  # FIXME
+    columns=set(''),  # FIXME
+    total=0,  # FIXME
+    labels={
+        label.column: SchemeLabel(
+            key=label.column,
+            name=label.name,
+            value=label.value,
+            colour=(label.colour[0], label.colour[1] * 100, label.colour[2] * 100),
+            desc=label.desc,
+        )
+        for group in LABELS.values()
+        for label in group.labels
+    },
+    groups={
+        group.key: SchemeGroup(name=group.name, key=group.key, type=group.type, labels=[label.column for label in group.labels]) for group in LABELS.values() if group.type in {'single', 'multi','bool'}
+    },
+    label_columns=set(''),  # FIXME
+    document_columns=set(''),  # FIXME
+)
+
 # import toml
 # import datetime
 # import pandas as pd
@@ -22,21 +66,6 @@
 #     for _, r in df.iterrows()
 # ]
 #
-# labels = {
-#     'rel|1': SchemeLabel(key='rel|1', name='Relevant', value=1, colour=(16.91, 87.13, 66.47)),
-#
-#     'cat|0': SchemeLabel(key='cat|0', name='Mitigation', value=0, colour=(350.93, 63.24, 26.67)),
-#     'cat|1': SchemeLabel(key='cat|1', name='Adaptation', value=1, colour=(290.53, 30.65, 48.63)),
-#     'cat|2': SchemeLabel(key='cat|2', name='Impacts', value=2, colour=(143.33, 17.31, 59.22)),
-#
-#     'cont|0': SchemeLabel(key='cont|0', name='Africa', value=0, colour=(25.18, 97.97, 61.37)),
-#     'cont|1': SchemeLabel(key='cont|1', name='Asia', value=1, colour=(338.33, 100.0, 92.94)),
-#     'cont|2': SchemeLabel(key='cont|2', name='Europe', value=2, colour=(184.32, 69.06, 35.49)),
-#     'cont|3': SchemeLabel(key='cont|3', name='Latin America', value=3, colour=(0.0, 0.0, 38.82)),
-#     'cont|4': SchemeLabel(key='cont|4', name='Northern America', value=4, colour=(202.46, 94.48, 35.49)),
-#     'cont|5': SchemeLabel(key='cont|5', name='Oceania', value=5, colour=(16.91, 87.13, 66.47)),
-#     'cont|6': SchemeLabel(key='cont|6', name='SIDS', value=6, colour=(16.91, 0.0, 66.47))
-# }
 #
 # groups = {
 #     'rel': SchemeGroup(name='Relevance', key='rel', type='bool', labels=['rel|1']),

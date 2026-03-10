@@ -5,7 +5,7 @@ import pandas as pd
 from scipy.spatial import ConvexHull
 from sklearn.cluster import DBSCAN
 
-from climate_health_map.topics import load_topic_infos, get_topic_labels
+from climate_health_map.topics import TopicModel, get_topic_labels
 
 
 class Keyword(TypedDict):
@@ -32,7 +32,7 @@ def project_topic_names(
     :return:
     """
     logger.info('Loading topicmodel info...')
-    df_topic_infos = load_topic_infos()
+    df_topic_infos = TopicModel.load_topic_infos()
     topic_labels = get_topic_labels()
 
     keyword_positions: list[Keyword] = []

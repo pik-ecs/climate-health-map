@@ -38,6 +38,7 @@ import pandas as pd
 from .continents import CONTINENT_MAP
 from .variations import country_names as COUNTRY_NORMALISATION
 from .places import fix_geographies, get_naming_mask, get_publisher_mask, load_df_places
+from .features import FEATURES, FEATURE_LOOKUP
 
 here = Path(__file__).parent.resolve()
 
@@ -59,4 +60,6 @@ __all__ = [
     'load_df_places',
     'CONTINENT_MAP',
     'COUNTRY_NORMALISATION',
+    'FEATURES',
+    'FEATURE_LOOKUP',
 ]

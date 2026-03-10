@@ -10,6 +10,7 @@ from .affiliations import export as export_affiliations
 from .places import export as export_places
 from .classifications import export as export_classifications
 from .topics import export as export_topics
+from .lithub import prepare_lithub_export
 
 app = typer.Typer(help='Commands to download data from NACSOS into csv files')
 
@@ -19,6 +20,7 @@ app.command('places', help='Export all geo-name information')(export_places)
 app.command('topics', help='Export all topic information from sources')(export_topics)
 app.command('classifications', help='Export all classifications')(export_classifications)
 app.command('annotations', help='Fetch all eligible human annotations from NACSOS and prepare a clean csv for training and evaluation')(export_annotations)
+app.command('lithub', help='Consolidate all exports into lithub files')(prepare_lithub_export)
 
 
 @app.command('all', help='Run all exports')

@@ -24,6 +24,10 @@ classify = [
     "optuna==4.7.0",
     "nltk==3.9.3",
 ]
+scatter = [
+    "opentsne==1.0.4",
+    "umap-learn==0.5.11",
+]
 extract = [
     "mordecai3==3.4.0",
     "en_core_web_trf",

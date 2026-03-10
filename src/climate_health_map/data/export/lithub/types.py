@@ -62,7 +62,7 @@ class DatasetInfoFull(_DatasetInfoFull):
     contact: list[str] | None = None
 
 
-class DatasetInfoWeb(_DatasetInfoFull):
+class DatasetInfoWeb(DatasetInfoFull):
     model_config = ConfigDict(extra='ignore')
     key: str
     total: int

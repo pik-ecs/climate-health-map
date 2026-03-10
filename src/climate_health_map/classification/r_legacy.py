@@ -43,7 +43,7 @@ LABEL_MAPPING = {
     },
     'impacts_rel': {  # no label map
         '0': 'rel_impacts|1',  # FIXME
-    }
+    },
 }
 
 
@@ -124,7 +124,7 @@ def classify(
     progress = tqdm(total=df_source.shape[0] // batch_size)
     df_predictions = pd.DataFrame()
     for idx_begin in range(0, len(df_source), batch_size):
-        batch = df_source.iloc[idx_begin:idx_begin + batch_size]
+        batch = df_source.iloc[idx_begin : idx_begin + batch_size]
         predictions = {'item_id': batch['item_id'].tolist()}
         texts = text_from_table(df=batch)
         if run_major_incl:

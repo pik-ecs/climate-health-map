@@ -8,4 +8,6 @@ uv run healthmap export places --config config/secret.env --target data/exports/
 
 # or just 
 uv run healthmap export all --config config/secret.env --target data/exports_2026/ --all-authors --filetype csv
+
+ uv run healthmap export lithub --source data/exports/2026 --target data/exports/lithub/ --year-start 1990 --year-end 2025
 ```
