@@ -13,6 +13,7 @@ def reduce_topic_distribution(
     source: Annotated[Path, typer.Option(help='Path to file containing topic scores')],
     target: Annotated[Path, typer.Option(help='Path to output file')],
     model_path: Annotated[Path | None, typer.Option(help='Path pickled fitted UMAP')] = None,
+    n_jobs: Annotated[int, typer.Option(help='Number of CPU cores for UMAP (-1 == all cores)')] = -1,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ) -> None:
     logger = get_logger(loglevel=loglevel, logger_name='dimension-reduction', run_log_init=True)
@@ -31,6 +32,7 @@ def reduce_topic_distribution(
             min_dist=0.8,
             n_neighbors=50,
             repulsion_strength=5,
+            n_jobs=n_jobs,
             verbose=True,
         )
         embedding = reducer.fit_transform(df_source[topic_columns].fillna(0))
