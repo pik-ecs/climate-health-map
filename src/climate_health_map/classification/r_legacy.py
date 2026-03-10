@@ -100,9 +100,6 @@ def classify(
 ) -> None:
     from climate_health_map import get_logger
 
-    if run_impacts:
-        raise NotImplementedError('Missing classifiers')
-
     logger = get_logger('classify', loglevel=loglevel, run_log_init=True)
     if target.exists() and on_exists == OnConflict.BREAK:
         raise FileExistsError(f'Output already exists at {target}')
