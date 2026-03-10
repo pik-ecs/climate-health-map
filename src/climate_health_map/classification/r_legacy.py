@@ -77,7 +77,7 @@ def classify_transformer(data: pd.Series, label_map: dict[str, str], model_dir: 
     logger.warning(f'Label mismatch: {set(label_map) - set(model.config.label2id)}  (OK when empty; shows configured labels missing in HF model -> BAD!)')
 
     logger.info('Classifying in batches')
-    y_pred: list[list[dict[str, str | float]]] = pipe(data, batch_size=32)  # type:ignore[assignment]
+    y_pred: list[list[dict[str, str | float]]] = pipe(data.tolist(), batch_size=32)  # type:ignore[assignment]
     return pd.DataFrame(
         [
             {'item_id': idx} | {label_map[lab['label']]: lab['score'] for lab in pred if lab['label'] in label_map}
