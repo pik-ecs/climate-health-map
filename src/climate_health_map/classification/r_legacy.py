@@ -47,7 +47,7 @@ LABEL_MAPPING = {
 }
 
 
-def classify_transformer(data: pd.Series, label_map: dict[str, str], model_dir: Path, cache_dir: Path, logger: logging.Logger) -> pd.DataFrame:
+def classify_transformer(data: pd.DataFrame, label_map: dict[str, str], model_dir: Path, cache_dir: Path, logger: logging.Logger) -> pd.DataFrame:
     import torch
     from transformers import TextClassificationPipeline, AutoTokenizer, AutoModelForSequenceClassification
 
@@ -77,7 +77,8 @@ def classify_transformer(data: pd.Series, label_map: dict[str, str], model_dir: 
     logger.warning(f'Label mismatch: {set(label_map) - set(model.config.label2id)}  (OK when empty; shows configured labels missing in HF model -> BAD!)')
 
     logger.info('Classifying in batches')
-    y_pred: list[list[dict[str, str | float]]] = pipe(data['text'].tolist(), batch_size=32)  # type:ignore[assignment]
+    texts = text_from_table(df=data)
+    y_pred: list[list[dict[str, str | float]]] = pipe(texts, batch_size=32)  # type:ignore[assignment]
     return pd.DataFrame(
         [
             {'item_id': idx} | {label_map[lab['label']]: lab['score'] for lab in pred if lab['label'] in label_map}
@@ -145,6 +146,6 @@ def classify(
         for key, mapping in LABEL_MAPPING.items():
             logger.info(f'Applying {key} classifier...')
             df_pred = classify_transformer(text_from_table(df=df_source), mapping, model_dir=models_dir / key, cache_dir=cache_dir, logger=logger)
-            df_predictions = df_predictions.merge(df_pred)
+            df_predictions = df_predictions.merge(df_pred, how='outer')
 
-    write_any_df(df_predictions, target=target, index=True)
+    write_any_df(df_source, target=target, index=True)
