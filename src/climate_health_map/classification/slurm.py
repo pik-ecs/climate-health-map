@@ -74,7 +74,7 @@ export HF_HUB_OFFLINE=1
 export OFFLINE_MODEL_PATH={models_path.resolve()}
 export NLTK_DATA={models_path.resolve()}/nltk_data
 
-export UV_NO_SOURCES_PACKAGE=nacsos_data,openalex_ingest
+export UV_NO_SOURCES_PACKAGE=nacsos_data openalex_ingest
 
 echo "Using python from $(which python)"
 echo "Python version is $(python --version)"
