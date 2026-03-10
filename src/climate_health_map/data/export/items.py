@@ -56,11 +56,16 @@ def export(
                    ai.scopus_id,
                    ai.title as title,
                    i.text   as abstract,
+                   author_names.names as authors,
                    ai.publication_year
             FROM academic_item ai
                  JOIN item i on i.item_id = ai.item_id
                  JOIN m2m_import_item ii ON ai.item_id = ii.item_id
                  {enhancement_join}
+            LEFT JOIN LATERAL (
+                SELECT string_agg(elem->>'name', ', ') AS names
+                FROM jsonb_array_elements(ai.authors) AS elem
+            ) AS author_names ON true
             WHERE ai.project_id = :project_id
               AND ii.import_id::text = ANY(:import_ids)
               AND (ai.meta -> 'openalex' ->> 'source_id' IS NULL OR ai.meta -> 'openalex' ->> 'source_id' <> 'S7407052681')  -- "source": "Data Planet"

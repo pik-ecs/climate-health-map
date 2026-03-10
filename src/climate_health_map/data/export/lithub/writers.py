@@ -8,46 +8,44 @@ from sqlalchemy import create_engine, text, types
 from climate_health_map.scatterplot.keywords import Keyword
 from climate_health_map.data.geographies import get_naming_mask, fix_geographies, FEATURE_LOOKUP
 from .info import info
-
+from ...labels import LABELS_LOOKUP
 
 CHUNK_SIZE = 10000
 
 
 def _write_batched_ipc(df: pd.DataFrame, target: Path, schema: pa.Schema, chunk_size: int = CHUNK_SIZE) -> None:
     fa = pa.Table.from_pandas(df=df[schema.names], schema=schema)
-    with pa.OSFile(target, 'wb') as sink:
+    with pa.OSFile(target.as_posix(), 'wb') as sink:
         with pa.ipc.new_file(sink, schema=schema) as writer:
             for batch in fa.to_batches(chunk_size):
                 writer.write(batch)
 
 
 def _write_streamed_ipc(df: pd.DataFrame, target: Path, schema: pa.Schema, chunk_size: int = CHUNK_SIZE) -> None:
-    with pa.OSFile(target, 'wb') as sink:
+    with pa.OSFile(target.as_posix(), 'wb') as sink:
         with pa.ipc.new_stream(sink, schema) as writer:
             for chunk_start in range(0, df.shape[0], chunk_size):
-                chunk = df.iloc[chunk_start : chunk_start + chunk_size]
+                chunk = df.iloc[chunk_start: chunk_start + chunk_size]
                 writer.write(pa.record_batch(chunk, schema))
 
 
 def ensure_types(df: pd.DataFrame) -> pd.DataFrame:
     df['x'] = df['x'].astype('float16')
     df['y'] = df['y'].astype('float16')
-    for key in info.label_columns + ['x', 'y']:
-        df[key] = df[key].astype('float16')
+    for key in LABELS_LOOKUP.keys():
+        if key in df.columns:
+            df[key] = df[key].astype('float16')
     for key in ['publication_year', 'idx']:
         df[key] = df[key].astype('Int64')
     return df
 
 
-def write_keywords(keywords: list[Keyword], target: Path, chunk_size: int = CHUNK_SIZE, logger: logging.Logger | None = None):
+def write_keywords(df, target: Path, chunk_size: int = CHUNK_SIZE, logger: logging.Logger | None = None):
     logger = logger or logging.getLogger('lithub.write')
 
-    logger.info('Constructing keyword dataframe...')
-    df_kws = pd.DataFrame(keywords)
-
-    logger.info(f'Writing {target}')
+    logger.info(f'Writing keywords with shape {df.shape} to {target}')
     _write_streamed_ipc(
-        df_kws,
+        df[['x', 'y', 'level', 'keyword']],
         target=target,
         schema=pa.schema([('x', pa.float16()), ('y', pa.float16()), ('level', pa.uint8()), ('keyword', pa.string())]),
         chunk_size=chunk_size,
@@ -58,6 +56,7 @@ def write_keywords(keywords: list[Keyword], target: Path, chunk_size: int = CHUN
 def write_sqlite(df: pd.DataFrame, target: Path, logger: logging.Logger | None = None) -> None:
     logger = logger or logging.getLogger('lithub.write')
     logger.info('Preparing SQLite schema...')
+    label_columns = [key for key in LABELS_LOOKUP.keys() if key in df.columns]
     sql_schema = {
         'idx': types.BIGINT,
         'publication_year': types.INT,
@@ -69,7 +68,7 @@ def write_sqlite(df: pd.DataFrame, target: Path, logger: logging.Logger | None =
         'institutions': types.String,
         'x': types.FLOAT,
         'y': types.FLOAT,
-        **dict.fromkeys(info.label_columns, types.FLOAT),
+        **dict.fromkeys(label_columns, types.FLOAT),
     }
 
     logger.info('Deleting (possibly) existing SQLite file...')
@@ -123,8 +122,8 @@ def write_geographies(df: pd.DataFrame, target_min: Path, target_full: Path, chu
     df['feature'] = df.apply(lambda row: FEATURE_LOOKUP.get(f'{row["feature_class"]}.{row["feature_code"] or ""}'), axis='columns')
 
     logger.info('Preparing dataframe...')
-    df = df.rename(columns={'item_id': 'id', 'feature_class': 'class', 'feature_code': 'code', 'iso_num': 'country_num'}).astype(
-        {'lat': 'float16', 'lon': 'float16'}
+    df = df.rename(columns={'item_id': 'id', 'feature_class': 'class', 'feature_code': 'code', 'iso_num': 'country_num', 'Name (ISO short)': 'country'}).astype(
+        {'lat': 'float16', 'lon': 'float16'},
     )
 
     logger.info('Writing minimal dataframe...')
@@ -137,7 +136,7 @@ def write_geographies(df: pd.DataFrame, target_min: Path, target_full: Path, chu
 
     logger.info('Writing full dataframe...')
     _write_batched_ipc(
-        df[['id', 'idx', 'geonameid', 'name', 'country', 'country_num', 'lat', 'lon', 'class', 'code', 'feature']],
+        df[['idx', 'geonameid', 'name', 'country', 'country_num', 'lat', 'lon', 'class', 'code', 'feature']],
         target=target_full,
         schema=pa.schema(
             [

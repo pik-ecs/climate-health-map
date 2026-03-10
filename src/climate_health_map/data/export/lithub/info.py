@@ -1,10 +1,11 @@
 from datetime import date
+
+import pandas as pd
+
 from climate_health_map.data.labels import LABELS
-from .types import DatasetInfoWeb, SchemeLabel, SchemeGroup
+from .types import DatasetInfoFull, SchemeLabel, SchemeGroup
 
-
-info = DatasetInfoWeb(
-    key='healthmap',
+info = DatasetInfoFull(
     name='Climate and Health Map',
     teaser='Explore scientific papers by subject and place of study',
     authors=['Max Callaghan'],
@@ -21,9 +22,7 @@ info = DatasetInfoWeb(
     full_geo_filename='geocodes.full.arrow',
     start_year=1990,
     end_year=2025,
-    default_colour='t3',  # FIXME
-    columns=set(''),  # FIXME
-    total=0,  # FIXME
+    default_colour='cat',
     labels={
         label.column: SchemeLabel(
             key=label.column,
@@ -40,9 +39,24 @@ info = DatasetInfoWeb(
         for group in LABELS.values()
         if group.type in {'single', 'multi', 'bool'}
     },
-    label_columns=set(''),  # FIXME
-    document_columns=set(''),  # FIXME
+    # TODO: subgroups
+
+    # DatasetInfoWeb:
+    # key='healthmap',
+    # total=0,
+    # columns=set(''),
+    # label_columns=set(''),
+    # document_columns=set(''),
 )
+
+def filter_labels(df: pd.DataFrame, info_:DatasetInfoFull) ->DatasetInfoFull:
+    # TODO: subgroups
+    info_.labels = {k: v for k,v in info_.labels.items() if k in df.columns}
+    for key, group in info_.groups.items():
+        info_.groups[key].labels = [col for col in group.labels if col in df.columns]
+        if len(info_.groups[key].labels) == 0:
+            del info_.groups[key]
+    return info_
 
 # import toml
 # import datetime

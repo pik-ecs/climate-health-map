@@ -59,6 +59,7 @@ class _DatasetInfoFull(DatasetInfo):
 
 
 class DatasetInfoFull(_DatasetInfoFull):
+    model_config = ConfigDict(extra='ignore')
     contact: list[str] | None = None
 
 
