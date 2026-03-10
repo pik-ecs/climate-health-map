@@ -34,6 +34,7 @@ def reduce_topic_distribution(
             verbose=True,
         )
         embedding = reducer.fit_transform(df_source[topic_columns].fillna(0))
+
         logger.info('Storing reducer...')
         with open(model_path, 'wb') as fp_model:
             pickle.dump(reducer, fp_model)
@@ -45,7 +46,7 @@ def reduce_topic_distribution(
         logger.info('Transforming data...')
         embedding = reducer.transform(df_source[topic_columns].fillna(0))
 
-    logger.info('Constructing table...')
+    logger.info('Constructing output table...')
     df_scatter = pd.DataFrame(
         {
             'item_id': df_source.index,
