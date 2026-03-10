@@ -21,8 +21,12 @@ def reduce_topic_distribution(
     logger.info(f'Reading topic distribution from {source}')
     df_source = read_any_pd(source, index_column='item_id')
     logger.info(f'Found data with shape {df_source.shape}')
+
     topic_columns = [topic.column for topic in get_topic_labels().values()]
     logger.debug(f'Going to use the following columns as topics: {topic_columns}')
+
+    df_source = df_source[df_source[topic_columns].notna().any(axis=1)]
+    logger.info(f'Filtered items down to shape shape {df_source.shape}')
 
     if model_path is None or not model_path.exists():
         logger.info('No reducer found, fitting reducer...')

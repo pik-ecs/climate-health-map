@@ -62,13 +62,12 @@ export PYTHONPATH=$PYTHONPATH:{os.getcwd()}
 export PYTHONUNBUFFERED=1
 
 # Environment variables for script
-#export NUMBA_NUM_THREADS=1
-#export OMP_NUM_THREADS=1
-#export MKL_NUM_THREADS=1
-#export NUMEXPR_NUM_THREADS=1
-#export VECLIB_MAXIMUM_THREADS=1
-
-export OPENBLAS_NUM_THREADS=1
+export NUMBA_NUM_THREADS={slurm_params.get('cpus-per-task', 1)}
+export OMP_NUM_THREADS={slurm_params.get('cpus-per-task', 1)}
+export MKL_NUM_THREADS={slurm_params.get('cpus-per-task', 1)}
+export NUMEXPR_NUM_THREADS={slurm_params.get('cpus-per-task', 1)}
+export VECLIB_MAXIMUM_THREADS={slurm_params.get('cpus-per-task', 1)}
+export OPENBLAS_NUM_THREADS={slurm_params.get('cpus-per-task', 1)}
 export TRANSFORMERS_OFFLINE=1
 export HF_HUB_OFFLINE=1
 export OFFLINE_MODEL_PATH={models_path.resolve()}

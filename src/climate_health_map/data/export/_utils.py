@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 from pathlib import Path
 
@@ -24,6 +25,8 @@ class ExportContext:
         loglevel: str = 'INFO',
     ):
         self.logger, self.settings, self.db_engine = essentials(config=config, loglevel=loglevel, logger_name='export', run_log_init=True)
+        self.db_engine.engine.echo = self.logger.level == logging.DEBUG
+
         if target.exists() and on_exists == OnConflict.SKIP:
             self.logger.warning(f'Target file already exists (ending silently): {target.resolve()}')
             return

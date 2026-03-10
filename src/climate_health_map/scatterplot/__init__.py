@@ -2,7 +2,7 @@ import typer
 
 from .keywords import project_topic_names
 from .util import rescale_projection
-from .topic_based import reduce_topic_distribution
+from .reduce_topic_scores import reduce_topic_distribution
 
 app = typer.Typer()
 
