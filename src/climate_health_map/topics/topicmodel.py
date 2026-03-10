@@ -18,7 +18,7 @@ class TopicModel:
     VOCAB_FILE = 'vocabulary.csv'
     SCORES_FILE = 'term_topic_scores.csv'
     TOPIC_INFOS_FILE = 'topic_infos.csv'
-    ID2COL = {label.topic_id: label.column for group in LABELS.values() for label in group.labels if type(label) == Topic}
+    ID2COL = {label.topic_id: label.column for group in LABELS.values() for label in group.labels if type(label) is Topic}
     FALLBACK_PATH = Path(__file__).parent.resolve() / '_model'
 
     TOPIC_INFOS: Optional[pd.DataFrame] = None

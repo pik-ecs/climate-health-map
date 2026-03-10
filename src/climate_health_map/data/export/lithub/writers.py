@@ -6,8 +6,9 @@ import pyarrow as pa
 from sqlalchemy import create_engine, text, types
 
 from climate_health_map.scatterplot.keywords import Keyword
+from climate_health_map.data.geographies import get_naming_mask, fix_geographies, FEATURE_LOOKUP
 from .info import info
-from ...geographies import get_naming_mask, fix_geographies, FEATURE_LOOKUP, load_country_infos
+
 
 CHUNK_SIZE = 10000
 
@@ -41,7 +42,7 @@ def ensure_types(df: pd.DataFrame) -> pd.DataFrame:
 def write_keywords(keywords: list[Keyword], target: Path, chunk_size: int = CHUNK_SIZE, logger: logging.Logger | None = None):
     logger = logger or logging.getLogger('lithub.write')
 
-    logger.info(f'Constructing keyword dataframe...')
+    logger.info('Constructing keyword dataframe...')
     df_kws = pd.DataFrame(keywords)
 
     logger.info(f'Writing {target}')
@@ -68,10 +69,10 @@ def write_sqlite(df: pd.DataFrame, target: Path, logger: logging.Logger | None =
         'institutions': types.String,
         'x': types.FLOAT,
         'y': types.FLOAT,
-        **{k: types.FLOAT for k in info.label_columns},
+        **dict.fromkeys(info.label_columns, types.FLOAT),
     }
 
-    logger.info(f'Deleting (possibly) existing SQLite file...')
+    logger.info('Deleting (possibly) existing SQLite file...')
     target.unlink(missing_ok=True)
     target.parent.mkdir(parents=True, exist_ok=True)
 
@@ -92,7 +93,7 @@ def write_sqlite(df: pd.DataFrame, target: Path, logger: logging.Logger | None =
         con.commit()
 
         rslt = con.execute(text('PRAGMA table_info(documents);')).fetchall()
-        db_cols = set([r[1] for r in rslt])
+        db_cols = {r[1] for r in rslt}
         logger.debug(f'Written columns: {db_cols}')
 
     logger.info(f'Wrote sqlite file to {target}')
@@ -108,7 +109,7 @@ def write_base_info(df: pd.DataFrame, target: Path, chunk_size: int = CHUNK_SIZE
         ),
         chunk_size=chunk_size,
     )
-    logger.info(f'Finished writing slim-feather.')
+    logger.info('Finished writing slim-feather.')
 
 
 def write_geographies(df: pd.DataFrame, target_min: Path, target_full: Path, chunk_size: int = CHUNK_SIZE, logger: logging.Logger | None = None):
@@ -121,12 +122,12 @@ def write_geographies(df: pd.DataFrame, target_min: Path, target_full: Path, chu
     logger.info('Adding feature column...')
     df['feature'] = df.apply(lambda row: FEATURE_LOOKUP.get(f'{row["feature_class"]}.{row["feature_code"] or ""}'), axis='columns')
 
-    logger.info(f'Preparing dataframe...')
+    logger.info('Preparing dataframe...')
     df = df.rename(columns={'item_id': 'id', 'feature_class': 'class', 'feature_code': 'code', 'iso_num': 'country_num'}).astype(
         {'lat': 'float16', 'lon': 'float16'}
     )
 
-    logger.info(f'Writing minimal dataframe...')
+    logger.info('Writing minimal dataframe...')
     _write_batched_ipc(
         df[['idx', 'country_num']],
         target=target_min,
@@ -134,7 +135,7 @@ def write_geographies(df: pd.DataFrame, target_min: Path, target_full: Path, chu
         chunk_size=chunk_size,
     )
 
-    logger.info(f'Writing full dataframe...')
+    logger.info('Writing full dataframe...')
     _write_batched_ipc(
         df[['id', 'idx', 'geonameid', 'name', 'country', 'country_num', 'lat', 'lon', 'class', 'code', 'feature']],
         target=target_full,

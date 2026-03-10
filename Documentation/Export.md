@@ -7,7 +7,10 @@ uv run healthmap export affiliations  --config config/secret.env --target data/e
 uv run healthmap export places --config config/secret.env --target data/exports/places.csv
 
 # or just 
-uv run healthmap export all --config config/secret.env --target data/exports_2026/ --all-authors --filetype csv
+uv run healthmap export all --config config/secret.env --target data/exports/2026/ --all-authors --filetype csv
 
- uv run healthmap export lithub --source data/exports/2026 --target data/exports/lithub/ --year-start 1990 --year-end 2025
+# prepare scatterplot
+uv run --extra scatter healthmap scatterplot reduce-topic-scores --source "data/exports/2026/classifications.csv" --target "data/exports/2026/scatterplot.csv" --model-path "data/trained/scatterplot_topicmodel_new.pkl"
+
+uv run healthmap export lithub --source data/exports/2026 --target data/exports/lithub/ --year-start 1990 --year-end 2025
 ```

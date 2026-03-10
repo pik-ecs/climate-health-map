@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, AfterValidator
 class SchemeLabel(BaseModel):
     key: str  # Column in the database
     name: str  # Humanly readable name
-    value: int  # label value (e.g. technology = 1)
+    value: int|str  # label value (e.g. technology = 1)
     colour: tuple[float, float, float]  # label colour in HSL
     desc: str | None = None  # Description
 

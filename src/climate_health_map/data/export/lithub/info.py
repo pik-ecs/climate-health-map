@@ -36,7 +36,9 @@ info = DatasetInfoWeb(
         for label in group.labels
     },
     groups={
-        group.key: SchemeGroup(name=group.name, key=group.key, type=group.type, labels=[label.column for label in group.labels]) for group in LABELS.values() if group.type in {'single', 'multi','bool'}
+        group.key: SchemeGroup(name=group.name, key=group.key, type=group.type, labels=[label.column for label in group.labels])
+        for group in LABELS.values()
+        if group.type in {'single', 'multi', 'bool'}
     },
     label_columns=set(''),  # FIXME
     document_columns=set(''),  # FIXME

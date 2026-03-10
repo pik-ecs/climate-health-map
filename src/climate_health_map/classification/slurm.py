@@ -90,7 +90,7 @@ param=${{PARAMS[$job]}}
 echo "array_task_id" $SLURM_ARRAY_TASK_ID " --> job" $job
 {env_vars}
 
-uv run --extra classify --prerelease=allow \\
+uv run --extra classify --prerelease=allow --no-sync \\
     healthmap classification {command} \\
 """
     for k, v in script_params.items():

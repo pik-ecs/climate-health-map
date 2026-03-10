@@ -55,13 +55,18 @@ class ExportContext:
             columns: list[str] | None = None
             # TODO: handle the case for `max_file_size`
             # TODO: handle arbitrary file type like `write_any_pd` (and possibly push batch/chunk logic upstream)
+
+            n_rows = 0
             for batch in tqdm(rslt.mappings().partitions(self.batch_size)):
                 sub_df = pd.DataFrame(batch).replace({np.nan: None})
+                n_rows += sub_df.shape[0]
                 if columns is None:
                     columns = sub_df.columns
                     sub_df.to_csv(self.target, index=False)
                 else:
                     sub_df.to_csv(self.target, index=False, header=False, columns=columns, mode='a')
+
+            self.logger.info(f'Wrote {n_rows:,} results to {self.target}')
 
         # return False to propagate exceptions
         return False  # type:ignore [return-value]

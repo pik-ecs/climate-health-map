@@ -6,11 +6,10 @@ import pandas as pd
 import typer
 
 from climate_health_map.scatterplot import project_topic_names
-from climate_health_map.shared import read_any_pd,get_logger
+from climate_health_map.shared import read_any_pd, get_logger
 from climate_health_map.data.geographies import load_country_infos
 from .info import info
-from .writers import ensure_types, write_base_info, write_sqlite, write_keywords, write_geographies
-
+from .writers import write_base_info, write_sqlite, write_keywords, write_geographies
 
 
 def _flatten_country_groups(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
@@ -18,20 +17,19 @@ def _flatten_country_groups(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
         [
             {'item_id': item_id}
             | {
-                f'{prefix}|{column}|{grouping}': count
+                f'{prefix}_{column}|{grouping}': count
                 for column in [
                     'Group (Lancet 2026)',
-                    'Region (WHO 2025)',
                     'Group (WHO 2026)',
                     'Group (HDI 2026)',
-                    "Region (IPCC AR6',' 6)",
-                    "Region (IPCC AR6',' 10)",
+                    'Region (IPCC AR6, 6)',
+                    'Region (IPCC AR6, 10)',
                     'Region (WorldBank 2026)',
                     'Income group (WorldBank 2026)',
                     'Lending category (WorldBank 2026)',
                     'Continent (Name)',
                 ]
-                for grouping, count in group[column].value_counts().items()
+                for grouping, count in group[group[column].notna()][column].value_counts().items()
             }
             for item_id, group in df.groupby('item_id')
         ],
@@ -45,14 +43,14 @@ def prepare_lithub_export(
     year_end: Annotated[int, typer.Option(help='End year (incl)')] = 2025,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ):
-    target.unlink(missing_ok=True)
+    target.rmdir()
     target.mkdir(parents=True, exist_ok=True)
 
     logger = get_logger(loglevel=loglevel, logger_name='lithub', run_log_init=True)
     df_countries = load_country_infos()
     logger.info(f'Loaded country infos: {df_countries.shape}')
 
-    df_items = read_any_pd(source / 'items.csv', index_column='item_id')
+    df_items = read_any_pd(source / 'items.csv', index_column='item_id')#, nrows=10000
     logger.info(f'Loaded items table: {df_items.shape}')
 
     df_items = df_items[(df_items['publication_year'].fillna(0) >= year_start) & (df_items['publication_year'].fillna(0) <= year_end)]
@@ -60,6 +58,9 @@ def prepare_lithub_export(
 
     df_classifications = read_any_pd(source / 'classifications.csv', index_column='item_id')
     logger.info(f'Loaded classifications table: {df_classifications.shape}')
+
+    df_scatterplot = read_any_pd(source / 'scatterplot.csv', index_column='item_id')
+    logger.info(f'Loaded scatterplot table: {df_scatterplot.shape}')
 
     df = df_items.join(df_classifications)
     logger.info(f'Joined tables: {df.shape}')
@@ -75,10 +76,12 @@ def prepare_lithub_export(
     # df, cols = rename_columns(df=df, logger=logger)
     # df = replace_human_annotations(df, logger=logger)
 
+    logger.info('Reading affiliation data...')
     df_affiliations = read_any_pd(source / 'affiliations.csv', keep_default_na=False).merge(df_countries, left_on='iso2', right_on='iso2', how='left')
     df_affiliations_flat = _flatten_country_groups(prefix='Affiliation', df=df_affiliations)
     logger.info(f'Loaded affiliations table: {df_affiliations.shape}; flattened: {df_affiliations_flat.shape}')
 
+    logger.info('Reading mordecai data...')
     df_places = read_any_pd(source / 'places.csv', keep_default_na=False).merge(df_countries, left_on='country_code3', right_on='iso3', how='left')
     df_places_flat = _flatten_country_groups(prefix='Location', df=df_places)
     logger.info(f'Loaded places table: {df_places.shape}; flattened: {df_places_flat.shape}')

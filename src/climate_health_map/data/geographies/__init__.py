@@ -44,11 +44,11 @@ here = Path(__file__).parent.resolve()
 
 
 def load_country_infos() -> pd.DataFrame:
-    return pd.read_csv(here / '_countries.csv', dtype=str, keep_default_na=False).map(str.strip, na_action='ignore')
+    return pd.read_csv(here / '_countries.csv', dtype=str, keep_default_na=False).map(str.strip, na_action='ignore').replace({'': pd.NA})
 
 
 def load_grid_data() -> pd.DataFrame:
-    return pd.read_csv(here / '_grid_data.csv', dtype=str, keep_default_na=False).map(str.strip, na_action='ignore')
+    return pd.read_csv(here / '_grid_data.csv', dtype=str, keep_default_na=False).map(str.strip, na_action='ignore').replace({'': pd.NA})
 
 
 __all__ = [
