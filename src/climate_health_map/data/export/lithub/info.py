@@ -161,7 +161,6 @@ def filter_labels(df: pd.DataFrame, info_: DatasetInfoFull) -> DatasetInfoFull:
             if key in info_.groups:
                 del info_.groups[key]
 
-
     # info_.labels = {k: v for k, v in info_.labels.items() if k in df.columns}
     #
     # keys = list(info_.groups.keys())
@@ -177,6 +176,7 @@ def filter_labels(df: pd.DataFrame, info_: DatasetInfoFull) -> DatasetInfoFull:
     #         if len(info_.groups[key].subgroups) == 0:
     #             del info_.groups[key]
     return info_
+
 
 # import toml
 # import datetime

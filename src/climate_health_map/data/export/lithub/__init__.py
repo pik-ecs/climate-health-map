@@ -14,6 +14,7 @@ from climate_health_map.scatterplot import rescale_projection
 
 from .info import info, filter_labels
 from .writers import write_base_info, write_sqlite, write_keywords, write_geographies
+from ...keywords import search_keywords, REVIEW_KEYWORDS, EVALUATION_KEYWORDS, MENTAL_HEALTH_TERMS
 
 
 def _replace_human_annotations(df: pd.DataFrame, source: Path, logger: logging.Logger) -> pd.DataFrame:
@@ -100,7 +101,14 @@ def prepare_lithub_export(
     logger.info(f'Joined output table: {df.shape}')
 
     if not skip_sqlite:
+        logger.info('Applying keyword columns...')
+        df['keywords|0'] = (search_keywords(df['title'], terms=REVIEW_KEYWORDS) | search_keywords(df['abstract'], terms=REVIEW_KEYWORDS)).astype(int)
+        df['keywords|1'] = (search_keywords(df['title'], terms=EVALUATION_KEYWORDS) | search_keywords(df['abstract'], terms=EVALUATION_KEYWORDS)).astype(int)
+        df['keywords|2'] = (search_keywords(df['title'], terms=MENTAL_HEALTH_TERMS) | search_keywords(df['abstract'], terms=MENTAL_HEALTH_TERMS)).astype(int)
+
+        logger.info('Writing sqlite...')
         write_sqlite(df, target=target / info.db_filename, logger=logger)
+
     write_geographies(
         df=df.join(df_places),
         target_min=target / info.slim_geo_filename,

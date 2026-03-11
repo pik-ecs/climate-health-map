@@ -7,6 +7,32 @@ import sqlalchemy as sa
 from climate_health_map.shared.types import OnConflict
 from ._utils import ExportContext
 
+OPENALEX_TYPE = "', '".join(
+    [
+        'article',  # 62712
+        'book',  # 606
+        'book-chapter',  # 3253
+        # 'book-section',  # 1
+        # 'database',  # 3
+        # 'dataset',  # 1833
+        'dissertation',  # 2205
+        'editorial',  # 93
+        'erratum',  # 15
+        'grant',  # 42
+        'letter',  # 69
+        # 'libguides',  # 25
+        'other',  # 4375
+        # 'paratext',  # 96
+        'peer-review',  # 270
+        'preprint',  # 1515
+        # 'reference-entry',  # 69
+        'report',  # 559
+        'review',  # 624
+        # 'standard',  # 5
+        # 'null', # 5877
+    ],
+)
+
 
 def export(
     config: Annotated[Path, typer.Option(help='Path to config file')],
@@ -17,7 +43,8 @@ def export(
     label_filter: Annotated[str | None, typer.Option(help='Add filter for this enhancement key')] = None,
     label_threshold: Annotated[float, typer.Option(help='Add filter for this enhancement key above payload threshold')] = 0.5,
     label_missing: Annotated[bool, typer.Option(help='Combined with `label_filter`; only return records that do not have this label')] = False,
-    exclude_xpac: Annotated[bool, typer.Option('--exclude-xpac/--include-xpac', help='Combined with `label_filter`; only return records that do not have this label')] = True,
+    exclude_xpac: Annotated[bool, typer.Option('--exclude-xpac/--include-xpac', help='Exclude OpenAlex XPAC entries')] = True,
+    exclude_types: Annotated[bool, typer.Option('--exclude-types/--include-all-types', help='Apply item type filter')] = True,
     limit: Annotated[int | None, typer.Option(help='Limit the number of records to export')] = None,
     max_file_size: Annotated[int | None, typer.Option(help='For large exports, use chunks of this size')] = None,
     on_exists: Annotated[OnConflict, typer.Option(help='How to react if the target file already exists')] = OnConflict.IGNORE,
@@ -47,6 +74,9 @@ def export(
             enhancement_where = ''
 
         xpac_where = "AND (ai.meta -> 'openalex' ->> 'is_xpac' IS NULL OR (ai.meta -> 'openalex' ->> 'is_xpac')::bool = FALSE)" if exclude_xpac else ''
+        type_where = (
+            f"AND (ai.meta -> 'openalex' ->> 'type' IS NULL OR ai.meta -> 'openalex' ->> 'type' = ANY (array['{OPENALEX_TYPE}']))" if exclude_types else ''
+        )
 
         limit_clause = 'LIMIT :limit' if limit else ''
 
@@ -74,6 +104,7 @@ def export(
               AND (ai.meta -> 'openalex' ->> 'source_id' IS NULL OR ai.meta -> 'openalex' ->> 'source_id' <> 'S7407052681')  -- "source": "Data Planet"
               {enhancement_where}
               {xpac_where}
+              {type_where}
             {limit_clause};
             """,
         )

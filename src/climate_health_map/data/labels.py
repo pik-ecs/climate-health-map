@@ -515,6 +515,36 @@ LABELS = {
             ),
         ],
     ),
+    'keywords': Group(
+        collection=Collection.OTHER,
+        key='keywords',
+        name='Additional filters',
+        type='multi',
+        colour=(0.57, 0.95, 0.6),
+        labels=[
+            Label(
+                column='keywords|0',
+                value=0,
+                name='Evidence synthesis',
+                colour=(0.57, 0.95, 0.6),
+                parent='keywords',
+            ),
+            Label(
+                column='keywords|1',
+                value=1,
+                name='Evaluation method',
+                colour=(0.57, 0.95, 0.6),
+                parent='keywords',
+            ),
+            Label(
+                column='keywords|2',
+                value=2,
+                name='Mental health',
+                colour=(0.57, 0.95, 0.6),
+                parent='keywords',
+            ),
+        ],
+    ),
     'topic': Group(
         collection=Collection.TOPICS,
         key='topic',
