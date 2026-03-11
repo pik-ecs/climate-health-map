@@ -52,8 +52,9 @@ info = DatasetInfoFull(
 def filter_labels(df: pd.DataFrame, info_:DatasetInfoFull) ->DatasetInfoFull:
     # TODO: subgroups
     info_.labels = {k: v for k,v in info_.labels.items() if k in df.columns}
-    for key, group in info_.groups.items():
-        info_.groups[key].labels = [col for col in group.labels if col in df.columns]
+    keys = list(info_.groups.keys())
+    for key in keys:
+        info_.groups[key].labels = [col for col in info_.groups[key].labels if col in df.columns]
         if len(info_.groups[key].labels) == 0:
             del info_.groups[key]
     return info_

@@ -133,8 +133,10 @@ def classify(
         if run_major_categories:
             progress.set_postfix_str('Applying major categories classifier...')
             y_pred = clf_major_cat.predict_proba(texts)
-            predictions['cat|0'] = y_pred[:, 0]
-            predictions['cat|1'] = y_pred[:, 1]
+            # old classifier: AMI
+            # new scheme: MAI
+            predictions['cat|0'] = y_pred[:, 1]
+            predictions['cat|1'] = y_pred[:, 0]
             predictions['cat|2'] = y_pred[:, 2]
 
         df_predictions = pd.concat([df_predictions, pd.DataFrame(predictions).set_index('item_id')])
