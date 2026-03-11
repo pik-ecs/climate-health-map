@@ -5,6 +5,71 @@ import pandas as pd
 from climate_health_map.data.labels import LABELS
 from .types import DatasetInfoFull, SchemeLabel, SchemeGroup
 
+exclude_columns = {
+    'topic-4-0|8',
+    'topic-agg-4|0',
+    'topic-agg-agg|4',
+}
+export_groups = [
+    'rel_major',
+    'cat',
+    'type',
+    'cont',
+    'rel_impacts',
+    'driver',
+    'event',
+    'health',
+    'expose',
+    'attr',
+    # 'gender_outcome',
+    # 'notes_major',
+    # 'notes_impacts',
+    'sector',
+    'topic',
+    # 'topic-agg',
+    # 'topic-agg-agg',
+    'Location_Group (Lancet 2026)',
+    'Location_Group (WHO 2026)',
+    'Location_Group (HDI 2026)',
+    'Location_Region (IPCC AR6, 6)',
+    'Location_Region (IPCC AR6, 10)',
+    'Location_Region (WorldBank 2026)',
+    'Location_Income group (WorldBank 2026)',
+    'Location_Lending category (WorldBank 2026)',
+    'Location_Continent (Name)',
+    'Affiliation_Group (Lancet 2026)',
+    'Affiliation_Group (WHO 2026)',
+    'Affiliation_Group (HDI 2026)',
+    'Affiliation_Region (IPCC AR6, 6)',
+    'Affiliation_Region (IPCC AR6, 10)',
+    'Affiliation_Region (WorldBank 2026)',
+    'Affiliation_Income group (WorldBank 2026)',
+    'Affiliation_Lending category (WorldBank 2026)',
+    'Affiliation_Continent (Name)',
+]
+label_groups = {}
+for col in export_groups:
+    group = LABELS[col]
+    if group.type not in {'single', 'multi', 'bool'}:
+        continue
+    label_groups[col] = SchemeGroup(
+        name=group.name,
+        key=group.key,
+        type=group.type,
+        labels=[label.column for label in group.labels if label.column not in exclude_columns],
+    )
+for col in {
+    'topic-agg',
+    'topic-agg-agg',
+}:
+    for group in LABELS[col].labels:
+        label_groups[group.column] = SchemeGroup(
+            name=group.name,
+            key=group.column,
+            type='multi',
+            subgroups=[topic_key for topic_key in group.topics if topic_key not in exclude_columns],
+        )
+
 info = DatasetInfoFull(
     name='Climate and Health Map',
     teaser='Explore scientific papers by subject and place of study',
@@ -34,13 +99,7 @@ info = DatasetInfoFull(
         for group in LABELS.values()
         for label in group.labels
     },
-    groups={
-        group.key: SchemeGroup(name=group.name, key=group.key, type=group.type, labels=[label.column for label in group.labels])
-        for group in LABELS.values()
-        if group.type in {'single', 'multi', 'bool'}
-    },
-    # TODO: subgroups
-
+    groups=label_groups,
     # DatasetInfoWeb:
     # key='healthmap',
     # total=0,
@@ -49,15 +108,24 @@ info = DatasetInfoFull(
     # document_columns=set(''),
 )
 
-def filter_labels(df: pd.DataFrame, info_:DatasetInfoFull) ->DatasetInfoFull:
+
+def filter_labels(df: pd.DataFrame, info_: DatasetInfoFull) -> DatasetInfoFull:
     # TODO: subgroups
-    info_.labels = {k: v for k,v in info_.labels.items() if k in df.columns}
+    info_.labels = {k: v for k, v in info_.labels.items() if k in df.columns}
     keys = list(info_.groups.keys())
     for key in keys:
-        info_.groups[key].labels = [col for col in info_.groups[key].labels if col in df.columns]
-        if len(info_.groups[key].labels) == 0:
-            del info_.groups[key]
+        if key not in info_.groups:
+            continue
+        if info_.groups[key].labels is not None:
+            info_.groups[key].labels = [col for col in info_.groups[key].labels if col in df.columns]
+            if len(info_.groups[key].labels) == 0:
+                del info_.groups[key]
+        elif info_.groups[key].subgroups is not None:
+            info_.groups[key].subgroups = [col for col in info_.groups[key].subgroups if col in df.columns]
+            if len(info_.groups[key].subgroups) == 0:
+                del info_.groups[key]
     return info_
+
 
 # import toml
 # import datetime

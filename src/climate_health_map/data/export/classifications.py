@@ -15,8 +15,8 @@ def export(
     batch_size: Annotated[int, typer.Option(help='Batch size')] = 1000,
     project_id: Annotated[str | None, typer.Option(help='Project ID override')] = None,
     import_ids: Annotated[list[str] | None, typer.Option(help='Import ID override')] = None,
-    filter_classifications: Annotated[bool, typer.Option( help='Only export items that are classified as impact-relevant')] = False,
-    filter_num_classifications: Annotated[int|None, typer.Option( help='Only export items with at least this many classification/topic enhancements')] = None,
+    filter_classifications: Annotated[bool, typer.Option(help='Only export items that are classified as impact-relevant')] = False,
+    filter_num_classifications: Annotated[int | None, typer.Option(help='Only export items with at least this many classification/topic enhancements')] = None,
     on_exists: Annotated[OnConflict, typer.Option(help='How to react if the target file already exists')] = OnConflict.IGNORE,
     loglevel: Annotated[str, typer.Option(help='Loglevel')] = 'INFO',
 ) -> None:

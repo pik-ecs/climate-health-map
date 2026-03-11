@@ -5,9 +5,7 @@ import pandas as pd
 import pyarrow as pa
 from sqlalchemy import create_engine, text, types
 
-from climate_health_map.scatterplot.keywords import Keyword
 from climate_health_map.data.geographies import get_naming_mask, fix_geographies, FEATURE_LOOKUP
-from .info import info
 from ...labels import LABELS_LOOKUP
 
 CHUNK_SIZE = 10000
@@ -25,7 +23,7 @@ def _write_streamed_ipc(df: pd.DataFrame, target: Path, schema: pa.Schema, chunk
     with pa.OSFile(target.as_posix(), 'wb') as sink:
         with pa.ipc.new_stream(sink, schema) as writer:
             for chunk_start in range(0, df.shape[0], chunk_size):
-                chunk = df.iloc[chunk_start: chunk_start + chunk_size]
+                chunk = df.iloc[chunk_start : chunk_start + chunk_size]
                 writer.write(pa.record_batch(chunk, schema))
 
 

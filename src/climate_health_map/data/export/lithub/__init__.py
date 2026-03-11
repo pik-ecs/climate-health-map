@@ -16,8 +16,6 @@ from .info import info, filter_labels
 from .writers import write_base_info, write_sqlite, write_keywords, write_geographies
 
 
-
-
 def _replace_human_annotations(df: pd.DataFrame, source: Path, logger: logging.Logger) -> pd.DataFrame:
     logger.info('Override predictions with human annotations')
 
@@ -57,7 +55,9 @@ def prepare_lithub_export(
     df_items = read_any_pd(source / 'items.csv', index_column='item_id')
     logger.info(f'Loaded items table: {df_items.shape}')
 
-    df_items = df_items[(df_items['publication_year'].fillna(0) >= year_start) & (df_items['publication_year'].fillna(0) <= year_end)]
+    df_items = df_items[
+        df_items['publication_year'].notna() & (df_items['publication_year'].fillna(0) >= year_start) & (df_items['publication_year'].fillna(0) <= year_end)
+    ]
     logger.info(f'Keeping {len(df_items):,} after PY filtering')
 
     df_classifications = read_any_pd(source / 'classifications.csv', index_column='item_id')
@@ -125,7 +125,7 @@ def prepare_lithub_export(
     info_ = filter_labels(df=df, info_=info)
     # info.total = df.shape[0]
     with open(target / 'info.json', 'w') as fp_info:
-        fp_info.write(info_.model_dump_json(indent=2))
+        fp_info.write(info_.model_dump_json(indent=2, exclude_none=True))
 
     logger.info(f'Export finished, now available at {target.resolve()}')
 

@@ -26,7 +26,7 @@ for prefix in ['Location', 'Affiliation']:
             colour=(0, 0, 0),
             labels=[
         """
-        for gi, (grouping, count) in enumerate(df_countries[df_countries[column].notna()][column].value_counts().items()):
+        for _gi, (grouping, count) in enumerate(df_countries[df_countries[column].notna()][column].value_counts().items()):
             print(f'{prefix} -> {column} -> {grouping}: {count}')
             # output += f"""
             #     Label(

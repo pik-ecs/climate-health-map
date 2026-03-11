@@ -76,10 +76,15 @@ def flatten_country_groups(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
     #
     # Gemini translation of the above:
     cols = [
-        'Group (Lancet 2026)', 'Group (WHO 2026)', 'Group (HDI 2026)',
-        'Region (IPCC AR6, 6)', 'Region (IPCC AR6, 10)', 'Region (WorldBank 2026)',
-        'Income group (WorldBank 2026)', 'Lending category (WorldBank 2026)',
-        'Continent (Name)'
+        'Group (Lancet 2026)',
+        'Group (WHO 2026)',
+        'Group (HDI 2026)',
+        'Region (IPCC AR6, 6)',
+        'Region (IPCC AR6, 10)',
+        'Region (WorldBank 2026)',
+        'Income group (WorldBank 2026)',
+        'Lending category (WorldBank 2026)',
+        'Continent (Name)',
     ]
     # 2. "Melt" the dataframe so columns become a single categorical variable
     # This is much faster than looping over columns manually
@@ -92,8 +97,9 @@ def flatten_country_groups(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
     # Unstack 'column' and 'grouping' into the header
     result = counts.unstack(level=[1, 2]).fillna(0).astype(int)
     # 6. Fix column names to match your '{prefix}_{column}|{grouping}' format
-    result.columns = [f"{prefix}_{col}|{grp}" for col, grp in result.columns]
+    result.columns = [f'{prefix}_{col}|{grp}' for col, grp in result.columns]
     return result
+
 
 __all__ = [
     'load_country_infos',

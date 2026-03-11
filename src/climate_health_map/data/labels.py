@@ -84,6 +84,7 @@ class HfGroup(Group):
     token_model: str = 'climatebert/distilroberta-base-climate-f'
 
 
+# TODO: fix all the placeholder colours: (0.57, 0.95, 0.6)
 LABELS = {
     'rel_major': Group(
         collection=Collection.MAJOR,
@@ -106,7 +107,7 @@ LABELS = {
                 value=0,
                 name='Not relevant (major category)',
                 desc='Abstracts covers nexus of climate change and health',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='rel_major',
             ),
         ],
@@ -117,7 +118,7 @@ LABELS = {
         nacsos_key='climateCategory',
         name='Category',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
             Label(column='cat|0', name='Mitigation', value=0, colour=(0.9748055555555556, 0.6324000000000001, 0.2667), parent='cat'),
             Label(column='cat|1', name='Adaptation', value=1, colour=(0.8070277777777777, 0.3065, 0.4863), parent='cat'),
@@ -130,14 +131,14 @@ LABELS = {
         nacsos_key='Resourcetype',
         name='Resource type',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
             Label(
                 column='type|0',
                 value=0,
                 name='Research Article',
                 desc='Article in peer-reviewed journal that describes original research; must contain  new data',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='type',
             ),
             Label(
@@ -145,7 +146,7 @@ LABELS = {
                 value=1,
                 name='Review Article ',
                 desc='Article in peer-reviewed journal that does not present original research, but  rather, provides an overview or review of the topic OR of specific literature.',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='type',
             ),
             Label(
@@ -153,7 +154,7 @@ LABELS = {
                 value=2,
                 name='Commentary/Opinion',
                 desc='Article in peer-reviewed journal that puts forward an individual or  organizational viewpoint. ',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='type',
             ),
             Label(
@@ -161,11 +162,18 @@ LABELS = {
                 value=3,
                 name='Assessment/Book/Report',
                 desc='Gray literature including scientific assessments,reports from governmental and non-governmental organizations, and books and book sections. ',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='type',
             ),
-            Label(column='type|4', value=4, name='News(Scientific Journal)', desc='News published in  peer-reviewed journal ', colour=(0, 0, 0), parent='type'),
-            Label(column='type|5', value=5, name='Other/Unspecified', desc='', colour=(0, 0, 0), parent='type'),
+            Label(
+                column='type|4',
+                value=4,
+                name='News(Scientific Journal)',
+                desc='News published in  peer-reviewed journal ',
+                colour=(0.57, 0.95, 0.6),
+                parent='type',
+            ),
+            Label(column='type|5', value=5, name='Other/Unspecified', desc='', colour=(0.57, 0.95, 0.6), parent='type'),
         ],
     ),
     'cont': Group(
@@ -173,7 +181,7 @@ LABELS = {
         key='cont',
         name='Continent',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
             Label(column='cont|0', name='Africa', value=0, colour=(0.06994444444444445, 0.9797, 0.6137), parent='cont'),
             Label(column='cont|1', name='Asia', value=1, colour=(0.9398055555555556, 1.0, 0.9294), parent='cont'),
@@ -190,14 +198,14 @@ LABELS = {
         nacsos_key='relevant',
         name='Relevant (impacts)',
         type='bool',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
             Label(
                 column='rel_impacts|1',
                 value=1,
                 name='Relevant (impacts)',
                 desc='Abstract covers nexus of climate impacts and health',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='rel_impacts',
             ),
             Label(
@@ -205,7 +213,7 @@ LABELS = {
                 value=0,
                 name='Not relevant (impacts)',
                 desc='Abstract covers nexus of climate impacts and health',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='rel_impacts',
             ),
         ],
@@ -217,23 +225,23 @@ LABELS = {
         name='Climate drivers',
         type='multi',
         desc='Which climate change-relevant drivers of the health impact are described in the document?',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-            Label(column='driver|0', name='CO2rise', value=0, colour=(0, 0, 0), parent='driver'),
-            Label(column='driver|1', name='Changes in temperature', value=1, colour=(0, 0, 0), parent='driver'),
-            Label(column='driver|2', name='Seasonal Change', value=2, colour=(0, 0, 0), parent='driver'),
-            Label(column='driver|3', name='Changes in precipitation', value=3, colour=(0, 0, 0), parent='driver'),
-            Label(column='driver|4', name='Sea-level rise', value=4, colour=(0, 0, 0), parent='driver'),
+            Label(column='driver|0', name='CO2rise', value=0, colour=(0.57, 0.95, 0.6), parent='driver'),
+            Label(column='driver|1', name='Changes in temperature', value=1, colour=(0.57, 0.95, 0.6), parent='driver'),
+            Label(column='driver|2', name='Seasonal Change', value=2, colour=(0.57, 0.95, 0.6), parent='driver'),
+            Label(column='driver|3', name='Changes in precipitation', value=3, colour=(0.57, 0.95, 0.6), parent='driver'),
+            Label(column='driver|4', name='Sea-level rise', value=4, colour=(0.57, 0.95, 0.6), parent='driver'),
             Label(
                 column='driver|5',
                 name='Climate Change (unspecified) ',
                 desc='where documents describe a link between “climate change” and a health impact, without specifying through which climate variable this is driven',
                 value=5,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='driver',
             ),
-            Label(column='driver|7', name='Other meteorological variables', value=7, colour=(0, 0, 0), parent='driver'),
-            Label(column='driver|6', name='Changes in humidity', value=6, colour=(0, 0, 0), parent='driver'),
+            Label(column='driver|7', name='Other meteorological variables', value=7, colour=(0.57, 0.95, 0.6), parent='driver'),
+            Label(column='driver|6', name='Changes in humidity', value=6, colour=(0.57, 0.95, 0.6), parent='driver'),
         ],
     ),
     'event': Group(
@@ -243,15 +251,15 @@ LABELS = {
         name='Extreme event',
         type='multi',
         desc='Which climate change related extreme event linked to health are described in the document?',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-            Label(column='event|0', name='Floods', value=0, colour=(0, 0, 0), parent='event'),
-            Label(column='event|1', name='Heatwaves', value=1, colour=(0, 0, 0), parent='event'),
-            Label(column='event|2', name='Wildfires', value=2, colour=(0, 0, 0), parent='event'),
-            Label(column='event|3', name='Extreme cold', value=3, colour=(0, 0, 0), parent='event'),
-            Label(column='event|6', name='Other extreme events', value=6, colour=(0, 0, 0), parent='event'),
-            Label(column='event|4', name='Storms', desc='including hurricanes, cyclones, typhoon', value=4, colour=(0, 0, 0), parent='event'),
-            Label(column='event|5', name='Droughts', value=5, colour=(0, 0, 0), parent='event'),
+            Label(column='event|0', name='Floods', value=0, colour=(0.57, 0.95, 0.6), parent='event'),
+            Label(column='event|1', name='Heatwaves', value=1, colour=(0.57, 0.95, 0.6), parent='event'),
+            Label(column='event|2', name='Wildfires', value=2, colour=(0.57, 0.95, 0.6), parent='event'),
+            Label(column='event|3', name='Extreme cold', value=3, colour=(0.57, 0.95, 0.6), parent='event'),
+            Label(column='event|6', name='Other extreme events', value=6, colour=(0.57, 0.95, 0.6), parent='event'),
+            Label(column='event|4', name='Storms', desc='including hurricanes, cyclones, typhoon', value=4, colour=(0.57, 0.95, 0.6), parent='event'),
+            Label(column='event|5', name='Droughts', value=5, colour=(0.57, 0.95, 0.6), parent='event'),
         ],
     ),
     'health': Group(
@@ -261,26 +269,26 @@ LABELS = {
         name='Health impacts',
         type='multi',
         desc='which kind of health impacts are discussed in the document?',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
             Label(
                 column='health|0',
                 name='Food safety and security',
                 desc='Quantity and quality of food',
                 value=0,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='health',
             ),
-            Label(column='health|1', name='Mental health and sentiment', value=1, colour=(0, 0, 0), parent='health'),
-            Label(column='health|2', name='Cardiovascular disease', value=2, colour=(0, 0, 0), parent='health'),
-            Label(column='health|3', name='Direct injury and death', value=3, colour=(0, 0, 0), parent='health'),
-            Label(column='health|4', name='Infectious diseases', value=4, colour=(0, 0, 0), parent='health'),
+            Label(column='health|1', name='Mental health and sentiment', value=1, colour=(0.57, 0.95, 0.6), parent='health'),
+            Label(column='health|2', name='Cardiovascular disease', value=2, colour=(0.57, 0.95, 0.6), parent='health'),
+            Label(column='health|3', name='Direct injury and death', value=3, colour=(0.57, 0.95, 0.6), parent='health'),
+            Label(column='health|4', name='Infectious diseases', value=4, colour=(0.57, 0.95, 0.6), parent='health'),
             Label(
                 column='health|5',
                 name='Water safety and security',
                 desc='Quantity and quality of water and sanitation',
                 value=5,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='health',
             ),
             Label(
@@ -288,7 +296,7 @@ LABELS = {
                 name='Mortality and morbidity (general)',
                 desc='Any quantitative measure of an unspecified health burden or mortality. This includes measures of health demand such as hospital visits/pharmacy prescriptions',
                 value=6,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='health',
             ),
             Label(
@@ -296,27 +304,27 @@ LABELS = {
                 name='Health system capacity',
                 desc='captures the impact of climate change (especially disasters) on the capacity of health systems. This includes for example doctors moving away and not coming back, direct damage to hospital facilities, etc.',
                 value=7,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='health',
             ),
             Label(
                 column='health|8',
                 name='Maternal, reproductive and infant health',
                 value=8,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='health',
             ),
-            Label(column='health|9', name='Renal system', value=9, colour=(0, 0, 0), parent='health'),
-            Label(column='health|10', name='Metabolic Disorders', value=10, colour=(0, 0, 0), parent='health'),
+            Label(column='health|9', name='Renal system', value=9, colour=(0.57, 0.95, 0.6), parent='health'),
+            Label(column='health|10', name='Metabolic Disorders', value=10, colour=(0.57, 0.95, 0.6), parent='health'),
             Label(
                 column='health|11',
                 name='Other / unspecified health impacts',
                 desc='captures all health impacts that cannot be allocated to any of the existing categories (including general unspecified health outcomes).',
                 value=11,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='health',
             ),
-            Label(column='health|12', name='Respiratory disease', value=12, colour=(0, 0, 0), parent='health'),
+            Label(column='health|12', name='Respiratory disease', value=12, colour=(0.57, 0.95, 0.6), parent='health'),
         ],
     ),
     'expose': Group(
@@ -326,25 +334,25 @@ LABELS = {
         name='Exposure',
         type='multi',
         desc='How is the exposure to the health risk described in the document?',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
             Label(
                 column='expose|0',
                 name='Reduced agricultural & aquaculture productivity',
                 value=0,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='expose',
             ),
-            Label(column='expose|1', name='Reduced labour and physical capacity', value=1, colour=(0, 0, 0), parent='expose'),
+            Label(column='expose|1', name='Reduced labour and physical capacity', value=1, colour=(0.57, 0.95, 0.6), parent='expose'),
             Label(
                 column='expose|2',
                 name='Biodiversity loss, ecosystem loss, and microbial change',
                 value=2,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='expose',
             ),
-            Label(column='expose|3', name='Air pollution and allergens', value=3, colour=(0, 0, 0), parent='expose'),
-            Label(column='expose|4', name='Other exposure', value=4, colour=(0, 0, 0), parent='expose'),
+            Label(column='expose|3', name='Air pollution and allergens', value=3, colour=(0.57, 0.95, 0.6), parent='expose'),
+            Label(column='expose|4', name='Other exposure', value=4, colour=(0.57, 0.95, 0.6), parent='expose'),
         ],
     ),
     'attr': Group(
@@ -354,14 +362,14 @@ LABELS = {
         name='Attribution type',
         type='multi',
         desc='How is the link between climate and health described in the document?',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
             Label(
                 column='attr|0',
                 name='Climate change attribution',
                 desc='refers to all documents which claim that a health impact was caused by “climate change”, or human influence on the climate system, and a health outcome.',
                 value=0,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='attr',
             ),
             Label(
@@ -369,7 +377,7 @@ LABELS = {
                 name='Trend attribution',
                 desc='refers to all documents which attribute a change in a health outcome or exposure to a trend in a climate variable (at least a decade)',
                 value=1,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='attr',
             ),
             Label(
@@ -377,7 +385,7 @@ LABELS = {
                 name='Climate sensitivity',
                 desc='refers to all documents which show how variation in a climate variable is associated with changes in health outcomes or exposure',
                 value=2,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='attr',
             ),
             Label(
@@ -385,7 +393,7 @@ LABELS = {
                 name='Extreme event attribution',
                 desc='refers to all documents which attribute health outcomes or exposures to an extreme event',
                 value=3,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='attr',
             ),
             Label(
@@ -393,7 +401,7 @@ LABELS = {
                 name='Scenarios',
                 desc='refers to all documents which use climate scenarios to show how health outcomes or exposures will be affected by climate change.',
                 value=4,
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='attr',
             ),
         ],
@@ -404,20 +412,20 @@ LABELS = {
         nacsos_key='GenderOutcomes',
         name='Gener-related outcomes',
         type='bool',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
             Label(
                 column='gender_outcome|1',
                 value=1,
                 name='Gender-specific outcome',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='gender_outcome',
             ),
             Label(
                 column='gender_outcome|0',
                 value=0,
                 name='No gender-specific outcome',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='gender_outcome',
             ),
         ],
@@ -428,7 +436,7 @@ LABELS = {
         nacsos_key='Notes',
         name='Notes (major)',
         type='str',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[],
     ),
     'notes_impacts': Group(
@@ -437,7 +445,7 @@ LABELS = {
         nacsos_key='notes',
         name='Notes (impacts)',
         type='str',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[],
     ),
     'sector': HfGroup(
@@ -447,14 +455,14 @@ LABELS = {
         nacsos_key=None,
         name='Sector',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
             Label(
                 column='sector|0',
                 value=0,
                 name='AFOLU',
                 hf_name='8 - 01. AFOLU',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='sector',
             ),
             Label(
@@ -462,7 +470,7 @@ LABELS = {
                 value=1,
                 name='Buildings',
                 hf_name='8 - 02. Buildings',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='sector',
             ),
             Label(
@@ -470,7 +478,7 @@ LABELS = {
                 value=2,
                 name='Industry',
                 hf_name='8 - 03. Industry',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='sector',
             ),
             Label(
@@ -478,7 +486,7 @@ LABELS = {
                 value=3,
                 name='Energy',
                 hf_name='8 - 04. Energy',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='sector',
             ),
             Label(
@@ -486,7 +494,7 @@ LABELS = {
                 value=4,
                 name='Transport',
                 hf_name='8 - 05. Transport',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='sector',
             ),
             Label(
@@ -494,7 +502,7 @@ LABELS = {
                 value=5,
                 name='Waste',
                 hf_name='8 - 06. Waste',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='sector',
             ),
             Label(
@@ -502,7 +510,7 @@ LABELS = {
                 value=6,
                 name='Cross-sectoral',
                 hf_name='8 - 15. Cross-sectoral',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='sector',
             ),
         ],
@@ -512,7 +520,7 @@ LABELS = {
         key='topic',
         name='Topic',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
             Topic(
                 parent='topic',
@@ -1431,7 +1439,7 @@ LABELS = {
         key='topic-agg',
         name='Meta-topic',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
             AggTopic(
                 parent='topic-agg',
@@ -1650,7 +1658,7 @@ LABELS = {
         key='topic-agg-agg',
         name='Aggregated meta-topic',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
             AggAggTopic(
                 parent='topic-agg-agg',
@@ -1768,15 +1776,14 @@ LABELS = {
         key='Location_Group (Lancet 2026)',
         name='Location grouped by Group (Lancet 2026)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Location_Group (Lancet 2026)|SIDS',
                 value='SIDS',
                 name='SIDS',
                 desc='Article with at least one Location in SIDS',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (Lancet 2026)',
             ),
             Label(
@@ -1784,7 +1791,7 @@ LABELS = {
                 value='Asia',
                 name='Asia',
                 desc='Article with at least one Location in Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (Lancet 2026)',
             ),
             Label(
@@ -1792,7 +1799,7 @@ LABELS = {
                 value='Africa',
                 name='Africa',
                 desc='Article with at least one Location in Africa',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (Lancet 2026)',
             ),
             Label(
@@ -1800,7 +1807,7 @@ LABELS = {
                 value='Europe',
                 name='Europe',
                 desc='Article with at least one Location in Europe',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (Lancet 2026)',
             ),
             Label(
@@ -1808,7 +1815,7 @@ LABELS = {
                 value='Latin America',
                 name='Latin America',
                 desc='Article with at least one Location in Latin America',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (Lancet 2026)',
             ),
             Label(
@@ -1816,7 +1823,7 @@ LABELS = {
                 value='Oceania',
                 name='Oceania',
                 desc='Article with at least one Location in Oceania',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (Lancet 2026)',
             ),
             Label(
@@ -1824,7 +1831,7 @@ LABELS = {
                 value='Northern America',
                 name='Northern America',
                 desc='Article with at least one Location in Northern America',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (Lancet 2026)',
             ),
         ],
@@ -1834,15 +1841,14 @@ LABELS = {
         key='Location_Group (WHO 2026)',
         name='Location grouped by Group (WHO 2026)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Location_Group (WHO 2026)|Europe',
                 value='Europe',
                 name='Europe',
                 desc='Article with at least one Location in Europe',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (WHO 2026)',
             ),
             Label(
@@ -1850,7 +1856,7 @@ LABELS = {
                 value='Americas',
                 name='Americas',
                 desc='Article with at least one Location in Americas',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (WHO 2026)',
             ),
             Label(
@@ -1858,7 +1864,7 @@ LABELS = {
                 value='Africa',
                 name='Africa',
                 desc='Article with at least one Location in Africa',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (WHO 2026)',
             ),
             Label(
@@ -1866,7 +1872,7 @@ LABELS = {
                 value='Western Pacific',
                 name='Western Pacific',
                 desc='Article with at least one Location in Western Pacific',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (WHO 2026)',
             ),
             Label(
@@ -1874,7 +1880,7 @@ LABELS = {
                 value='Eastern Mediterranean',
                 name='Eastern Mediterranean',
                 desc='Article with at least one Location in Eastern Mediterranean',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (WHO 2026)',
             ),
             Label(
@@ -1882,7 +1888,7 @@ LABELS = {
                 value='South-East Asia',
                 name='South-East Asia',
                 desc='Article with at least one Location in South-East Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (WHO 2026)',
             ),
         ],
@@ -1892,15 +1898,14 @@ LABELS = {
         key='Location_Group (HDI 2026)',
         name='Location grouped by Group (HDI 2026)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Location_Group (HDI 2026)|Very High',
                 value='Very High',
                 name='Very High',
                 desc='Article with at least one Location in Very High',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (HDI 2026)',
             ),
             Label(
@@ -1908,7 +1913,7 @@ LABELS = {
                 value='High',
                 name='High',
                 desc='Article with at least one Location in High',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (HDI 2026)',
             ),
             Label(
@@ -1916,7 +1921,7 @@ LABELS = {
                 value='Medium',
                 name='Medium',
                 desc='Article with at least one Location in Medium',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (HDI 2026)',
             ),
             Label(
@@ -1924,7 +1929,7 @@ LABELS = {
                 value='Low',
                 name='Low',
                 desc='Article with at least one Location in Low',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Group (HDI 2026)',
             ),
         ],
@@ -1934,15 +1939,14 @@ LABELS = {
         key='Location_Region (IPCC AR6, 6)',
         name='Location grouped by Region (IPCC AR6, 6)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Location_Region (IPCC AR6, 6)|Developed Countries',
                 value='Developed Countries',
                 name='Developed Countries',
                 desc='Article with at least one Location in Developed Countries',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 6)',
             ),
             Label(
@@ -1950,7 +1954,7 @@ LABELS = {
                 value='Africa',
                 name='Africa',
                 desc='Article with at least one Location in Africa',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 6)',
             ),
             Label(
@@ -1958,7 +1962,7 @@ LABELS = {
                 value='Latin America and Caribbean',
                 name='Latin America and Caribbean',
                 desc='Article with at least one Location in Latin America and Caribbean',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 6)',
             ),
             Label(
@@ -1966,7 +1970,7 @@ LABELS = {
                 value='Asia and developing Pacific',
                 name='Asia and developing Pacific',
                 desc='Article with at least one Location in Asia and developing Pacific',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 6)',
             ),
             Label(
@@ -1974,7 +1978,7 @@ LABELS = {
                 value='Middle East',
                 name='Middle East',
                 desc='Article with at least one Location in Middle East',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 6)',
             ),
             Label(
@@ -1982,7 +1986,7 @@ LABELS = {
                 value='Eastern Europe and Central Asia',
                 name='Eastern Europe and Central Asia',
                 desc='Article with at least one Location in Eastern Europe and Central Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 6)',
             ),
         ],
@@ -1992,15 +1996,14 @@ LABELS = {
         key='Location_Region (IPCC AR6, 10)',
         name='Location grouped by Region (IPCC AR6, 10)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Location_Region (IPCC AR6, 10)|Africa',
                 value='Africa',
                 name='Africa',
                 desc='Article with at least one Location in Africa',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2008,7 +2011,7 @@ LABELS = {
                 value='Latin America and Caribbean',
                 name='Latin America and Caribbean',
                 desc='Article with at least one Location in Latin America and Caribbean',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2016,7 +2019,7 @@ LABELS = {
                 value='Europe',
                 name='Europe',
                 desc='Article with at least one Location in Europe',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2024,7 +2027,7 @@ LABELS = {
                 value='South-East Asia and Pacific',
                 name='South-East Asia and Pacific',
                 desc='Article with at least one Location in South-East Asia and Pacific',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2032,7 +2035,7 @@ LABELS = {
                 value='Middle East',
                 name='Middle East',
                 desc='Article with at least one Location in Middle East',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2040,7 +2043,7 @@ LABELS = {
                 value='Eastern Europe and Central Asia',
                 name='Eastern Europe and Central Asia',
                 desc='Article with at least one Location in Eastern Europe and Central Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2048,7 +2051,7 @@ LABELS = {
                 value='Southern Asia',
                 name='Southern Asia',
                 desc='Article with at least one Location in Southern Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2056,7 +2059,7 @@ LABELS = {
                 value='Australia, Japan, New Zealand',
                 name='Australia, Japan, New Zealand',
                 desc='Article with at least one Location in Australia, Japan, New Zealand',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2064,7 +2067,7 @@ LABELS = {
                 value='Eastern Asia',
                 name='Eastern Asia',
                 desc='Article with at least one Location in Eastern Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2072,7 +2075,7 @@ LABELS = {
                 value='North America',
                 name='North America',
                 desc='Article with at least one Location in North America',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (IPCC AR6, 10)',
             ),
         ],
@@ -2082,15 +2085,14 @@ LABELS = {
         key='Location_Region (WorldBank 2026)',
         name='Location grouped by Region (WorldBank 2026)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Location_Region (WorldBank 2026)|Europe & Central Asia',
                 value='Europe & Central Asia',
                 name='Europe & Central Asia',
                 desc='Article with at least one Location in Europe & Central Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (WorldBank 2026)',
             ),
             Label(
@@ -2098,7 +2100,7 @@ LABELS = {
                 value='Sub-Saharan Africa',
                 name='Sub-Saharan Africa',
                 desc='Article with at least one Location in Sub-Saharan Africa',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (WorldBank 2026)',
             ),
             Label(
@@ -2106,7 +2108,7 @@ LABELS = {
                 value='Latin America & Caribbean',
                 name='Latin America & Caribbean',
                 desc='Article with at least one Location in Latin America & Caribbean',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (WorldBank 2026)',
             ),
             Label(
@@ -2114,7 +2116,7 @@ LABELS = {
                 value='East Asia & Pacific',
                 name='East Asia & Pacific',
                 desc='Article with at least one Location in East Asia & Pacific',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (WorldBank 2026)',
             ),
             Label(
@@ -2122,7 +2124,7 @@ LABELS = {
                 value='Middle East, North Africa, Afghanistan & Pakistan',
                 name='Middle East, North Africa, Afghanistan & Pakistan',
                 desc='Article with at least one Location in Middle East, North Africa, Afghanistan & Pakistan',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (WorldBank 2026)',
             ),
             Label(
@@ -2130,7 +2132,7 @@ LABELS = {
                 value='South Asia',
                 name='South Asia',
                 desc='Article with at least one Location in South Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (WorldBank 2026)',
             ),
             Label(
@@ -2138,7 +2140,7 @@ LABELS = {
                 value='North America',
                 name='North America',
                 desc='Article with at least one Location in North America',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Region (WorldBank 2026)',
             ),
         ],
@@ -2148,15 +2150,14 @@ LABELS = {
         key='Location_Income group (WorldBank 2026)',
         name='Location grouped by Income group (WorldBank 2026)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Location_Income group (WorldBank 2026)|High income',
                 value='High income',
                 name='High income',
                 desc='Article with at least one Location in High income',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Income group (WorldBank 2026)',
             ),
             Label(
@@ -2164,7 +2165,7 @@ LABELS = {
                 value='Upper middle income',
                 name='Upper middle income',
                 desc='Article with at least one Location in Upper middle income',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Income group (WorldBank 2026)',
             ),
             Label(
@@ -2172,7 +2173,7 @@ LABELS = {
                 value='Lower middle income',
                 name='Lower middle income',
                 desc='Article with at least one Location in Lower middle income',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Income group (WorldBank 2026)',
             ),
             Label(
@@ -2180,7 +2181,7 @@ LABELS = {
                 value='Low income',
                 name='Low income',
                 desc='Article with at least one Location in Low income',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Income group (WorldBank 2026)',
             ),
         ],
@@ -2190,15 +2191,14 @@ LABELS = {
         key='Location_Lending category (WorldBank 2026)',
         name='Location grouped by Lending category (WorldBank 2026)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Location_Lending category (WorldBank 2026)|IBRD',
                 value='IBRD',
                 name='IBRD',
                 desc='Article with at least one Location in IBRD',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Lending category (WorldBank 2026)',
             ),
             Label(
@@ -2206,7 +2206,7 @@ LABELS = {
                 value='IDA',
                 name='IDA',
                 desc='Article with at least one Location in IDA',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Lending category (WorldBank 2026)',
             ),
             Label(
@@ -2214,7 +2214,7 @@ LABELS = {
                 value='Blend',
                 name='Blend',
                 desc='Article with at least one Location in Blend',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Lending category (WorldBank 2026)',
             ),
         ],
@@ -2224,15 +2224,14 @@ LABELS = {
         key='Location_Continent (Name)',
         name='Location grouped by Continent (Name)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Location_Continent (Name)|Africa',
                 value='Africa',
                 name='Africa',
                 desc='Article with at least one Location in Africa',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Continent (Name)',
             ),
             Label(
@@ -2240,7 +2239,7 @@ LABELS = {
                 value='Asia',
                 name='Asia',
                 desc='Article with at least one Location in Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Continent (Name)',
             ),
             Label(
@@ -2248,7 +2247,7 @@ LABELS = {
                 value='Europe',
                 name='Europe',
                 desc='Article with at least one Location in Europe',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Continent (Name)',
             ),
             Label(
@@ -2256,7 +2255,7 @@ LABELS = {
                 value='North America',
                 name='North America',
                 desc='Article with at least one Location in North America',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Continent (Name)',
             ),
             Label(
@@ -2264,7 +2263,7 @@ LABELS = {
                 value='Oceania',
                 name='Oceania',
                 desc='Article with at least one Location in Oceania',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Continent (Name)',
             ),
             Label(
@@ -2272,7 +2271,7 @@ LABELS = {
                 value='South America',
                 name='South America',
                 desc='Article with at least one Location in South America',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Continent (Name)',
             ),
             Label(
@@ -2280,7 +2279,7 @@ LABELS = {
                 value='Antarctica',
                 name='Antarctica',
                 desc='Article with at least one Location in Antarctica',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Location_Continent (Name)',
             ),
         ],
@@ -2290,15 +2289,14 @@ LABELS = {
         key='Affiliation_Group (Lancet 2026)',
         name='Affiliation grouped by Group (Lancet 2026)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Affiliation_Group (Lancet 2026)|SIDS',
                 value='SIDS',
                 name='SIDS',
                 desc='Article with at least one Affiliation in SIDS',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (Lancet 2026)',
             ),
             Label(
@@ -2306,7 +2304,7 @@ LABELS = {
                 value='Asia',
                 name='Asia',
                 desc='Article with at least one Affiliation in Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (Lancet 2026)',
             ),
             Label(
@@ -2314,7 +2312,7 @@ LABELS = {
                 value='Africa',
                 name='Africa',
                 desc='Article with at least one Affiliation in Africa',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (Lancet 2026)',
             ),
             Label(
@@ -2322,7 +2320,7 @@ LABELS = {
                 value='Europe',
                 name='Europe',
                 desc='Article with at least one Affiliation in Europe',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (Lancet 2026)',
             ),
             Label(
@@ -2330,7 +2328,7 @@ LABELS = {
                 value='Latin America',
                 name='Latin America',
                 desc='Article with at least one Affiliation in Latin America',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (Lancet 2026)',
             ),
             Label(
@@ -2338,7 +2336,7 @@ LABELS = {
                 value='Oceania',
                 name='Oceania',
                 desc='Article with at least one Affiliation in Oceania',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (Lancet 2026)',
             ),
             Label(
@@ -2346,7 +2344,7 @@ LABELS = {
                 value='Northern America',
                 name='Northern America',
                 desc='Article with at least one Affiliation in Northern America',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (Lancet 2026)',
             ),
         ],
@@ -2356,15 +2354,14 @@ LABELS = {
         key='Affiliation_Group (WHO 2026)',
         name='Affiliation grouped by Group (WHO 2026)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Affiliation_Group (WHO 2026)|Europe',
                 value='Europe',
                 name='Europe',
                 desc='Article with at least one Affiliation in Europe',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (WHO 2026)',
             ),
             Label(
@@ -2372,7 +2369,7 @@ LABELS = {
                 value='Americas',
                 name='Americas',
                 desc='Article with at least one Affiliation in Americas',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (WHO 2026)',
             ),
             Label(
@@ -2380,7 +2377,7 @@ LABELS = {
                 value='Africa',
                 name='Africa',
                 desc='Article with at least one Affiliation in Africa',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (WHO 2026)',
             ),
             Label(
@@ -2388,7 +2385,7 @@ LABELS = {
                 value='Western Pacific',
                 name='Western Pacific',
                 desc='Article with at least one Affiliation in Western Pacific',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (WHO 2026)',
             ),
             Label(
@@ -2396,7 +2393,7 @@ LABELS = {
                 value='Eastern Mediterranean',
                 name='Eastern Mediterranean',
                 desc='Article with at least one Affiliation in Eastern Mediterranean',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (WHO 2026)',
             ),
             Label(
@@ -2404,7 +2401,7 @@ LABELS = {
                 value='South-East Asia',
                 name='South-East Asia',
                 desc='Article with at least one Affiliation in South-East Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (WHO 2026)',
             ),
         ],
@@ -2414,15 +2411,14 @@ LABELS = {
         key='Affiliation_Group (HDI 2026)',
         name='Affiliation grouped by Group (HDI 2026)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Affiliation_Group (HDI 2026)|Very High',
                 value='Very High',
                 name='Very High',
                 desc='Article with at least one Affiliation in Very High',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (HDI 2026)',
             ),
             Label(
@@ -2430,7 +2426,7 @@ LABELS = {
                 value='High',
                 name='High',
                 desc='Article with at least one Affiliation in High',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (HDI 2026)',
             ),
             Label(
@@ -2438,7 +2434,7 @@ LABELS = {
                 value='Medium',
                 name='Medium',
                 desc='Article with at least one Affiliation in Medium',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (HDI 2026)',
             ),
             Label(
@@ -2446,7 +2442,7 @@ LABELS = {
                 value='Low',
                 name='Low',
                 desc='Article with at least one Affiliation in Low',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Group (HDI 2026)',
             ),
         ],
@@ -2456,15 +2452,14 @@ LABELS = {
         key='Affiliation_Region (IPCC AR6, 6)',
         name='Affiliation grouped by Region (IPCC AR6, 6)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Affiliation_Region (IPCC AR6, 6)|Developed Countries',
                 value='Developed Countries',
                 name='Developed Countries',
                 desc='Article with at least one Affiliation in Developed Countries',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 6)',
             ),
             Label(
@@ -2472,7 +2467,7 @@ LABELS = {
                 value='Africa',
                 name='Africa',
                 desc='Article with at least one Affiliation in Africa',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 6)',
             ),
             Label(
@@ -2480,7 +2475,7 @@ LABELS = {
                 value='Latin America and Caribbean',
                 name='Latin America and Caribbean',
                 desc='Article with at least one Affiliation in Latin America and Caribbean',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 6)',
             ),
             Label(
@@ -2488,7 +2483,7 @@ LABELS = {
                 value='Asia and developing Pacific',
                 name='Asia and developing Pacific',
                 desc='Article with at least one Affiliation in Asia and developing Pacific',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 6)',
             ),
             Label(
@@ -2496,7 +2491,7 @@ LABELS = {
                 value='Middle East',
                 name='Middle East',
                 desc='Article with at least one Affiliation in Middle East',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 6)',
             ),
             Label(
@@ -2504,7 +2499,7 @@ LABELS = {
                 value='Eastern Europe and Central Asia',
                 name='Eastern Europe and Central Asia',
                 desc='Article with at least one Affiliation in Eastern Europe and Central Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 6)',
             ),
         ],
@@ -2514,15 +2509,14 @@ LABELS = {
         key='Affiliation_Region (IPCC AR6, 10)',
         name='Affiliation grouped by Region (IPCC AR6, 10)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Affiliation_Region (IPCC AR6, 10)|Africa',
                 value='Africa',
                 name='Africa',
                 desc='Article with at least one Affiliation in Africa',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2530,7 +2524,7 @@ LABELS = {
                 value='Latin America and Caribbean',
                 name='Latin America and Caribbean',
                 desc='Article with at least one Affiliation in Latin America and Caribbean',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2538,7 +2532,7 @@ LABELS = {
                 value='Europe',
                 name='Europe',
                 desc='Article with at least one Affiliation in Europe',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2546,7 +2540,7 @@ LABELS = {
                 value='South-East Asia and Pacific',
                 name='South-East Asia and Pacific',
                 desc='Article with at least one Affiliation in South-East Asia and Pacific',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2554,7 +2548,7 @@ LABELS = {
                 value='Middle East',
                 name='Middle East',
                 desc='Article with at least one Affiliation in Middle East',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2562,7 +2556,7 @@ LABELS = {
                 value='Eastern Europe and Central Asia',
                 name='Eastern Europe and Central Asia',
                 desc='Article with at least one Affiliation in Eastern Europe and Central Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2570,7 +2564,7 @@ LABELS = {
                 value='Southern Asia',
                 name='Southern Asia',
                 desc='Article with at least one Affiliation in Southern Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2578,7 +2572,7 @@ LABELS = {
                 value='Australia, Japan, New Zealand',
                 name='Australia, Japan, New Zealand',
                 desc='Article with at least one Affiliation in Australia, Japan, New Zealand',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2586,7 +2580,7 @@ LABELS = {
                 value='Eastern Asia',
                 name='Eastern Asia',
                 desc='Article with at least one Affiliation in Eastern Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 10)',
             ),
             Label(
@@ -2594,7 +2588,7 @@ LABELS = {
                 value='North America',
                 name='North America',
                 desc='Article with at least one Affiliation in North America',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (IPCC AR6, 10)',
             ),
         ],
@@ -2604,15 +2598,14 @@ LABELS = {
         key='Affiliation_Region (WorldBank 2026)',
         name='Affiliation grouped by Region (WorldBank 2026)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Affiliation_Region (WorldBank 2026)|Europe & Central Asia',
                 value='Europe & Central Asia',
                 name='Europe & Central Asia',
                 desc='Article with at least one Affiliation in Europe & Central Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (WorldBank 2026)',
             ),
             Label(
@@ -2620,7 +2613,7 @@ LABELS = {
                 value='Sub-Saharan Africa',
                 name='Sub-Saharan Africa',
                 desc='Article with at least one Affiliation in Sub-Saharan Africa',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (WorldBank 2026)',
             ),
             Label(
@@ -2628,7 +2621,7 @@ LABELS = {
                 value='Latin America & Caribbean',
                 name='Latin America & Caribbean',
                 desc='Article with at least one Affiliation in Latin America & Caribbean',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (WorldBank 2026)',
             ),
             Label(
@@ -2636,7 +2629,7 @@ LABELS = {
                 value='East Asia & Pacific',
                 name='East Asia & Pacific',
                 desc='Article with at least one Affiliation in East Asia & Pacific',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (WorldBank 2026)',
             ),
             Label(
@@ -2644,7 +2637,7 @@ LABELS = {
                 value='Middle East, North Africa, Afghanistan & Pakistan',
                 name='Middle East, North Africa, Afghanistan & Pakistan',
                 desc='Article with at least one Affiliation in Middle East, North Africa, Afghanistan & Pakistan',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (WorldBank 2026)',
             ),
             Label(
@@ -2652,7 +2645,7 @@ LABELS = {
                 value='South Asia',
                 name='South Asia',
                 desc='Article with at least one Affiliation in South Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (WorldBank 2026)',
             ),
             Label(
@@ -2660,7 +2653,7 @@ LABELS = {
                 value='North America',
                 name='North America',
                 desc='Article with at least one Affiliation in North America',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Region (WorldBank 2026)',
             ),
         ],
@@ -2670,15 +2663,14 @@ LABELS = {
         key='Affiliation_Income group (WorldBank 2026)',
         name='Affiliation grouped by Income group (WorldBank 2026)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Affiliation_Income group (WorldBank 2026)|High income',
                 value='High income',
                 name='High income',
                 desc='Article with at least one Affiliation in High income',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Income group (WorldBank 2026)',
             ),
             Label(
@@ -2686,7 +2678,7 @@ LABELS = {
                 value='Upper middle income',
                 name='Upper middle income',
                 desc='Article with at least one Affiliation in Upper middle income',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Income group (WorldBank 2026)',
             ),
             Label(
@@ -2694,7 +2686,7 @@ LABELS = {
                 value='Lower middle income',
                 name='Lower middle income',
                 desc='Article with at least one Affiliation in Lower middle income',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Income group (WorldBank 2026)',
             ),
             Label(
@@ -2702,7 +2694,7 @@ LABELS = {
                 value='Low income',
                 name='Low income',
                 desc='Article with at least one Affiliation in Low income',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Income group (WorldBank 2026)',
             ),
         ],
@@ -2712,15 +2704,14 @@ LABELS = {
         key='Affiliation_Lending category (WorldBank 2026)',
         name='Affiliation grouped by Lending category (WorldBank 2026)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Affiliation_Lending category (WorldBank 2026)|IBRD',
                 value='IBRD',
                 name='IBRD',
                 desc='Article with at least one Affiliation in IBRD',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Lending category (WorldBank 2026)',
             ),
             Label(
@@ -2728,7 +2719,7 @@ LABELS = {
                 value='IDA',
                 name='IDA',
                 desc='Article with at least one Affiliation in IDA',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Lending category (WorldBank 2026)',
             ),
             Label(
@@ -2736,7 +2727,7 @@ LABELS = {
                 value='Blend',
                 name='Blend',
                 desc='Article with at least one Affiliation in Blend',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Lending category (WorldBank 2026)',
             ),
         ],
@@ -2746,15 +2737,14 @@ LABELS = {
         key='Affiliation_Continent (Name)',
         name='Affiliation grouped by Continent (Name)',
         type='multi',
-        colour=(0, 0, 0),
+        colour=(0.57, 0.95, 0.6),
         labels=[
-
             Label(
                 column='Affiliation_Continent (Name)|Africa',
                 value='Africa',
                 name='Africa',
                 desc='Article with at least one Affiliation in Africa',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Continent (Name)',
             ),
             Label(
@@ -2762,7 +2752,7 @@ LABELS = {
                 value='Asia',
                 name='Asia',
                 desc='Article with at least one Affiliation in Asia',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Continent (Name)',
             ),
             Label(
@@ -2770,7 +2760,7 @@ LABELS = {
                 value='Europe',
                 name='Europe',
                 desc='Article with at least one Affiliation in Europe',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Continent (Name)',
             ),
             Label(
@@ -2778,7 +2768,7 @@ LABELS = {
                 value='North America',
                 name='North America',
                 desc='Article with at least one Affiliation in North America',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Continent (Name)',
             ),
             Label(
@@ -2786,7 +2776,7 @@ LABELS = {
                 value='Oceania',
                 name='Oceania',
                 desc='Article with at least one Affiliation in Oceania',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Continent (Name)',
             ),
             Label(
@@ -2794,7 +2784,7 @@ LABELS = {
                 value='South America',
                 name='South America',
                 desc='Article with at least one Affiliation in South America',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Continent (Name)',
             ),
             Label(
@@ -2802,7 +2792,7 @@ LABELS = {
                 value='Antarctica',
                 name='Antarctica',
                 desc='Article with at least one Affiliation in Antarctica',
-                colour=(0, 0, 0),
+                colour=(0.57, 0.95, 0.6),
                 parent='Affiliation_Continent (Name)',
             ),
         ],
