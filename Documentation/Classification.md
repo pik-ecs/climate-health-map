@@ -5,6 +5,9 @@ Classification has three steps
 2) Training (using best model config from above per label and train+store a model)
 3) Application (point to a file, and this will apply trained classifiers)
 
+Original classification:
+https://github.com/AnneIsARealProgrammerNow/ClimateHealth_Wellcome/blob/v0.1/active_learning_with_evaluation.ipynb
+
 ## Cluster environment
 When running any of the sl
 ```bash

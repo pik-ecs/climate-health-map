@@ -17,6 +17,7 @@ def export(
     label_filter: Annotated[str | None, typer.Option(help='Add filter for this enhancement key')] = None,
     label_threshold: Annotated[float, typer.Option(help='Add filter for this enhancement key above payload threshold')] = 0.5,
     label_missing: Annotated[bool, typer.Option(help='Combined with `label_filter`; only return records that do not have this label')] = False,
+    exclude_xpac: Annotated[bool, typer.Option('--exclude-xpac/--include-xpac', help='Combined with `label_filter`; only return records that do not have this label')] = True,
     limit: Annotated[int | None, typer.Option(help='Limit the number of records to export')] = None,
     max_file_size: Annotated[int | None, typer.Option(help='For large exports, use chunks of this size')] = None,
     on_exists: Annotated[OnConflict, typer.Option(help='How to react if the target file already exists')] = OnConflict.IGNORE,
@@ -45,6 +46,8 @@ def export(
             enhancement_join = ''
             enhancement_where = ''
 
+        xpac_where = "AND (ai.meta -> 'openalex' ->> 'is_xpac' IS NULL OR (ai.meta -> 'openalex' ->> 'is_xpac')::bool = FALSE)" if exclude_xpac else ''
+
         limit_clause = 'LIMIT :limit' if limit else ''
 
         ctx.query = sa.text(
@@ -70,6 +73,7 @@ def export(
               AND ii.import_id::text = ANY(:import_ids)
               AND (ai.meta -> 'openalex' ->> 'source_id' IS NULL OR ai.meta -> 'openalex' ->> 'source_id' <> 'S7407052681')  -- "source": "Data Planet"
               {enhancement_where}
+              {xpac_where}
             {limit_clause};
             """,
         )

@@ -56,19 +56,27 @@ for col in export_groups:
         name=group.name,
         key=group.key,
         type=group.type,
+        colour=(group.colour[0] * 360, group.colour[1] * 100, group.colour[2] * 100),
         labels=[label.column for label in group.labels if label.column not in exclude_columns],
     )
-for col in {
-    'topic-agg',
-    'topic-agg-agg',
-}:
-    for group in LABELS[col].labels:
-        label_groups[group.column] = SchemeGroup(
-            name=group.name,
-            key=group.column,
-            type='multi',
-            subgroups=[topic_key for topic_key in group.topics if topic_key not in exclude_columns],
-        )
+for gi, group in enumerate(LABELS['topic-agg'].labels):
+    label_groups[group.column] = SchemeGroup(
+        name=group.name,
+        key=group.column,
+        type='multi',
+        colour=(group.colour[0] * 360, group.colour[1] * 100, group.colour[2] * 100),
+        labels=[topic_key for topic_key in group.topics if topic_key not in exclude_columns],
+    )
+label_groups['topic-agg-agg'] = SchemeGroup(name='Meta-topic', key='topic-agg-agg', type='multi', colour=(180, 90, 90), subgroups=[])
+for group in LABELS['topic-agg-agg'].labels:
+    label_groups[group.column] = SchemeGroup(
+        name=group.name,
+        key=group.column,
+        type='multi',
+        colour=(group.colour[0] * 360, group.colour[1] * 100, group.colour[2] * 100),
+        subgroups=[topic_key for topic_key in group.topics_agg if topic_key not in exclude_columns],
+    )
+    label_groups['topic-agg-agg'].subgroups.append(group.column)
 
 info = DatasetInfoFull(
     name='Climate and Health Map',
@@ -93,7 +101,7 @@ info = DatasetInfoFull(
             key=label.column,
             name=label.name,
             value=label.value,
-            colour=(label.colour[0], label.colour[1] * 100, label.colour[2] * 100),
+            colour=(label.colour[0] * 360, label.colour[1] * 100, label.colour[2] * 100),
             desc=label.desc,
         )
         for group in LABELS.values()
@@ -110,22 +118,65 @@ info = DatasetInfoFull(
 
 
 def filter_labels(df: pd.DataFrame, info_: DatasetInfoFull) -> DatasetInfoFull:
-    # TODO: subgroups
+    # 1. Filter the top-level labels first
     info_.labels = {k: v for k, v in info_.labels.items() if k in df.columns}
-    keys = list(info_.groups.keys())
-    for key in keys:
-        if key not in info_.groups:
-            continue
-        if info_.groups[key].labels is not None:
-            info_.groups[key].labels = [col for col in info_.groups[key].labels if col in df.columns]
-            if len(info_.groups[key].labels) == 0:
-                del info_.groups[key]
-        elif info_.groups[key].subgroups is not None:
-            info_.groups[key].subgroups = [col for col in info_.groups[key].subgroups if col in df.columns]
-            if len(info_.groups[key].subgroups) == 0:
-                del info_.groups[key]
-    return info_
 
+    # Cache to store whether a group ID is valid (True/False)
+    # This prevents redundant work and handles nested dependencies.
+    memory = {}
+
+    def check_group_validity(key_: str):
+        # If we've already decided if this group is valid, return the result
+        if key_ in memory:
+            return memory[key_]
+
+        group_ = info_.groups.get(key_)
+        if not group_:
+            memory[key_] = False
+            return False
+
+        # Case 1: Group contains direct column labels
+        if group_.labels is not None:
+            group_.labels = [col for col in group_.labels if col in df.columns]
+            is_valid = len(group_.labels) > 0
+
+        # Case 2: Group contains references to other groups (subgroups)
+        elif group_.subgroups is not None:
+            # We recursively check each subgroup.
+            # A subgroup is kept only if check_group_validity returns True.
+            group_.subgroups = [s for s in group_.subgroups if check_group_validity(s)]
+            is_valid = len(group_.subgroups) > 0
+
+        else:
+            is_valid = False
+
+        memory[key_] = is_valid
+        return is_valid
+
+    # 2. Iterate through all group keys and trigger the recursive check
+    all_keys = list(info_.groups.keys())
+    for key in all_keys:
+        if not check_group_validity(key):
+            # If the group (or its nested children) ended up empty, delete it
+            if key in info_.groups:
+                del info_.groups[key]
+
+
+    # info_.labels = {k: v for k, v in info_.labels.items() if k in df.columns}
+    #
+    # keys = list(info_.groups.keys())
+    # for key in keys:
+    #     if key not in info_.groups:
+    #         continue
+    #     if info_.groups[key].labels is not None:
+    #         info_.groups[key].labels = [col for col in info_.groups[key].labels if col in df.columns]
+    #         if len(info_.groups[key].labels) == 0:
+    #             del info_.groups[key]
+    #     elif info_.groups[key].subgroups is not None:
+    #         info_.groups[key].subgroups = [col for col in info_.groups[key].subgroups if col in keys]
+    #         if len(info_.groups[key].subgroups) == 0:
+    #             del info_.groups[key]
+    return info_
 
 # import toml
 # import datetime

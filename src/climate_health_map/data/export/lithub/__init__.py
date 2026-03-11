@@ -44,6 +44,7 @@ def prepare_lithub_export(
     source_annotations: Annotated[Path | None, typer.Option(help='path to human annotations')] = None,
     year_start: Annotated[int, typer.Option(help='Start year (incl)')] = 1990,
     year_end: Annotated[int, typer.Option(help='End year (incl)')] = 2025,
+    skip_sqlite: Annotated[bool, typer.Option(help='Skip sqlite export for speedy info update')] = False,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ):
     target.mkdir(parents=True, exist_ok=True)
@@ -98,7 +99,8 @@ def prepare_lithub_export(
     df = df.join(df_affiliations_flat, how='left').join(df_places_flat, how='left')
     logger.info(f'Joined output table: {df.shape}')
 
-    write_sqlite(df, target=target / info.db_filename, logger=logger)
+    if not skip_sqlite:
+        write_sqlite(df, target=target / info.db_filename, logger=logger)
     write_geographies(
         df=df.join(df_places),
         target_min=target / info.slim_geo_filename,
