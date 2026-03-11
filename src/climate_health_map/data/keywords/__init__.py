@@ -1,3 +1,5 @@
+import warnings
+
 import pandas as pd
 
 from .equity import EQUITY_TERMS_EN, EQUITY_TERMS_ES, EQUITY_TERMS_PT
@@ -17,7 +19,10 @@ def search_keywords(column: pd.Series, term: str | None = None, terms: list[str]
         regex = '(' + ('|'.join(terms)) + ')'
     else:
         raise ValueError('No term provided')
-    return column.str.contains(regex, case=False, regex=True)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=UserWarning)
+        return column.str.contains(regex, case=False, regex=True)
 
 
 __all__ = [

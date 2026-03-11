@@ -21,6 +21,7 @@ export_groups = [
     'health',
     'expose',
     'attr',
+    'keywords',
     # 'gender_outcome',
     # 'notes_major',
     # 'notes_impacts',
