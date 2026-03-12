@@ -12,7 +12,7 @@ from .mental_health import MENTAL_HEALTH_TERMS
 # copy-paste code should be in these notebooks: https://gitlab.pik-potsdam.de/mcc-apsis/living-evidence-maps/lancet-countdown/-/tree/main/2025?ref_type=heads
 
 
-def search_keywords(column: pd.Series, term: str | None = None, terms: list[str] | None = None) -> pd.Series:
+def search_keywords(column: pd.Series, term: str | None = None, terms: list[str] | None = None, case_sensitive: bool = False) -> pd.Series:
     if term:
         regex = term
     elif terms:
@@ -22,7 +22,7 @@ def search_keywords(column: pd.Series, term: str | None = None, terms: list[str]
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=UserWarning)
-        return column.str.contains(regex, case=False, regex=True)
+        return column.str.contains(regex, case=case_sensitive, regex=True)
 
 
 __all__ = [
