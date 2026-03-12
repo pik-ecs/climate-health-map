@@ -1,4 +1,6 @@
+import re
 import warnings
+from functools import reduce
 
 import pandas as pd
 
@@ -21,8 +23,13 @@ def search_keywords(column: pd.Series, term: str | None = None, terms: list[str]
         raise ValueError('No term provided')
 
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore", category=UserWarning)
+        warnings.simplefilter('ignore', category=UserWarning)
         return column.str.contains(regex, case=case_sensitive, regex=True)
+
+
+def search_regexes(column: pd.Series, regexes: list[re.Pattern]) -> pd.Series:
+    masks = [column.str.contains(p, regex=True) for p in regexes]
+    return reduce(lambda x, y: x | y, masks)
 
 
 __all__ = [
@@ -34,4 +41,5 @@ __all__ = [
     'MENTAL_HEALTH_TERMS',
     'EVALUATION_KEYWORDS',
     'search_keywords',
+    'search_regexes',
 ]

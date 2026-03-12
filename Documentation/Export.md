@@ -20,6 +20,7 @@ uv run --extra scatter healthmap scatterplot reduce-topic-scores --source "data/
 uv run --extra scatter healthmap scatterplot reduce-topic-scores --source "data/exports/2026/classifications.csv" --target "data/exports/2026/scatterplot.csv" --model-path "data/trained/scatterplot_topicmodel_new.pkl"
 # place keywords
 uv run healthmap scatterplot topic-keywords --source-topics data/exports/2026/classifications.csv --source-scatter data/exports/2026/scatterplot.csv --target data/exports/2026/keywords.csv
+uv run healthmap scatterplot text-keywords --source-scatter data/exports/2026/scatterplot.csv --source-items data/exports/2026/items.csv --target data/exports/2026/kws.csv --limit 10000 --n-clusters 15 --n-clusters 5 --n-clusters 3
 
 # cluster
 export NUMBA_NUM_THREADS=40

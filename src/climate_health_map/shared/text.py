@@ -24,7 +24,7 @@ def chunked_text(text: str, chunk_size: int = 500, overlap: int = 15) -> Generat
         yield ' '.join(tokens[pos_begin : pos_begin + chunk_size + overlap])
 
 
-def text_utils() -> tuple[Callable[[str, str], str], Callable[[str], str], Callable[[str], str]]:
+def text_utils() -> tuple[Callable[[str, str], str], Callable[[str, set[str]], str], Callable[[str], str]]:
     from nltk import WordNetLemmatizer, pos_tag, wordpunct_tokenize, sent_tokenize, word_tokenize
     from nltk.corpus import stopwords as sw
     from nltk.corpus import wordnet as wn
@@ -37,13 +37,13 @@ def text_utils() -> tuple[Callable[[str, str], str], Callable[[str], str], Calla
         tag = {'N': wn.NOUN, 'V': wn.VERB, 'R': wn.ADV, 'J': wn.ADJ}.get(tag[0], wn.NOUN)
         return lemmatizer.lemmatize(token, tag)  # type:ignore[no-any-return]
 
-    def process_text_aggressive(text: str) -> str:
+    def process_text_aggressive(text: str, pos_filter: set[str] | None = None, min_len: int = 3) -> str:
         return ' '.join(
             [
                 lemmatize(tok, tag)
                 for sentence in sent_tokenize(text)
                 for tok, tag in pos_tag(wordpunct_tokenize(sentence))
-                if tok not in stopwords and len(NOALPH.sub('', tok)) >= 3
+                if tok not in stopwords and len(NOALPH.sub('', tok)) >= min_len and (pos_filter is None or tag not in pos_filter)
             ],
         )
 

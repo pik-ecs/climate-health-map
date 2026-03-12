@@ -12,11 +12,12 @@ CHUNK_SIZE = 10000
 
 
 def _write_batched_ipc(df: pd.DataFrame, target: Path, schema: pa.Schema, chunk_size: int = CHUNK_SIZE) -> None:
-    fa = pa.Table.from_pandas(df=df[schema.names], schema=schema)
+    fa = pa.Table.from_pandas(df=df[schema.names], schema=schema, preserve_index=False)
     with pa.OSFile(target.as_posix(), 'wb') as sink:
         with pa.ipc.new_file(sink, schema=schema) as writer:
-            for batch in fa.to_batches(chunk_size):
-                writer.write(batch)
+            # for batch in fa.to_batches(chunk_size):
+            #     writer.write(batch)
+            writer.write_table(table=fa, max_chunksize=chunk_size)
 
 
 def _write_streamed_ipc(df: pd.DataFrame, target: Path, schema: pa.Schema, chunk_size: int = CHUNK_SIZE) -> None:
@@ -38,12 +39,11 @@ def ensure_types(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def write_keywords(df, target: Path, chunk_size: int = CHUNK_SIZE, logger: logging.Logger | None = None):
+def write_keywords(df: pd.DataFrame, target: Path, chunk_size: int = CHUNK_SIZE, logger: logging.Logger | None = None):
     logger = logger or logging.getLogger('lithub.write')
-
     logger.info(f'Writing keywords with shape {df.shape} to {target}')
     _write_streamed_ipc(
-        df[['x', 'y', 'level', 'keyword']],
+        df.sample(frac=1).sort_values('level', kind='stable')[['x', 'y', 'level', 'keyword']],
         target=target,
         schema=pa.schema([('x', pa.float16()), ('y', pa.float16()), ('level', pa.uint8()), ('keyword', pa.string())]),
         chunk_size=chunk_size,
@@ -112,7 +112,6 @@ def write_base_info(df: pd.DataFrame, target: Path, chunk_size: int = CHUNK_SIZE
 def write_geographies(df: pd.DataFrame, target_min: Path, target_full: Path, chunk_size: int = CHUNK_SIZE, logger: logging.Logger | None = None):
     logger.info('Preparing filter mask...')
     mask_search_names = get_naming_mask(place_df=df)
-
     logger.info('Fixing geographies...')
     df = fix_geographies(place_df=df[mask_search_names])
 

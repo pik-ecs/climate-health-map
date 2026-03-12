@@ -2,8 +2,8 @@ from pathlib import Path
 from typing import Annotated
 
 import typer
-
 from climate_health_map.shared.types import OnConflict
+
 from .items import export as export_items
 from .annotations import export as export_annotations
 from .affiliations import export as export_affiliations

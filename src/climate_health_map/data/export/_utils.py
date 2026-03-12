@@ -7,8 +7,11 @@ import pandas as pd
 from tqdm import tqdm
 import sqlalchemy as sa
 
-from climate_health_map.shared import essentials
+from climate_health_map.shared import essentials, read_any_pd
 from climate_health_map.shared.types import OnConflict
+from climate_health_map.data.labels import LABELS, Collection
+from climate_health_map.data.keywords import search_keywords, REVIEW_KEYWORDS, EVALUATION_KEYWORDS, MENTAL_HEALTH_TERMS, search_regexes
+from climate_health_map.topics import rescale_topic_scores as rescale_topic_scores_func
 
 
 class ExportContext:
@@ -73,3 +76,83 @@ class ExportContext:
 
         # return False to propagate exceptions
         return False  # type:ignore [return-value]
+
+
+def replace_human_annotations(df: pd.DataFrame, source: Path, logger: logging.Logger) -> pd.DataFrame:
+    logger.info('Override predictions with human annotations')
+
+    # Load human annotations
+    df_human = read_any_pd(source, index_column='item_id')
+    for group in LABELS.values():
+        if group.collection not in {Collection.MAJOR, Collection.IMPACTS, Collection.EXTERNAL}:
+            continue
+        for label in group.labels:
+            # Make sure all values are within range and not exactly 0 or 1
+            df[label.column] = df[label.column].clip(lower=0.01, upper=0.99)
+
+            for val in [0, 1]:
+                mask = df_human[label.column] == val
+                item_ids = df_human[mask]['item_id'].tolist()
+                df.loc[df.index.isin(item_ids), label.column] = val
+
+            logger.debug(f' > Human {label.column}==1: {(df[label.column] == 1).sum():,} | {label.column}==0: {(df[label.column] == 0).sum():,}')
+
+    return df
+
+
+def read_export(
+    source_items: Path,
+    source_classifications: Path,
+    source_annotations: Path | None = None,
+    year_start: int | None = None,
+    year_end: int | None = None,
+    filter_rel: bool = True,
+    filter_mai: bool = True,
+    rescale_topic_scores: bool = False,
+    include_keyword_columns: bool = False,
+    logger: logging.Logger | None = None,
+):
+    logger = logger or logging.getLogger('reader')
+
+    df_items = read_any_pd(source_items, index_column='item_id')
+    logger.info(f'Loaded items table: {df_items.shape}')
+
+    mask_items = np.ones(df_items.shape[0], dtype=bool)
+    if year_start is not None:
+        mask_items &= df_items['publication_year'].fillna(0) >= year_start
+    if year_end is not None:
+        mask_items &= df_items['publication_year'].fillna(0) <= year_end
+    logger.info(f'Keeping {mask_items.sum():,} after PY filtering')
+
+    df_classifications = read_any_pd(source_classifications, index_column='item_id')
+    logger.info(f'Loaded classifications table: {df_classifications.shape}')
+
+    mask_classifications = np.ones(df_classifications.shape[0], dtype=bool)
+    if filter_rel:
+        mask_classifications &= df_classifications['rel_major|1'] > 0.5
+        logger.info(f'Keeping {mask_classifications.sum():,} after relevance filtering')
+    if filter_mai:
+        mask_classifications &= (df_classifications[['cat|0', 'cat|1', 'cat|2']] > 0.5).any(axis=1)
+        logger.info(f'Keeping {mask_classifications.sum():,} after mitigation/adaptation/impacts filtering')
+
+    df_items = df_items[mask_items]
+    df_classifications = df_classifications[mask_classifications]
+
+    if source_annotations is not None:
+        logger.info('Replacing scores with human annotations where available')
+        df_classifications = replace_human_annotations(df_classifications, source=source_annotations, logger=logger)
+
+    if rescale_topic_scores:
+        df_classifications = rescale_topic_scores_func(df=df_classifications, logger=logger)
+        logger.info('Rescaled topic scores')
+
+    df = df_items.join(df_classifications, how='inner').copy()
+    logger.info(f'Joined tables into shape {df.shape}')
+
+    if include_keyword_columns:
+        logger.info('Applying keyword columns...')
+        df['keywords|0'] = (search_regexes(df['title'], regexes=REVIEW_KEYWORDS) | search_regexes(df['abstract'], regexes=REVIEW_KEYWORDS)).astype(int)
+        df['keywords|1'] = (search_regexes(df['title'], regexes=EVALUATION_KEYWORDS) | search_regexes(df['abstract'], regexes=EVALUATION_KEYWORDS)).astype(int)
+        df['keywords|2'] = (search_keywords(df['title'], terms=MENTAL_HEALTH_TERMS) | search_keywords(df['abstract'], terms=MENTAL_HEALTH_TERMS)).astype(int)
+
+    return df

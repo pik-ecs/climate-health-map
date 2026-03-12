@@ -6,6 +6,7 @@ import typer
 import numpy as np
 
 from climate_health_map.shared import read_any_pd, get_logger, write_any_df
+from climate_health_map.shared.text import text_from_table
 from climate_health_map.topics import TopicModel, get_topic_labels
 
 
@@ -22,7 +23,7 @@ def project_topic_names(
     target: Annotated[Path, typer.Option(help='')],
     eps: Annotated[float, typer.Option(help=' Maximum distance between two samples for one to be considered as in the neighborhood of the other.')] = 0.5,
     min_cluster_size: Annotated[int, typer.Option(help='Number of samples (or total weight) in a neighborhood for a point to be considered as centroid')] = 50,
-    threshold_quantile: Annotated[float, typer.Option(help=' pick a topic score threshold that keeps X% of records per topic (0.0–1.0)')] = 0.95,
+    threshold_quantile: Annotated[float, typer.Option(help='Pick a topic score threshold that keeps X% of records per topic (0.0–1.0)')] = 0.95,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ) -> None:
     from scipy.spatial import ConvexHull
@@ -98,4 +99,63 @@ def project_topic_names(
     write_any_df(df=pd.DataFrame(keyword_positions), target=target)
 
 
-# TODO: add function that's purely based on keywords from the data
+def text_based(
+    source_scatter: Annotated[Path, typer.Option(help='')],
+    source_items: Annotated[Path, typer.Option(help='')],
+    target: Annotated[Path, typer.Option(help='')],
+    n_clusters: Annotated[list[int], typer.Option(help='')],
+    level_offset: Annotated[int, typer.Option(help='')] = 0,
+    limit: Annotated[int | None, typer.Option(help='')] = None,
+    loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
+):
+    from sklearn.cluster import KMeans
+    from climate_health_map.shared.text import text_utils
+    from sklearn.feature_extraction.text import TfidfVectorizer
+
+    logger = get_logger(loglevel=loglevel, logger_name='keywords', run_log_init=True)
+
+    logger.info('Loading aggressive text util')
+    _, process_text_aggressive, _ = text_utils()
+
+    logger.info('Loading data')
+    df_scatter = read_any_pd(source_scatter, index_column='item_id').join(
+        text_from_table(read_any_pd(source_items, index_column='item_id')).to_frame(name='text'),
+    )
+    df_scatter = df_scatter[df_scatter['text'].notna()]
+    if limit is not None:
+        df_scatter = df_scatter.sample(frac=1).iloc[:limit]
+    logger.info(f'Processing text for {df_scatter.shape}')
+    df_scatter['text'] = df_scatter['text'].map(lambda txt: process_text_aggressive(txt, pos_filter={'ADV', 'DET', 'VERB', 'VBZ', 'RB'}))
+    df_scatter['level_0'] = np.zeros(len(df_scatter))
+
+    keyword_positions: list[Keyword] = []
+    groups = [['level_0']]
+
+    for level, n_cluster in enumerate(n_clusters, start=1):
+        logger.info(f'Working on level {level} (n={n_cluster}) with {len(df_scatter.groupby(groups[level - 1]))} groups')
+        df_scatter[f'level_{level}'] = 0
+        for _, cluster in df_scatter.groupby(groups[level - 1]):
+            if len(cluster) <= n_cluster:
+                continue
+            df_scatter.loc[cluster.index, f'level_{level}'] = KMeans(n_clusters=n_cluster).fit_predict(cluster[['x', 'y']])
+        groups.append([f'level_{li}' for li in range(level + 1)])
+
+    for group in groups[1:]:
+        logger.info(f'Working on placements for group {group}')
+        pseudo_docs = df_scatter.groupby(group)['text'].apply(lambda grp: ','.join(grp))
+
+        logger.info('Vectorising...')
+        vzr = TfidfVectorizer(ngram_range=(1, 3), max_df=0.5, min_df=1, stop_words=None)
+        vecs = vzr.fit_transform(pseudo_docs)
+        vocab = {v: k for k, v in vzr.vocabulary_.items()}
+        logger.info('Placing keywords')
+        for (_, grp), vector in zip(df_scatter.groupby(group), vecs, strict=True):
+            centroid = grp[['x', 'y']].mean()
+            token_idxs = np.asarray(vector.todense())[0].argsort()
+            keyword_positions.append(Keyword(x=float(centroid['x']), y=float(centroid['y']), keyword=vocab[token_idxs[-1]], level=len(group) + level_offset))
+        logger.info(f'Placed {len(keyword_positions):,} keywords so far')
+    write_any_df(df=pd.DataFrame(keyword_positions), target=target)
+
+
+if __name__ == '__main__':
+    typer.run(text_based)

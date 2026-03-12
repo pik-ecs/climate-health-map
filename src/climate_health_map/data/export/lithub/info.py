@@ -60,7 +60,7 @@ for col in export_groups:
         colour=(group.colour[0] * 360, group.colour[1] * 100, group.colour[2] * 100),
         labels=[label.column for label in group.labels if label.column not in exclude_columns],
     )
-for gi, group in enumerate(LABELS['topic-agg'].labels):
+for _gi, group in enumerate(LABELS['topic-agg'].labels):
     label_groups[group.column] = SchemeGroup(
         name=group.name,
         key=group.column,

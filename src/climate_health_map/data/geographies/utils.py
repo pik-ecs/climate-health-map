@@ -1,8 +1,4 @@
-from pathlib import Path
-
 import pandas as pd
-
-from climate_health_map.shared import read_any_pd
 
 EXCLUDED_SEARCH_NAMES = {
     'B.V.',
@@ -52,7 +48,7 @@ EXCLUDED_NAMES = {
 
 def get_naming_mask(place_df: pd.DataFrame) -> pd.Series:
     """Create mask to remove places that are, based on anecdotal evidence, not actually clean place names."""
-    return ~place_df['search_name'].isin(EXCLUDED_SEARCH_NAMES) & ~place_df['name'].isin(EXCLUDED_NAMES) & (place_df['search_name'].str.len() > 2)
+    return ~place_df['name'].isin(EXCLUDED_NAMES) & place_df['search_name'].str.len() > 2 & ~place_df['search_name'].isin(EXCLUDED_SEARCH_NAMES)
 
 
 def get_publisher_mask(merged_df: pd.DataFrame) -> pd.Series:
@@ -129,25 +125,53 @@ def fix_geographies(place_df: pd.DataFrame) -> pd.DataFrame:
     return place_df
 
 
-def load_df_places(source: Path, index_column: str = 'item_id') -> tuple[pd.DataFrame, pd.Series]:
-    """Load a clean version of extracted places and a filter mask.
-
-    Don't forget to get the additional `get_publisher_mask` after merging df_places with df_base!
-    Example usage:
-
-    ```
-    df_base = pd.read(main-data)
-    df_places, mask_places = load_df_places(source)
-    df = df_base.merge(df_places, on='search_name')
-    ```
-
-    """
-    df = read_any_pd(
-        source,
-        index_column=index_column,
-        dtype=str,
-        keep_default_na=False,  # keep_default_na handles cells that contain "NA" (which is valid)
-    )
-    df = fix_geographies(df)
-    mask = get_naming_mask(df)
-    return df, mask
+def flatten_country_groups(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
+    # return pd.DataFrame(
+    #     [
+    #         {'item_id': item_id}
+    #         | {
+    #             f'{prefix}_{column}|{grouping}': count
+    #             for column in [
+    #                 'Group (Lancet 2026)',
+    #                 'Group (WHO 2026)',
+    #                 'Group (HDI 2026)',
+    #                 'Region (IPCC AR6, 6)',
+    #                 'Region (IPCC AR6, 10)',
+    #                 'Region (WorldBank 2026)',
+    #                 'Income group (WorldBank 2026)',
+    #                 'Lending category (WorldBank 2026)',
+    #                 'Continent (Name)',
+    #             ]
+    #             for grouping, count in group[group[column].notna()][column].value_counts().items()
+    #         }
+    #         for item_id, group in tqdm(df.groupby('item_id'))
+    #     ],
+    # ).set_index('item_id')
+    #
+    # Gemini translation of the above:
+    cols = [
+        'Group (Lancet 2026)',
+        'Group (WHO 2026)',
+        'Group (HDI 2026)',
+        'Region (IPCC AR6, 6)',
+        'Region (IPCC AR6, 10)',
+        'Region (WorldBank 2026)',
+        'Income group (WorldBank 2026)',
+        'Lending category (WorldBank 2026)',
+        'Continent (Name)',
+    ]
+    if 'item_id' not in df.columns:
+        df.reset_index(inplace=True)
+    # 2. "Melt" the dataframe so columns become a single categorical variable
+    # This is much faster than looping over columns manually
+    df_melted = df.melt(id_vars=['item_id'], value_vars=cols, var_name='column', value_name='grouping')
+    # 3. Drop NaNs once globally
+    df_melted = df_melted.dropna(subset=['grouping'])
+    # 4. Perform a single GroupBy + Size (Vectorized value_counts)
+    counts = df_melted.groupby(['item_id', 'column', 'grouping']).size()
+    # 5. Reshape to get your specific naming convention
+    # Unstack 'column' and 'grouping' into the header
+    result = counts.unstack(level=[1, 2]).fillna(0).astype(int)
+    # 6. Fix column names to match your '{prefix}_{column}|{grouping}' format
+    result.columns = [f'{prefix}_{col}|{grp}' for col, grp in result.columns]
+    return result
