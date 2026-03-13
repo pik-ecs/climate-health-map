@@ -11,6 +11,9 @@ exclude_columns = {
     'topic-4-0|38',
     'topic-agg-4|0',
     'topic-agg-agg|4',
+    'driver|0',  # CO2rise
+    'driver|2',  # Seasonal Change
+    'driver|4',  # Sea-level rise
 }
 export_groups = [
     'rel_major',
@@ -118,6 +121,8 @@ info = DatasetInfoFull(
     # label_columns=set(''),
     # document_columns=set(''),
 )
+
+
 # TODO: rewire keyword based labels
 
 def filter_labels(df: pd.DataFrame, info_: DatasetInfoFull) -> DatasetInfoFull:
@@ -179,7 +184,6 @@ def filter_labels(df: pd.DataFrame, info_: DatasetInfoFull) -> DatasetInfoFull:
     #         if len(info_.groups[key].subgroups) == 0:
     #             del info_.groups[key]
     return info_
-
 
 # import toml
 # import datetime
