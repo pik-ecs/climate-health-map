@@ -36,6 +36,8 @@ def mordecai(
     min_text_len: Annotated[int, typer.Option(help='Minimum length of title+abstract (in characters)')] = 100,
     show_count: Annotated[bool, typer.Option(help='')] = False,
     created_after: Annotated[str | None, typer.Option(help='Filter to only apply mordecai to items created after that date; format: YYYY-MM-DD')] = None,
+    published_after: Annotated[int, typer.Option(help='Filter to only apply mordecai to items publisher after this year (>=)')] = None,
+    published_before: Annotated[int, typer.Option(help='Filter to only apply mordecai to items publisher before this year (<>>=)')] = None,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ) -> None:
     logger, settings, db_engine = essentials(config=config, loglevel=loglevel, logger_name='export', run_log_init=True)
@@ -53,6 +55,12 @@ def mordecai(
     if created_after:
         extra_joins.append('JOIN import_revision ir ON m2mii.import_id = ir.import_id AND m2mii.first_revision = ir.import_revision_counter')
         extra_wheres.append('ir.time_created > :created_after')
+
+    if published_after:
+        extra_wheres.append('ai.publication_year >= :published_after')
+    if published_before:
+        extra_wheres.append('ai.publication_year <= :published_before')
+
     extra_wheres_ = ''
     if len(extra_wheres) > 0:
         extra_wheres_ = ' AND '.join(extra_wheres)
@@ -79,6 +87,8 @@ def mordecai(
             'created_after': created_after,
             'threshold': incl_threshold,
             'min_len': min_text_len,
+            'published_before': published_before,
+            'published_after': published_after,
         }
         count = None
         if show_count:
