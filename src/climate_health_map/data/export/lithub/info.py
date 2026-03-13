@@ -14,6 +14,7 @@ exclude_columns = {
     'driver|0',  # CO2rise
     'driver|2',  # Seasonal Change
     'driver|4',  # Sea-level rise
+    'health|10',  # Metabolic Disorders
 }
 export_groups = [
     'rel_major',
