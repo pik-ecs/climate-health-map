@@ -27,7 +27,7 @@ export_groups = [
     'health',
     'expose',
     'attr',
-    'keywords',
+    # 'keywords', # -> moved into methods
     # 'gender_outcome',
     # 'notes_major',
     # 'notes_impacts',
@@ -66,6 +66,7 @@ for col in export_groups:
         colour=(group.colour[0] * 360, group.colour[1] * 100, group.colour[2] * 100),
         labels=[label.column for label in group.labels if label.column not in exclude_columns],
     )
+
 for _gi, group in enumerate(LABELS['topic-agg'].labels):
     label_groups[group.column] = SchemeGroup(
         name=group.name,
@@ -74,6 +75,12 @@ for _gi, group in enumerate(LABELS['topic-agg'].labels):
         colour=(group.colour[0] * 360, group.colour[1] * 100, group.colour[2] * 100),
         labels=[topic_key for topic_key in group.topics if topic_key not in exclude_columns],
     )
+# Add keyword filters to the Methods topic group
+label_groups['topic-agg-4|0'].labels += [
+    'keywords|0',  # Evidence synthesis
+    'keywords|1',  # Evaluation method
+]
+
 label_groups['topic-agg-agg'] = SchemeGroup(name='Meta-topic', key='topic-agg-agg', type='multi', colour=(180, 90, 90), subgroups=[])
 for group in LABELS['topic-agg-agg'].labels:
     label_groups[group.column] = SchemeGroup(
@@ -123,8 +130,6 @@ info = DatasetInfoFull(
     # document_columns=set(''),
 )
 
-
-# TODO: rewire keyword based labels
 
 def filter_labels(df: pd.DataFrame, info_: DatasetInfoFull) -> DatasetInfoFull:
     # 1. Filter the top-level labels first
