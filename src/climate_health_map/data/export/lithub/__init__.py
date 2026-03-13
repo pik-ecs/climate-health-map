@@ -12,6 +12,7 @@ from climate_health_map.scatterplot import rescale_projection
 from .info import info, filter_labels
 from .writers import write_base_info, write_sqlite, write_keywords, write_geographies
 from .._utils import read_export
+from ... import LABELS
 
 
 def prepare_lithub_export(
@@ -44,6 +45,11 @@ def prepare_lithub_export(
     )
     df['idx'] = np.arange(len(df))  # set a continuous index now that we are done filtering/joining
     logger.info(f'Joined tables: {df.shape}')
+
+    logger.info('Dropping some scores for specific columns to improve count logics...')
+    for label in LABELS['sector'].labels:
+        # Drop scores of sector columns if mitigation < 0.5
+        df.loc[df['cat|0'] <= 0.5, label.column] = pd.NA
 
     logger.info('Reading affiliation data...')
     df_affiliations = read_any_pd(source / 'affiliations.csv', keep_default_na=False).merge(df_countries, left_on='iso2', right_on='iso2', how='left')

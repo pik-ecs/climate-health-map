@@ -7,6 +7,8 @@ from .types import DatasetInfoFull, SchemeLabel, SchemeGroup
 
 exclude_columns = {
     'topic-4-0|8',
+    'topic-4-0|18',
+    'topic-4-0|38',
     'topic-agg-4|0',
     'topic-agg-agg|4',
 }
@@ -116,7 +118,7 @@ info = DatasetInfoFull(
     # label_columns=set(''),
     # document_columns=set(''),
 )
-
+# TODO: rewire keyword based labels
 
 def filter_labels(df: pd.DataFrame, info_: DatasetInfoFull) -> DatasetInfoFull:
     # 1. Filter the top-level labels first
