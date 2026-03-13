@@ -37,7 +37,7 @@ def essentials(config: Path, logger_name: str, run_log_init: bool = True, loglev
     logger, settings = base_essentials(config=config, logger_name=logger_name, run_log_init=run_log_init, loglevel=loglevel)
 
     logger.info('Connecting to database...')
-    db_engine = get_engine(settings=settings.DB)
+    db_engine = get_engine(settings=settings.DB, debug=logger.level == logging.DEBUG)
 
     return logger, settings, db_engine
 

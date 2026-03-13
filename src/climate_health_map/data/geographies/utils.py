@@ -1,5 +1,7 @@
 import pandas as pd
 
+from climate_health_map.data import LABELS
+
 EXCLUDED_SEARCH_NAMES = {
     'B.V.',
     'MMT',
@@ -160,8 +162,15 @@ def flatten_country_groups(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
         'Lending category (WorldBank 2026)',
         'Continent (Name)',
     ]
+
     if 'item_id' not in df.columns:
         df.reset_index(inplace=True)
+
+    # for col in cols:
+    #     df.groupby(['item_id', col])['Group (WHO 2026)'].count().unstack(level=[1]).fillna(0).astype(int)
+    #     # rename
+    #     result.columns = [f'{prefix}_{col}|{grp}' for col, grp in result.columns]
+
     # 2. "Melt" the dataframe so columns become a single categorical variable
     # This is much faster than looping over columns manually
     df_melted = df.melt(id_vars=['item_id'], value_vars=cols, var_name='column', value_name='grouping')
@@ -174,4 +183,5 @@ def flatten_country_groups(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
     result = counts.unstack(level=[1, 2]).fillna(0).astype(int)
     # 6. Fix column names to match your '{prefix}_{column}|{grouping}' format
     result.columns = [f'{prefix}_{col}|{grp}' for col, grp in result.columns]
-    return result
+    result.index.name = 'item_id'
+    return result.rename(columns={f'{prefix}_{col}|{label.name}': label.column for col in cols for label in LABELS[f'{prefix}_{col}'].labels})

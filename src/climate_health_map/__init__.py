@@ -40,7 +40,7 @@ def main() -> None:
     app.add_typer(export_app, name='export')
     app.add_typer(classifier_app, name='classification')
     app.add_typer(ingest_app, name='ingest')
-    app.add_typer(abstracts_app, name='abstracts')
+    app.add_typer(abstracts_app, name='hydrate')
     app.add_typer(scatterplot_app, name='scatterplot')
     app.command('geoparser', help='Extract geolocations using mordecai where the information is missing in the database')(mordecai)
     app.command('topicmodel', help='Apply topic model to unseen records')(topic_model)

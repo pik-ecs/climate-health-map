@@ -23,28 +23,18 @@ for prefix in ['Location', 'Affiliation']:
             key='{key}',
             name='{prefix} grouped by {column}',
             type='multi',
-            colour=(0, 0, 0),
+            colour=(0.57, 0.95, 0.6),
             labels=[
         """
-        for _gi, (grouping, count) in enumerate(df_countries[df_countries[column].notna()][column].value_counts().items()):
+        for gi, (grouping, count) in enumerate(df_countries[df_countries[column].notna()][column].value_counts().items()):
             print(f'{prefix} -> {column} -> {grouping}: {count}')
-            # output += f"""
-            #     Label(
-            #         column='{key}|{gi}',
-            #         value={gi},
-            #         name='{grouping}',
-            #         desc='Article with at least one {prefix} in {grouping}',
-            #         colour=(0, 0, 0),
-            #         parent='{key}',
-            #     ),
-            # """
             output += f"""
                        Label(
-                           column='{key}|{grouping}',
-                           value='{grouping}',
+                           column='{key}|{gi}',
+                           value={gi},
                            name='{grouping}',
                            desc='Article with at least one {prefix} in {grouping}',
-                           colour=(0, 0, 0),
+                           colour=(0.57, 0.95, 0.6),
                            parent='{key}',
                        ),
                    """

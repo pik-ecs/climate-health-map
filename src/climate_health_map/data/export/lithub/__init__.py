@@ -9,7 +9,7 @@ from climate_health_map.data.geographies import load_country_infos, flatten_coun
 from climate_health_map.shared import read_any_pd, get_logger
 from climate_health_map.scatterplot import rescale_projection
 
-from .info import info, filter_labels
+from .info import get_info, filter_labels
 from .writers import write_base_info, write_sqlite, write_keywords, write_geographies
 from .._utils import read_export
 from ... import LABELS
@@ -30,6 +30,8 @@ def prepare_lithub_export(
     logger = get_logger(loglevel=loglevel, logger_name='lithub', run_log_init=True)
     df_countries = load_country_infos()
     logger.info(f'Loaded country infos: {df_countries.shape}')
+
+    info = get_info()
 
     df = read_export(
         source_items=source / 'items.csv',
@@ -53,14 +55,18 @@ def prepare_lithub_export(
 
     logger.info('Reading affiliation data...')
     df_affiliations = read_any_pd(source / 'affiliations.csv', keep_default_na=False).merge(df_countries, left_on='iso2', right_on='iso2', how='left')
+    logger.debug(df_affiliations.value_counts('iso2'))
     logger.info('Flattening affiliation data...')
     df_affiliations_flat = flatten_country_groups(prefix='Affiliation', df=df_affiliations)
+    logger.debug(f'Unique item_ids in flattened affiliations table: {df_affiliations_flat.reset_index()["item_id"].nunique():,}')
     logger.info(f'Loaded affiliations table: {df_affiliations.shape}; flattened: {df_affiliations_flat.shape}')
 
     logger.info('Reading mordecai data...')
     df_places = read_places_export(source=source / 'places.csv', df_countries=df_countries)
+    logger.debug(df_places.value_counts('country_code3'))
     logger.info('Flattening mordecai data...')
     df_places_flat = flatten_country_groups(prefix='Location', df=df_places)
+    logger.debug(f'Unique item_ids in flattened places table: {df_places_flat.reset_index()["item_id"].nunique():,}')
     logger.info(f'Loaded places table: {df_places.shape}; flattened: {df_places_flat.shape}')
 
     df = df.join(df_affiliations_flat, how='left').join(df_places_flat, how='left')
@@ -96,7 +102,7 @@ def prepare_lithub_export(
 
     info.start_year = year_start
     info.end_year = year_end
-    info_ = filter_labels(df=df, info_=info)
+    info_ = filter_labels(df=df, info=info)
     # info.total = df.shape[0]
     with open(target / 'info.json', 'w') as fp_info:
         fp_info.write(info_.model_dump_json(indent=2, exclude_none=True))

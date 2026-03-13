@@ -79,3 +79,12 @@ LEFT JOIN LATERAL (
     FROM jsonb_array_elements(ai.authors) AS elem
 ) AS author_stuff ON true
 LIMIT 10;
+
+-- correct: IAM  / 210
+-- current: MAI  / 012
+-- Label(column='cat|0', name='Mitigation', value=0, colour=(0.9748055555555556, 0.6324000000000001, 0.2667), parent='cat'),
+-- Label(column='cat|1', name='Adaptation', value=1, colour=(0.8070277777777777, 0.3065, 0.4863), parent='cat'),
+-- Label(column='cat|2', name='Impacts', value=2, colour=(0.39813888888888893, 0.17309999999999998, 0.5922), parent='cat'),
+-- UPDATE enhancement SET key = '_cat|0' WHERE key='cat|0';  -- park original cat|0
+-- UPDATE enhancement SET key = 'cat|0' WHERE key='cat|2';  -- move cat|2 to cat|0
+-- UPDATE enhancement SET key = 'cat|2' WHERE key='_cat|0';  -- move cat|0 to cat|2

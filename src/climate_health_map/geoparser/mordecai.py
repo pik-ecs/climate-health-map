@@ -34,6 +34,7 @@ def mordecai(
     only_incl: Annotated[bool, typer.Option(help='Only apply mordecai to included records')] = True,
     incl_threshold: Annotated[float, typer.Option(help='Only apply mordecai to records with "rel_major|1" > THRESHOLD')] = 0.5,
     min_text_len: Annotated[int, typer.Option(help='Minimum length of title+abstract (in characters)')] = 100,
+    show_count: Annotated[bool, typer.Option(help='')] = False,
     created_after: Annotated[str | None, typer.Option(help='Filter to only apply mordecai to items created after that date; format: YYYY-MM-DD')] = None,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ) -> None:
@@ -72,22 +73,24 @@ def mordecai(
     """
 
     with db_engine.session() as session:
+        params = {
+            'project_id': settings.PROJECT_ID,
+            'import_ids': settings.IMPORTS,
+            'created_after': created_after,
+            'threshold': incl_threshold,
+            'min_len': min_text_len,
+        }
+        count = None
+        if show_count:
+            logger.info(f'Running count query...')
+            count = session.scalar(sa.text(f'SELECT count(1) as n_records FROM ({stmt})').execution_options(yield_per=batch_size), params=params)
+            logger.info(f'Will hydrate openalex info for {count:,} records.')
+
         logger.info('Running query...')
-        rslt = session.execute(
-            sa.text(stmt).execution_options(yield_per=batch_size),
-            {
-                'project_id': settings.PROJECT_ID,
-                'import_ids': settings.IMPORTS,
-                'created_after': created_after,
-                'min_len': min_text_len,
-                'threshold': incl_threshold,
-            },
-        )
-
-        tq = tqdm()
-        counters = {'n_processed': 0, 'n_without_place': 0}
-
+        rslt = session.execute(sa.text(stmt).execution_options(yield_per=batch_size), params=params)
         logger.info('Start batched processing...')
+        tq = tqdm(total=count)
+        counters = {'n_processed': 0, 'n_with_place': 0}
         for batch in rslt.mappings().partitions():
             for item in batch:
                 tq.update()
@@ -103,7 +106,7 @@ def mordecai(
                         ),
                     )
                     counters['n_processed'] += 1
-                    counters['n_without_place'] += int(places is not None)
+                    counters['n_with_place'] += int(places is not None)
                 except Exception as e:
                     logger.error(e)
             session.commit()
