@@ -77,7 +77,8 @@ def mordecai(
         WHERE ai.project_id = :project_id
           AND m2mii.import_id::text = ANY(:import_ids)
           AND length((coalesce(ai.title, '') || '. ' || coalesce(i.text, ''))) > :min_len
-          AND e.key IS NULL {extra_wheres_};
+          AND e.key IS NULL
+          {extra_wheres_}
     """
 
     with db_engine.session() as session:
@@ -93,11 +94,11 @@ def mordecai(
         count = None
         if show_count:
             logger.info(f'Running count query...')
-            count = session.scalar(sa.text(f'SELECT count(1) as n_records FROM ({stmt})').execution_options(yield_per=batch_size), params=params)
+            count = session.scalar(sa.text(f'SELECT count(1) as n_records FROM ({stmt});').execution_options(yield_per=batch_size), params=params)
             logger.info(f'Will hydrate openalex info for {count:,} records.')
 
         logger.info('Running query...')
-        rslt = session.execute(sa.text(stmt).execution_options(yield_per=batch_size), params=params)
+        rslt = session.execute(sa.text(f'{stmt};').execution_options(yield_per=batch_size), params=params)
         logger.info('Start batched processing...')
         tq = tqdm(total=count)
         counters = {'n_processed': 0, 'n_with_place': 0}
