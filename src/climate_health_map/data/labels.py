@@ -116,7 +116,7 @@ LABELS = {
         collection=Collection.MAJOR,
         key='cat',
         nacsos_key='climateCategory',
-        name='Category',
+        name='Climate category',
         type='multi',
         colour=(0.57, 0.95, 0.6),
         labels=[
@@ -518,7 +518,7 @@ LABELS = {
     'keywords': Group(
         collection=Collection.OTHER,
         key='keywords',
-        name='Additional filters',
+        name='Keyword-based filters',
         type='multi',
         colour=(0.57, 0.95, 0.6),
         labels=[

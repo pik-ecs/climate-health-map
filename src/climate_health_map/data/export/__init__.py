@@ -11,6 +11,7 @@ from .places import export as export_places
 from .classifications import export as export_classifications
 from .topics import export as export_topics
 from .lithub import prepare_lithub_export
+from .lancet import app as lancet_app
 
 app = typer.Typer(help='Commands to download data from NACSOS into csv files')
 
@@ -21,6 +22,8 @@ app.command('topics', help='Export all topic information from sources')(export_t
 app.command('classifications', help='Export all classifications')(export_classifications)
 app.command('annotations', help='Fetch all eligible human annotations from NACSOS and prepare a clean csv for training and evaluation')(export_annotations)
 app.command('lithub', help='Consolidate all exports into lithub files')(prepare_lithub_export)
+
+app.add_typer(lancet_app, name='lancet', help='Lancet Countdown data and figure exports')
 
 
 @app.command('all', help='Run all exports')

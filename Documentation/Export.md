@@ -10,7 +10,12 @@ uv run healthmap export items --config config/secret.env --target data/exports/2
 # or just 
 uv run healthmap export all --config config/secret.env --target data/exports/2026/ --all-authors --filetype csv
 
+
+# Prepare files for literature hub
 uv run healthmap export lithub --source data/exports/2026 --target data/exports/lithub/ --year-start 1990 --year-end 2025
+
+# Prepare excel exports for Lancet Countdown
+uv run healthmap export lancet excel --source data/exports/2026/ --target data/exports/lancet
 ```
 
 # Scatterplot preparation

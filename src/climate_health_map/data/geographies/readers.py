@@ -50,7 +50,7 @@ def load_grid_data() -> pd.DataFrame:
     return df_grid
 
 
-def _read_places_df(source: Path, index_column: str | None = 'item_id', resolution: float = 2.5) -> pd.DataFrame:
+def _read_places_df(source: Path, index_column: str | None = 'item_id', resolution: float = 2.5, merge_taiwan_china: bool = True) -> pd.DataFrame:
     df_places = (
         read_any_pd(source, dtype=str, keep_default_na=False, index_column=index_column)
         .replace(
@@ -74,10 +74,18 @@ def _read_places_df(source: Path, index_column: str | None = 'item_id', resoluti
     )
     df_places['LAT'] = df_places['lat'] // resolution * resolution + (resolution / 2)
     df_places['LON'] = df_places['lon'] // resolution * resolution + (resolution / 2)
+
+    if merge_taiwan_china:
+        df_places.loc[df_places['country_code3'] == 'TWN', 'country_code3'] = 'CHN'
+
     return df_places
 
 
-def load_df_places(source: Path, index_column: str = 'item_id') -> tuple[pd.DataFrame, pd.Series]:
+def load_df_places(
+    source: Path,
+    index_column: str | None = None,
+    merge_taiwan_china: bool = True,
+) -> tuple[pd.DataFrame, pd.Series]:
     """Load a clean version of extracted places and a filter mask.
 
     Don't forget to get the additional `get_publisher_mask` after merging df_places with df_base!
@@ -90,7 +98,7 @@ def load_df_places(source: Path, index_column: str = 'item_id') -> tuple[pd.Data
     ```
 
     """
-    df = _read_places_df(source)
+    df = _read_places_df(source, index_column=index_column, merge_taiwan_china=merge_taiwan_china)
     df = fix_geographies(df)
     mask = get_naming_mask(df)
     return df, mask
@@ -102,12 +110,14 @@ def read_places_export(
     df_grid: Optional[pd.DataFrame] = None,
     resolution: float = 2.5,
     include_grid: bool = False,
+    merge_taiwan_china: bool = True,
+    index_column: str | None = None,
 ) -> pd.DataFrame:
     df_countries = load_country_infos() if df_countries is None else df_countries
-    df_places = _read_places_df(source, index_column=None, resolution=resolution)
+    df_places = _read_places_df(source, index_column=index_column, resolution=resolution, merge_taiwan_china=merge_taiwan_china)
     df = df_places.merge(df_countries, left_on='country_code3', right_on='iso3', how='left')
 
     if include_grid:
         df_grid = load_grid_data() if df_grid is None else df_grid
         df = df.merge(df_grid, left_on=['LAT', 'LON'], right_on=['LAT', 'LON'], how='outer')
-    return df
+    return df.replace({np.nan: pd.NA})

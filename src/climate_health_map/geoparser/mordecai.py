@@ -51,7 +51,7 @@ def mordecai(
     extra_wheres = []
 
     if only_incl:
-        extra_joins.append("JOIN enhancement incl ON i.item_id = incl.item_id AND incl.key = 'rel_major|1' AND payload::float > :threshold")
+        extra_joins.append("JOIN enhancement incl ON i.item_id = incl.item_id AND incl.key = 'rel_major|1' AND incl.payload::float > :threshold")
     if created_after:
         extra_joins.append('JOIN import_revision ir ON m2mii.import_id = ir.import_id AND m2mii.first_revision = ir.import_revision_counter')
         extra_wheres.append('ir.time_created > :created_after')
@@ -93,7 +93,7 @@ def mordecai(
         }
         count = None
         if show_count:
-            logger.info(f'Running count query...')
+            logger.info('Running count query...')
             count = session.scalar(sa.text(f'SELECT count(1) as n_records FROM ({stmt});').execution_options(yield_per=batch_size), params=params)
             logger.info(f'Will hydrate openalex info for {count:,} records.')
 

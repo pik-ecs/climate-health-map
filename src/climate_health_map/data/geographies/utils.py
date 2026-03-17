@@ -127,30 +127,7 @@ def fix_geographies(place_df: pd.DataFrame) -> pd.DataFrame:
     return place_df
 
 
-def flatten_country_groups(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
-    # return pd.DataFrame(
-    #     [
-    #         {'item_id': item_id}
-    #         | {
-    #             f'{prefix}_{column}|{grouping}': count
-    #             for column in [
-    #                 'Group (Lancet 2026)',
-    #                 'Group (WHO 2026)',
-    #                 'Group (HDI 2026)',
-    #                 'Region (IPCC AR6, 6)',
-    #                 'Region (IPCC AR6, 10)',
-    #                 'Region (WorldBank 2026)',
-    #                 'Income group (WorldBank 2026)',
-    #                 'Lending category (WorldBank 2026)',
-    #                 'Continent (Name)',
-    #             ]
-    #             for grouping, count in group[group[column].notna()][column].value_counts().items()
-    #         }
-    #         for item_id, group in tqdm(df.groupby('item_id'))
-    #     ],
-    # ).set_index('item_id')
-    #
-    # Gemini translation of the above:
+def flatten_country_groups(df: pd.DataFrame, prefix: str) -> tuple[pd.DataFrame, dict[str, list[tuple[str, str, str]]]]:
     cols = [
         'Group (Lancet 2026)',
         'Group (WHO 2026)',
@@ -166,22 +143,21 @@ def flatten_country_groups(df: pd.DataFrame, prefix: str) -> pd.DataFrame:
     if 'item_id' not in df.columns:
         df.reset_index(inplace=True)
 
-    # for col in cols:
-    #     df.groupby(['item_id', col])['Group (WHO 2026)'].count().unstack(level=[1]).fillna(0).astype(int)
-    #     # rename
-    #     result.columns = [f'{prefix}_{col}|{grp}' for col, grp in result.columns]
-
-    # 2. "Melt" the dataframe so columns become a single categorical variable
-    # This is much faster than looping over columns manually
+    # "Melt" the dataframe so columns become a single categorical variable
     df_melted = df.melt(id_vars=['item_id'], value_vars=cols, var_name='column', value_name='grouping')
-    # 3. Drop NaNs once globally
+    # Drop NaNs once globally
     df_melted = df_melted.dropna(subset=['grouping'])
-    # 4. Perform a single GroupBy + Size (Vectorized value_counts)
+    # Perform a single GroupBy + Size (Vectorized value_counts)
     counts = df_melted.groupby(['item_id', 'column', 'grouping']).size()
-    # 5. Reshape to get your specific naming convention
-    # Unstack 'column' and 'grouping' into the header
+    # Reshape to get specific naming convention /  Unstack 'column' and 'grouping' into the header
     result = counts.unstack(level=[1, 2]).fillna(0).astype(int)
-    # 6. Fix column names to match your '{prefix}_{column}|{grouping}' format
+
+    # Fix column names to match '{prefix}_{column}|{grouping}' format and build lookup
+    groups: dict[str, list[tuple[str, str, str]]] = {}
+    renamed_columns = {f'{prefix}_{col}|{label.name}': label.column for col in cols for label in LABELS[f'{prefix}_{col}'].labels}
+    for col, grp in result.columns:
+        column = f'{prefix}_{col}|{grp}'
+        groups.setdefault(col, []).append((grp, column, renamed_columns[column]))
     result.columns = [f'{prefix}_{col}|{grp}' for col, grp in result.columns]
     result.index.name = 'item_id'
-    return result.rename(columns={f'{prefix}_{col}|{label.name}': label.column for col in cols for label in LABELS[f'{prefix}_{col}'].labels})
+    return result.rename(columns=renamed_columns), groups

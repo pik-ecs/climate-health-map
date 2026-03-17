@@ -4,15 +4,13 @@ from typing import Annotated
 import pandas as pd
 import typer
 import numpy as np
-
 from climate_health_map.data.geographies import load_country_infos, flatten_country_groups, read_places_export
 from climate_health_map.shared import read_any_pd, get_logger
 from climate_health_map.scatterplot import rescale_projection
-
+from climate_health_map.data.labels import LABELS
+from climate_health_map.data.export._utils import read_export
 from .info import get_info, filter_labels
 from .writers import write_base_info, write_sqlite, write_keywords, write_geographies
-from .._utils import read_export
-from ... import LABELS
 
 
 def prepare_lithub_export(
@@ -57,7 +55,7 @@ def prepare_lithub_export(
     df_affiliations = read_any_pd(source / 'affiliations.csv', keep_default_na=False).merge(df_countries, left_on='iso2', right_on='iso2', how='left')
     logger.debug(df_affiliations.value_counts('iso2'))
     logger.info('Flattening affiliation data...')
-    df_affiliations_flat = flatten_country_groups(prefix='Affiliation', df=df_affiliations)
+    df_affiliations_flat, _ = flatten_country_groups(prefix='Affiliation', df=df_affiliations)
     logger.debug(f'Unique item_ids in flattened affiliations table: {df_affiliations_flat.reset_index()["item_id"].nunique():,}')
     logger.info(f'Loaded affiliations table: {df_affiliations.shape}; flattened: {df_affiliations_flat.shape}')
 
@@ -65,20 +63,25 @@ def prepare_lithub_export(
     df_places = read_places_export(source=source / 'places.csv', df_countries=df_countries)
     logger.debug(df_places.value_counts('country_code3'))
     logger.info('Flattening mordecai data...')
-    df_places_flat = flatten_country_groups(prefix='Location', df=df_places)
+    df_places_flat, _ = flatten_country_groups(prefix='Location', df=df_places)
     logger.debug(f'Unique item_ids in flattened places table: {df_places_flat.reset_index()["item_id"].nunique():,}')
     logger.info(f'Loaded places table: {df_places.shape}; flattened: {df_places_flat.shape}')
 
     df = df.join(df_affiliations_flat, how='left').join(df_places_flat, how='left')
     logger.info(f'Joined output table: {df.shape}')
+    df = df[df.columns[df.any()]]
+    logger.info(f'Joined output table after dropping empty columns: {df.shape}')
 
     if not skip_sqlite:
         logger.info('Writing sqlite...')
         write_sqlite(df, target=target / info.db_filename, logger=logger)
 
     if not skip_geo:
+        logger.info(f'Adding item idx to place table (before join): df: {df.shape[0]:,} / df_places: {df_places.shape[0]:,}')
+        df_places = df_places.set_index('item_id').join(df[['idx']], how='inner')
+        logger.info(f'Adding item idx to place table (after join): df: {df.shape[0]:,} / df_places: {df_places.shape[0]:,}')
         write_geographies(
-            df=df_places.join(df[['idx']], how='left'),
+            df=df_places,
             target_min=target / info.slim_geo_filename,
             target_full=target / info.full_geo_filename,
             logger=logger,
@@ -110,3 +113,7 @@ def prepare_lithub_export(
     logger.info(f'Export finished, now available at {target.resolve()}')
 
     # TODO: topics_openalex.csv
+
+
+if __name__ == '__main__':
+    typer.run(prepare_lithub_export)

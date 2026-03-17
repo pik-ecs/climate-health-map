@@ -12,6 +12,7 @@ https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-coun
 
 ```python
 import pandas as pd
+-----------------------
 df1 = pd.read_csv('src/climate_health_map/data/geographies/_countries.csv', keep_default_na=False)  # dtype=str,
 df2 = pd.read_csv('src/climate_health_map/data/geographies/tmp.csv')  # , sep='\t')
 (
@@ -21,6 +22,7 @@ df2 = pd.read_csv('src/climate_health_map/data/geographies/tmp.csv')  # , sep='\
     .rename(columns={'population': 'Population (Lancet, 2025)'})
     .to_csv('src/climate_health_map/data/geographies/updated.csv', index=False)
 )
+-----------------------
 df2 = pd.read_csv('src/climate_health_map/data/geographies/tmp.csv')  # , sep='\t')
 (
     df1
@@ -29,6 +31,15 @@ df2 = pd.read_csv('src/climate_health_map/data/geographies/tmp.csv')  # , sep='\
     .astype({'Population (Lancet, 2025)': 'Int32', 'iso_num': 'Int32'})
     .to_csv('src/climate_health_map/data/geographies/updated.csv', index=False)
 )
+-----------------------
+df1 = pd.read_csv('src/climate_health_map/data/geographies/_countries.csv', keep_default_na=False, dtype=str)
+df2 = pd.read_csv('src/climate_health_map/data/geographies/europe.csv' , keep_default_na=False, sep='\t')
+df1.merge(df2[['iso3', 'EEA sub-region division', 'European sub-region (UN geoscheme)', 'EU', 'EEA ']].rename(columns={
+    'EEA sub-region division': 'Region (EEA sub-division)',
+    'European sub-region (UN geoscheme)': 'Region (UN Europe sub-region)',
+    'EU': 'EU member (2025)',
+    'EEA ':'EEA member (2025)'
+}), left_on='iso3', right_on='iso3', how='left').to_csv('src/climate_health_map/data/geographies/updated.csv', index=False)
 ```
 """
 

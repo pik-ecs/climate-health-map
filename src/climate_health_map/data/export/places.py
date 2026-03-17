@@ -65,21 +65,30 @@ WITH
           AND e.payload <> '[]'::jsonb)
 SELECT item_id::text,
        place ->> 'lat'           AS lat,
-       place ->> 'lat'           AS lat,
        place ->> 'lon'           AS lon,
        place ->> 'name'          AS name,
        place ->> 'score'         AS score,
-       place ->> 'city_id'       AS city_id,
+    -- avg_dist
        place ->> 'end_char'      AS end_char,
-       place ->> 'city_name'     AS city_name,
+    -- max_dist
+    -- min_dist
+    -- continent
        place ->> 'geonameid'     AS geonameid,
+    -- adm1_count
+    -- ascii_dist
        place ->> 'start_char'    AS start_char,
        place ->> 'admin1_code'   AS admin1_code,
        place ->> 'admin1_name'   AS admin1_name,
        place ->> 'search_name'   AS search_name,
        place ->> 'feature_code'  AS feature_code,
        place ->> 'country_code3' AS country_code3,
-       place ->> 'feature_class' AS feature_class
+    -- country_count
+       place ->> 'feature_class' AS feature_class,
+       place ->> 'city_id'       AS city_id,
+       place ->> 'city_name'     AS city_name
+    -- admin1_parent_match
+    -- admin1_parent_match
+    -- alt_name_length
 FROM unrolled;
             """,
         )

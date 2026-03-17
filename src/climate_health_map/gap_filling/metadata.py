@@ -1,5 +1,4 @@
 import logging
-import uuid
 from itertools import batched
 from pathlib import Path
 from typing import Annotated, Sequence, Iterator, Generator
@@ -21,11 +20,12 @@ def unroll_partitions(rslt: Iterator[Sequence[sa.RowMapping]]) -> Generator[sa.R
 
 def hydrate_openalex_metadata(
     config: Annotated[Path, typer.Option(help='Path to config.env')],
-    only_incl: Annotated[bool, typer.Option(help='Only apply mordecai to included records')] = True,
+    only_incl: Annotated[bool, typer.Option('--only-incl/--all', help='Only apply mordecai to included records')] = True,
     incl_threshold: Annotated[float, typer.Option(help='Only apply mordecai to records with "rel_major|1" > THRESHOLD')] = 0.5,
     created_after: Annotated[str | None, typer.Option(help='Filter to only apply mordecai to items created after that date; format: YYYY-MM-DD')] = None,
     batch_size: Annotated[int, typer.Option(help='', max=100)] = 100,
     show_count: Annotated[bool, typer.Option(help='')] = False,
+    overwrite_meta: Annotated[bool, typer.Option(help='Set to update existing `openalex` meta entry via || (concatenate)')] = True,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ) -> None:
     logger, settings, db_engine = essentials(config=config, loglevel=loglevel, logger_name='export', run_log_init=True)
@@ -80,7 +80,7 @@ def hydrate_openalex_metadata(
         }
         count = None
         if show_count:
-            logger.info(f'Running count query...')
+            logger.info('Running count query...')
             count = session.scalar(sa.text(f'SELECT count(1) as n_records FROM ({stmt});').execution_options(yield_per=batch_size), params=params)
             logger.info(f'Will hydrate openalex info for {count:,} records.')
 
@@ -92,7 +92,7 @@ def hydrate_openalex_metadata(
         api = OpenAlexAPI(api_key=settings.OPENALEX.API_KEY, page_size=batch_size, logger=api_logger)
         logger.info('Start batched processing...')
         tq = tqdm(total=count)
-        counters = {'n_processed': 0, 'n_with_oa': 0}
+        counters = {'n_processed': 0, 'n_with_oa': 0, 'n_with_authorships': 0}
         for batch in batched(
             # partitions are not necessarily the batch size, so do some acrobatics to ensure exact batch size
             unroll_partitions(rslt.mappings().partitions()),
@@ -103,12 +103,14 @@ def hydrate_openalex_metadata(
             counters['n_processed'] += len(batch)
             for item in api.fetch_translated(project_id=settings.PROJECT_ID, query=f'ids.openalex:({"|".join(id_map.keys())})'):
                 counters['n_with_oa'] += 1
+                if len(item.meta['openalex'].get('authorships', [])) > 0:
+                    counters['n_with_authorships'] += 1
                 tq.update()
+                stmt = sa.update(AcademicItem).where(AcademicItem.openalex_id == item.openalex_id)
+                if not overwrite_meta:
+                    stmt = stmt.where(AcademicItem.meta['openalex'].astext == None)  # noqa: E711
                 session.execute(
-                    sa.update(AcademicItem)
-                    .where(AcademicItem.openalex_id == item.openalex_id)
-                    .where(AcademicItem.meta['openalex'].astext == None)
-                    .values(
+                    stmt.values(
                         meta=sa.func.coalesce(AcademicItem.meta, sa.cast({}, JSONB)).concat(item.meta),
                     ),
                 )
