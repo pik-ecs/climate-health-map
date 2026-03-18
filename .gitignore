@@ -27,3 +27,6 @@ venv/
 data/
 !src/climate_health_map/data/
 uv
+
+*.db
+Notebooks

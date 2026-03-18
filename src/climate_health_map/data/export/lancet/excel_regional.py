@@ -162,7 +162,7 @@ def prepare_lancet_excel_export(
                         df=df,
                         label_groups=default_label_groups,
                         count_primary_class=count_primary_class,
-                        geography_filter=geo_filter,
+                        geography_filter=geo_filter,  # type: ignore[arg-type]
                         threshold=threshold,
                         region=region,
                     )

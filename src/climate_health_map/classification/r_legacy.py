@@ -108,7 +108,10 @@ def classify(
         return
     models_dir = models_dir.resolve()
     if cache_dir is None:
-        cache_dir = Path(os.getenv('OFFLINE_MODEL_PATH'))  # type: ignore[unreachable]
+        cache_dir_ = os.getenv('OFFLINE_MODEL_PATH')
+        if not cache_dir_:
+            raise RuntimeError('Offline model path not set')
+        cache_dir = Path(cache_dir_)
 
     logger.info(f'Reading data from {source.resolve()}')
     df_source = read_any_pd(source)

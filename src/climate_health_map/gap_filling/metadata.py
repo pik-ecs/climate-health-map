@@ -103,12 +103,12 @@ def hydrate_openalex_metadata(
             counters['n_processed'] += len(batch)
             for item in api.fetch_translated(project_id=settings.PROJECT_ID, query=f'ids.openalex:({"|".join(id_map.keys())})'):
                 counters['n_with_oa'] += 1
-                if len(item.meta['openalex'].get('authorships', [])) > 0:
+                if len(item.meta['openalex'].get('authorships', [])) > 0:  # type: ignore[index]
                     counters['n_with_authorships'] += 1
                 tq.update()
-                stmt = sa.update(AcademicItem).where(AcademicItem.openalex_id == item.openalex_id)
+                stmt = sa.update(AcademicItem).where(AcademicItem.openalex_id == item.openalex_id)  # type: ignore[assignment]
                 if not overwrite_meta:
-                    stmt = stmt.where(AcademicItem.meta['openalex'].astext == None)  # noqa: E711 # type: ignore[attr-defined]
+                    stmt = stmt.where(AcademicItem.meta['openalex'].astext == None)  # type: ignore[attr-defined] # noqa: E711
                 session.execute(
                     stmt.values(  # type:ignore[attr-defined]
                         meta=sa.func.coalesce(AcademicItem.meta, sa.cast({}, JSONB)).concat(item.meta),

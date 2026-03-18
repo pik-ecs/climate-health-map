@@ -362,7 +362,7 @@ def get_openalex_ids(
     with open(target, 'w') as ids_file:
         row = next(results)
         ids_file.write(f'{row["id"]}\n')
-        for row in tqdm(results, total=api.meta['count'] - 1):
+        for row in tqdm(results, total=int((api.meta or {}).get('count', 0)) - 1):  # type: ignore[opera]
             ids_file.write(f'{row["id"]}\n')
 
 

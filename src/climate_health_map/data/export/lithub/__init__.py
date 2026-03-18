@@ -82,8 +82,8 @@ def prepare_lithub_export(
         logger.info(f'Adding item idx to place table (after join): df: {df.shape[0]:,} / df_places: {df_places.shape[0]:,}')
         write_geographies(
             df=df_places,
-            target_min=target / info.slim_geo_filename,
-            target_full=target / info.full_geo_filename,
+            target_min=target / info.slim_geo_filename,  # type: ignore[operator]
+            target_full=target / info.full_geo_filename,  # type: ignore[operator]
             logger=logger,
             chunk_size=2000,
         )
@@ -100,7 +100,7 @@ def prepare_lithub_export(
     df_keywords = rescale_projection(df_keywords, logger=logger)
     logger.info('Rescaled x/y values of keywords')
 
-    write_keywords(df_keywords, target=target / info.keywords_filename, logger=logger)
+    write_keywords(df_keywords, target=target / info.keywords_filename, logger=logger)  # type: ignore[operator]
     write_base_info(df.join(df_scatterplot), target=target / info.arrow_filename, logger=logger)
 
     info.start_year = year_start

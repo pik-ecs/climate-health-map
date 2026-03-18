@@ -12,7 +12,7 @@ from climate_health_map.topics import get_topic_labels
 def reduce_topic_distribution(
     source: Annotated[Path, typer.Option(help='Path to file containing topic scores')],
     target: Annotated[Path, typer.Option(help='Path to output file')],
-    model_path: Annotated[Path | None, typer.Option(help='Path pickled fitted UMAP')] = None,
+    model_path: Annotated[Path, typer.Option(help='Path pickled fitted UMAP')],
     n_jobs: Annotated[int, typer.Option(help='Number of CPU cores for UMAP (-1 == all cores)')] = -1,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ) -> None:
@@ -28,7 +28,7 @@ def reduce_topic_distribution(
     df_source = df_source[df_source[topic_columns].notna().any(axis=1)]
     logger.info(f'Filtered items down to shape shape {df_source.shape}')
 
-    if model_path is None or not model_path.exists():
+    if not model_path.exists():
         logger.info('No reducer found, fitting reducer...')
         import umap
 
@@ -58,6 +58,6 @@ def reduce_topic_distribution(
             'item_id': df_source.index,
             'x': embedding[:, 0],
             'y': embedding[:, 1],
-        }
+        },
     )
     write_any_df(df_scatter, target)
