@@ -1,4 +1,12 @@
-region_groups = {
+from typing import TypedDict
+
+
+class RegionInfo(TypedDict):
+    Groups: dict[str, str]
+    Countries: set[str]
+
+
+region_groups: dict[str, RegionInfo] = {
     'China': {'Groups': {}, 'Countries': {'TWN', 'CHN'}},  # Add Taiwan just in case we forgot rewriting on load
     'Europe': {
         'Groups': {

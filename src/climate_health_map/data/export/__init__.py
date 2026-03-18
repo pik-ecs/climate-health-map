@@ -4,12 +4,12 @@ from typing import Annotated
 import typer
 from climate_health_map.shared.types import OnConflict
 
-from .items import export as export_items
+from .raw.items import export as export_items
+from .raw.affiliations import export as export_affiliations
+from .raw.places import export as export_places
+from .raw.classifications import export as export_classifications
+from .raw.topics import export as export_topics
 from .annotations import export as export_annotations
-from .affiliations import export as export_affiliations
-from .places import export as export_places
-from .classifications import export as export_classifications
-from .topics import export as export_topics
 from .lithub import prepare_lithub_export
 from .lancet import app as lancet_app
 

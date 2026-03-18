@@ -39,7 +39,7 @@ def ensure_types(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def write_keywords(df: pd.DataFrame, target: Path, chunk_size: int = CHUNK_SIZE, logger: logging.Logger | None = None):
+def write_keywords(df: pd.DataFrame, target: Path, chunk_size: int = CHUNK_SIZE, logger: logging.Logger | None = None) -> None:
     logger = logger or logging.getLogger('lithub.write')
     logger.info(f'Writing keywords with shape {df.shape} to {target}')
     _write_streamed_ipc(
@@ -96,7 +96,7 @@ def write_sqlite(df: pd.DataFrame, target: Path, logger: logging.Logger | None =
     logger.info(f'Wrote sqlite file to {target}')
 
 
-def write_base_info(df: pd.DataFrame, target: Path, chunk_size: int = CHUNK_SIZE, logger: logging.Logger | None = None):
+def write_base_info(df: pd.DataFrame, target: Path, logger: logging.Logger, chunk_size: int = CHUNK_SIZE) -> None:
     logger.info(f'Writing slim-feather to {target}')
     _write_streamed_ipc(
         df=df[['idx', 'x', 'y', 'publication_year']],
@@ -109,7 +109,7 @@ def write_base_info(df: pd.DataFrame, target: Path, chunk_size: int = CHUNK_SIZE
     logger.info('Finished writing slim-feather.')
 
 
-def write_geographies(df: pd.DataFrame, target_min: Path, target_full: Path, chunk_size: int = CHUNK_SIZE, logger: logging.Logger | None = None):
+def write_geographies(df: pd.DataFrame, target_min: Path, target_full: Path, logger: logging.Logger, chunk_size: int = CHUNK_SIZE) -> None:
     logger.info('Preparing filter mask...')
     mask_search_names = get_naming_mask(place_df=df)
     logger.info('Fixing geographies...')

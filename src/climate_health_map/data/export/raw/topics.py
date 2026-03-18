@@ -6,7 +6,7 @@ import typer
 import sqlalchemy as sa
 
 from climate_health_map.shared.types import OnConflict
-from ._utils import ExportContext
+from ..utils import ExportContext
 
 
 class TopicSource(str, Enum):

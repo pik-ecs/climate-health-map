@@ -108,9 +108,9 @@ def hydrate_openalex_metadata(
                 tq.update()
                 stmt = sa.update(AcademicItem).where(AcademicItem.openalex_id == item.openalex_id)
                 if not overwrite_meta:
-                    stmt = stmt.where(AcademicItem.meta['openalex'].astext == None)  # noqa: E711
+                    stmt = stmt.where(AcademicItem.meta['openalex'].astext == None)  # noqa: E711 # type: ignore[attr-defined]
                 session.execute(
-                    stmt.values(
+                    stmt.values(  # type:ignore[attr-defined]
                         meta=sa.func.coalesce(AcademicItem.meta, sa.cast({}, JSONB)).concat(item.meta),
                     ),
                 )

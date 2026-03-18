@@ -49,7 +49,7 @@ def annual_counts(
     geography_filter: Literal['affiliation', 'location', 'region_affiliation', 'region_location'] | None = None,
     count_primary_class: bool = False,
     threshold: float = 0.5,
-    group_by: str | None = None,
+    group_by: str | list[str] | None = None,
 ) -> pd.DataFrame:
     py_range = list(range(df['Publication year'].min(), df['Publication year'].max() + 1))
 
@@ -124,7 +124,7 @@ def prepare_lancet_excel_export(
     year_end: Annotated[int, typer.Option(help='End year (incl)')] = 2025,
     threshold: Annotated[float, typer.Option(help='Threshold')] = 0.5,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
-):
+) -> None:
     logger_ = get_logger(loglevel=loglevel, logger_name='lancet-excel', run_log_init=True)
     target.mkdir(parents=True, exist_ok=True)
 

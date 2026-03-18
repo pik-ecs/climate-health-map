@@ -7,7 +7,7 @@ import typer
 import pandas as pd
 
 from climate_health_map.shared import get_logger
-from climate_health_map.data.labels import LABELS, Collection, Group, AggTopic, AggAggTopic
+from climate_health_map.data.labels import LABELS, Collection
 from .loaders import read_base_data
 
 exclude_columns = {
@@ -54,40 +54,13 @@ region_groups = {
 }
 
 
-def label_group_counts(
-    df: pd.DataFrame,
-    group: Group | AggTopic | AggAggTopic,
-    geography_filter: Literal['affiliation', 'location'] | None = None,
-    count_primary_class: bool = False,
-    threshold: float = 0.5,
-) -> pd.Series:
-    columns = [label.column for label in group.labels if label.column in df.columns and label.column not in exclude_columns]
-    mask = (df[columns].notna() & (df[columns] > threshold)).any(axis=1)
-    primary = df[mask][columns].fillna(0).idxmax(axis=1)
-    data = {}
-    for label in group.labels:
-        if label.column not in df.columns or label.column in exclude_columns:
-            continue
-
-        extra_mask = (primary == label.column) if count_primary_class else df[label.column] > threshold
-        if group.collection == Collection.IMPACTS:
-            extra_mask &= df['incl_impacts']
-        if geography_filter == 'location':
-            extra_mask &= df['incl_location']
-        if geography_filter == 'affiliation':
-            extra_mask &= df['incl_affiliation']
-
-        data[(group.name, label.name)] = df[mask & extra_mask]['item_id'].nunique()
-    return pd.Series(data)
-
-
 def annual_counts(
     df: pd.DataFrame,
     label_groups: set[str],
     geography_filter: Literal['affiliation', 'location'] | None = None,
     count_primary_class: bool = False,
     threshold: float = 0.5,
-    group_by: str | None = None,
+    group_by: str | list[str] | None = None,
 ) -> pd.DataFrame:
     py_range = list(range(df['Publication year'].min(), df['Publication year'].max() + 1))
 
@@ -227,7 +200,7 @@ def prepare_lancet_excel_export(
     year_end: Annotated[int, typer.Option(help='End year (incl)')] = 2025,
     threshold: Annotated[float, typer.Option(help='Threshold')] = 0.5,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
-):
+) -> None:
     logger = get_logger(loglevel=loglevel, logger_name='lancet-excel', run_log_init=True)
     target.mkdir(parents=True, exist_ok=True)
     df, df_locations, df_locations_flat, location_groups, df_affiliations, df_affiliations_flat, affiliation_groups = read_base_data(

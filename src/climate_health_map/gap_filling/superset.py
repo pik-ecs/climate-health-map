@@ -361,9 +361,9 @@ def get_openalex_ids(
     target.parent.mkdir(parents=True, exist_ok=True)
     with open(target, 'w') as ids_file:
         row = next(results)
-        ids_file.write(row['id'] + '\n')
+        ids_file.write(f'{row["id"]}\n')
         for row in tqdm(results, total=api.meta['count'] - 1):
-            ids_file.write(row['id'] + '\n')
+            ids_file.write(f'{row["id"]}\n')
 
 
 # On NACSOS: 1,290,164 (in Oct 2024)

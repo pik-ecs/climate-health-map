@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, Literal
 from pathlib import Path
 
 import numpy as np
@@ -9,7 +9,7 @@ import sqlalchemy as sa
 
 from climate_health_map.shared import essentials, read_any_pd
 from climate_health_map.shared.types import OnConflict
-from climate_health_map.data.labels import LABELS, Collection
+from climate_health_map.data.labels import LABELS, Collection, Group, AggTopic, AggAggTopic
 from climate_health_map.data.keywords import search_keywords, REVIEW_KEYWORDS, EVALUATION_KEYWORDS, MENTAL_HEALTH_TERMS, search_regexes
 from climate_health_map.topics import rescale_topic_scores as rescale_topic_scores_func
 
@@ -111,7 +111,7 @@ def read_export(
     rescale_topic_scores: bool = False,
     include_keyword_columns: bool = False,
     logger: logging.Logger | None = None,
-):
+) -> pd.DataFrame:
     logger = logger or logging.getLogger('reader')
 
     df_items = read_any_pd(source_items, index_column='item_id')
@@ -156,3 +156,40 @@ def read_export(
         df['keywords|2'] = (search_keywords(df['title'], terms=MENTAL_HEALTH_TERMS) | search_keywords(df['abstract'], terms=MENTAL_HEALTH_TERMS)).astype(int)
 
     return df
+
+
+def label_group_counts(
+    df: pd.DataFrame,
+    group: Group | AggTopic | AggAggTopic,
+    geography_filter: Literal['affiliation', 'location', 'region_affiliation', 'region_location'] | None = None,
+    count_primary_class: bool = False,
+    threshold: float = 0.5,
+) -> pd.Series:
+    table_index = pd.RangeIndex(start=df['Publication year'].min(), stop=df['Publication year'].max() + 1, step=1, name='Publication year')
+
+    columns = [label.column for label in group.labels if label.column in df.columns]
+    mask = (df[columns].notna() & (df[columns] > threshold)).any(axis=1)
+    primary = df[mask][columns].fillna(0).idxmax(axis=1)
+
+    data = {}
+    totals = {}
+    for label in group.labels:
+        if label.column not in df.columns:
+            continue
+
+        extra_mask = (primary == label.column) if count_primary_class else df[label.column] > threshold
+        if group.collection == Collection.IMPACTS:
+            extra_mask &= df['incl_impacts']
+        if geography_filter == 'location':
+            extra_mask &= df['incl_location']
+        if geography_filter == 'affiliation':
+            extra_mask &= df['incl_affiliation']
+        if geography_filter == 'region_location':
+            extra_mask &= df['incl_region_location']
+        if geography_filter == 'region_affiliation':
+            extra_mask &= df['incl_region_affiliation']
+
+        totals[(group.name, label.name)] = df[mask & extra_mask]['item_id'].nunique()
+        data[(group.name, label.name)] = df[mask & extra_mask].groupby('Publication_year')['item_id'].nunique()
+
+    return pd.Series(data, index=table_index).fillna(0).astype(int)

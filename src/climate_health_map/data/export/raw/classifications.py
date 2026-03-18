@@ -6,7 +6,7 @@ import sqlalchemy as sa
 
 from climate_health_map.data.labels import LABELS, Collection, AggTopic, AggAggTopic
 from climate_health_map.shared.types import OnConflict
-from ._utils import ExportContext
+from ..utils import ExportContext
 
 
 def export(

@@ -36,8 +36,8 @@ def mordecai(
     min_text_len: Annotated[int, typer.Option(help='Minimum length of title+abstract (in characters)')] = 100,
     show_count: Annotated[bool, typer.Option(help='')] = False,
     created_after: Annotated[str | None, typer.Option(help='Filter to only apply mordecai to items created after that date; format: YYYY-MM-DD')] = None,
-    published_after: Annotated[int, typer.Option(help='Filter to only apply mordecai to items publisher after this year (>=)')] = None,
-    published_before: Annotated[int, typer.Option(help='Filter to only apply mordecai to items publisher before this year (<>>=)')] = None,
+    published_after: Annotated[int | None, typer.Option(help='Filter to only apply mordecai to items publisher after this year (>=)')] = None,
+    published_before: Annotated[int | None, typer.Option(help='Filter to only apply mordecai to items publisher before this year (<>>=)')] = None,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
 ) -> None:
     logger, settings, db_engine = essentials(config=config, loglevel=loglevel, logger_name='export', run_log_init=True)

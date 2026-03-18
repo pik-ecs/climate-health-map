@@ -27,7 +27,7 @@ def search_keywords(column: pd.Series, term: str | None = None, terms: list[str]
         return column.str.contains(regex, case=case_sensitive, regex=True)
 
 
-def search_regexes(column: pd.Series, regexes: list[re.Pattern]) -> pd.Series:
+def search_regexes(column: pd.Series, regexes: list[re.Pattern]) -> pd.Series:  # type: ignore[type-arg]
     masks = [column.str.contains(p, regex=True) for p in regexes]
     return reduce(lambda x, y: x | y, masks)
 

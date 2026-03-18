@@ -56,7 +56,7 @@ export_groups = [
 ]
 
 
-def get_info():
+def get_info() -> DatasetInfoFull:
     label_groups = {}
     for col in export_groups:
         group = LABELS[col]
@@ -79,7 +79,7 @@ def get_info():
             labels=[topic_key for topic_key in group.topics if topic_key not in exclude_columns],
         )
     # Add keyword filters to the Methods topic group
-    label_groups['topic-agg-4|0'].labels += [
+    label_groups['topic-agg-4|0'].labels += [  # type: ignore[operator]
         'keywords|0',  # Evidence synthesis
         'keywords|1',  # Evaluation method
     ]
@@ -93,7 +93,7 @@ def get_info():
             colour=(group.colour[0] * 360, group.colour[1] * 100, group.colour[2] * 100),
             subgroups=[topic_key for topic_key in group.topics_agg if topic_key not in exclude_columns],
         )
-        label_groups['topic-agg-agg'].subgroups.append(group.column)
+        label_groups['topic-agg-agg'].subgroups.append(group.column)  # type: ignore[union-attr]
 
     return DatasetInfoFull(
         name='Climate and Health Map',
@@ -140,9 +140,9 @@ def filter_labels(df: pd.DataFrame, info: DatasetInfoFull) -> DatasetInfoFull:
 
     # Cache to store whether a group ID is valid (True/False)
     # This prevents redundant work and handles nested dependencies.
-    memory = {}
+    memory: dict[str, bool] = {}
 
-    def check_group_validity(key_: str):
+    def check_group_validity(key_: str) -> bool:
         # If we've already decided if this group is valid, return the result
         if key_ in memory:
             return memory[key_]

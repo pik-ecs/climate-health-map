@@ -107,7 +107,7 @@ def text_based(
     level_offset: Annotated[int, typer.Option(help='')] = 0,
     limit: Annotated[int | None, typer.Option(help='')] = None,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
-):
+) -> None:
     from sklearn.cluster import KMeans
     from climate_health_map.shared.text import text_utils
     from sklearn.feature_extraction.text import TfidfVectorizer

@@ -5,7 +5,7 @@ import pandas as pd
 from climate_health_map.data.geographies import load_country_infos, flatten_country_groups, read_places_export, get_naming_mask, fix_geographies, FEATURE_LOOKUP
 from climate_health_map.shared import read_any_pd
 from climate_health_map.data.labels import LABELS
-from climate_health_map.data.export._utils import read_export
+from climate_health_map.data.export.utils import read_export
 
 
 def read_base_data(
@@ -23,7 +23,7 @@ def read_base_data(
     region_iso3: set[str] | None = None,
     merge_taiwan_china: bool = True,
     logger: logging.Logger | None = None,
-):
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, dict[str, list[tuple[str, str, str]]], pd.DataFrame, pd.DataFrame, dict[str, list[tuple[str, str, str]]]]:
     logger = logger or logging.getLogger('loader')
     exclude_columns = exclude_columns or set()
 

@@ -80,7 +80,7 @@ def classify_transformer(data: pd.Series, label_map: dict[str, str], model_dir: 
     y_pred: list[list[dict[str, str | float]]] = pipe(data.tolist(), batch_size=32)  # type:ignore[assignment]
     return pd.DataFrame(
         [
-            {'item_id': idx} | {label_map[lab['label']]: lab['score'] for lab in pred if lab['label'] in label_map}
+            {'item_id': idx} | {label_map[lab['label']]: lab['score'] for lab in pred if lab['label'] in label_map}  # type: ignore[index]
             for idx, pred in zip(data.index, y_pred, strict=True)
         ],
     ).set_index('item_id')
@@ -90,7 +90,7 @@ def classify(
     source: Annotated[Path, typer.Option(help='Path to source data to classify')],
     target: Annotated[Path, typer.Option(help='Path to write classifications to')],
     models_dir: Annotated[Path, typer.Option(help='Path to trained models (not the huggingface `OFFLINE_MODEL_PATH`!)')],
-    cache_dir: Annotated[Path, typer.Option(help='Optional parameter to overwrite `OFFLINE_MODEL_PATH`')] = None,
+    cache_dir: Annotated[Path | None, typer.Option(help='Optional parameter to overwrite `OFFLINE_MODEL_PATH`')] = None,
     on_exists: Annotated[OnConflict, typer.Option(help='How to behave when the target file already exists')] = OnConflict.IGNORE,
     run_major_incl: Annotated[bool, typer.Option(help='Run C&H inclusion classifier')] = True,
     run_major_categories: Annotated[bool, typer.Option(help='Run major category classifier (mitigation, adaptation, impacts)')] = True,
@@ -108,7 +108,7 @@ def classify(
         return
     models_dir = models_dir.resolve()
     if cache_dir is None:
-        cache_dir = Path(os.getenv('OFFLINE_MODEL_PATH'))
+        cache_dir = Path(os.getenv('OFFLINE_MODEL_PATH'))  # type: ignore[unreachable]
 
     logger.info(f'Reading data from {source.resolve()}')
     df_source = read_any_pd(source)
@@ -126,13 +126,13 @@ def classify(
         texts = text_from_table(df=batch)
         if run_major_incl:
             progress.set_postfix_str('Applying major inclusion classifier...')
-            y_pred = clf_major_rel.predict_proba(texts)
+            y_pred = clf_major_rel.predict_proba(texts)  # type: ignore[union-attr]
             predictions['rel_major|0'] = y_pred[:, 0]
             predictions['rel_major|1'] = y_pred[:, 1]
 
         if run_major_categories:
             progress.set_postfix_str('Applying major categories classifier...')
-            y_pred = clf_major_cat.predict_proba(texts)
+            y_pred = clf_major_cat.predict_proba(texts)  # type: ignore[union-attr]
             # old classifier: AMI
             # new scheme: MAI
             predictions['cat|0'] = y_pred[:, 1]

@@ -8,7 +8,7 @@ from climate_health_map.data.geographies import load_country_infos, flatten_coun
 from climate_health_map.shared import read_any_pd, get_logger
 from climate_health_map.scatterplot import rescale_projection
 from climate_health_map.data.labels import LABELS
-from climate_health_map.data.export._utils import read_export
+from climate_health_map.data.export.utils import read_export
 from .info import get_info, filter_labels
 from .writers import write_base_info, write_sqlite, write_keywords, write_geographies
 
@@ -22,7 +22,7 @@ def prepare_lithub_export(
     skip_sqlite: Annotated[bool, typer.Option(help='Skip sqlite export for speedy info update')] = False,
     skip_geo: Annotated[bool, typer.Option(help='Skip geography stuff for speedy info update')] = False,
     loglevel: Annotated[str, typer.Option(help='Verbosity of logger')] = 'INFO',
-):
+) -> None:
     target.mkdir(parents=True, exist_ok=True)
 
     logger = get_logger(loglevel=loglevel, logger_name='lithub', run_log_init=True)
