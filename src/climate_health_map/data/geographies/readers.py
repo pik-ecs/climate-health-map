@@ -31,23 +31,50 @@ def load_grid_data() -> pd.DataFrame:
         .astype(
             {
                 'index': 'Int32',
-                'lat': 'Float64',
-                'lon': 'Float64',
+                'LAT': 'Float64',
+                'LON': 'Float64',
                 'area': 'Float64',
                 'is_land': 'bool',
-                'precip_da': 'Int8',
-                'temp_da': 'Int8',
-                'population': 'Int32',
+                'precip_da': 'Float32',
+                'temp_da': 'Float32',
+                'population': 'Float32',
             },
         )
+        # we need two steps before getting to int
+        .astype({'precip_da': 'Int8', 'temp_da': 'Int8', 'population': 'Int32'})
         .set_index('index')
     )
     df_grid['grid_cooler'] = df_grid['temp_da'].isin([-2, -3])
     df_grid['grid_warmer'] = df_grid['temp_da'].isin([2, 3])
     df_grid['grid_wetter'] = df_grid['precip_da'].isin([2, 3])
     df_grid['grid_drier'] = df_grid['precip_da'].isin([-2, -3])
-    df_grid['grid_attributable'] = df_grid[['cooler', 'warmer', 'wetter', 'drier']].any(axis=1)
+    df_grid['grid_attributable'] = df_grid[['grid_cooler', 'grid_warmer', 'grid_wetter', 'grid_drier']].any(axis=1)
     return df_grid
+
+
+def load_annual_population():
+    """
+    ```bash
+    wget -O "data/shapes_2026/population.json" "https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json&date=1990:2025&per_page=20000"
+    ```
+
+    ```python
+    import json
+    import pandas as pd
+    pop = json.load(open('data/shapes_2026/population.json'))
+    (
+        pd.DataFrame(pop[1])
+        .drop(columns=['indicator', 'country', 'unit', 'obs_status', 'decimal'])
+        .astype({'value': 'Int64'})
+        .rename(columns={'countryiso3code': 'iso3', 'value': 'Population'})
+        .to_csv('src/climate_health_map/data/geographies/_annual_population.csv', index=False)
+    )
+    ```
+    """
+    return (
+        pd.read_csv(here / '_annual_population.csv')
+        .astype({'year': 'Int32', 'Population': 'Int64'})
+    )
 
 
 def _read_places_df(source: Path, index_column: str | None = 'item_id', resolution: float = 2.5, merge_taiwan_china: bool = True) -> pd.DataFrame:

@@ -60,7 +60,7 @@ TODO: elaborate what this produces and how to interpret outputs
 ```bash
 rsync -avh --progress -e ssh foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/tuning data/
 
-uv run healthmap classification tuning-quality --source=data/tuning --target=quality/tuning
+uv run healthmap classification tuning-quality --source=data/tuning --target=data/quality/tuning
 ```
 
 # Training

@@ -164,12 +164,23 @@ def label_group_counts(
     geography_filter: Literal['affiliation', 'location', 'region_affiliation', 'region_location'] | None = None,
     count_primary_class: bool = False,
     threshold: float = 0.5,
-) -> pd.Series:
+) -> tuple[pd.DataFrame, pd.Series, pd.Series]:
     table_index = pd.RangeIndex(start=df['Publication year'].min(), stop=df['Publication year'].max() + 1, step=1, name='Publication year')
 
     columns = [label.column for label in group.labels if label.column in df.columns]
     mask = (df[columns].notna() & (df[columns] > threshold)).any(axis=1)
     primary = df[mask][columns].fillna(0).idxmax(axis=1)
+
+    if group.collection == Collection.IMPACTS:
+        mask &= df['incl_impacts']
+    if geography_filter == 'location':
+        mask &= df['incl_location']
+    if geography_filter == 'affiliation':
+        mask &= df['incl_affiliation']
+    if geography_filter == 'region_location':
+        mask &= df['incl_region_location']
+    if geography_filter == 'region_affiliation':
+        mask &= df['incl_region_affiliation']
 
     data = {}
     totals = {}
@@ -178,18 +189,12 @@ def label_group_counts(
             continue
 
         extra_mask = (primary == label.column) if count_primary_class else df[label.column] > threshold
-        if group.collection == Collection.IMPACTS:
-            extra_mask &= df['incl_impacts']
-        if geography_filter == 'location':
-            extra_mask &= df['incl_location']
-        if geography_filter == 'affiliation':
-            extra_mask &= df['incl_affiliation']
-        if geography_filter == 'region_location':
-            extra_mask &= df['incl_region_location']
-        if geography_filter == 'region_affiliation':
-            extra_mask &= df['incl_region_affiliation']
 
-        totals[(group.name, label.name)] = df[mask & extra_mask]['item_id'].nunique()
-        data[(group.name, label.name)] = df[mask & extra_mask].groupby('Publication_year')['item_id'].nunique()
+        totals[label.name] = df[mask & extra_mask]['item_id'].nunique()
+        data[label.name] = df[mask & extra_mask].groupby('Publication year')['item_id'].nunique()
 
-    return pd.Series(data, index=table_index).fillna(0).astype(int)
+    return (
+        pd.DataFrame(data, index=table_index).fillna(0).astype(int),
+        pd.Series(totals).fillna(0).astype(int),
+        pd.Series(df[mask].groupby('Publication year')['item_id'].nunique(), index=table_index, name='Total').fillna(0).astype(int),
+    )
