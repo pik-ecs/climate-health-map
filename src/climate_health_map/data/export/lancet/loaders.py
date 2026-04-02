@@ -76,11 +76,13 @@ def read_base_data(
         df_locations = df_locations.loc[df_locations.index.intersection(df.index)]
         logger.info(f'Filtered locations shape: {df_locations.shape} (unique: {df_locations.index.nunique():,})')
     if fix_locations:
-        logger.info('Preparing filter mask...')
+        logger.info(f'Dropping locations w/o geoname info (shape before: {df_locations.shape})...')
+        df_locations = df_locations[df_locations['geonameid'].notna()]
+        logger.info(f'Preparing filter mask (shape before: {df_locations.shape})...')
         mask_search_names = get_naming_mask(place_df=df_locations)
-        logger.info('Fixing geographies...')
+        logger.info(f'Fixing geographies and adding mask ({mask_search_names.sum():,} / {df_locations.shape[0]:,})...')
         df_locations = fix_geographies(place_df=df_locations[mask_search_names])
-        logger.info('Adding feature column...')
+        logger.info(f'Adding feature column (current shape: {df_locations.shape})...')
         df_locations['feature'] = df_locations.apply(lambda row: FEATURE_LOOKUP.get(f'{row["feature_class"]}.{row["feature_code"] or ""}'), axis='columns')
         logger.info(f'Fixed locations shape: {df_locations.shape} (unique: {df_locations.index.nunique():,})')
 

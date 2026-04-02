@@ -14,10 +14,10 @@ pd.options.display.width = 100000
 
 
 def pretty_table(
-    source_annotations: Annotated[Path, typer.Option(help='Path to folder containing training stats')]='data/exports/annotations_20260213.csv',
-    source_quality: Annotated[Path, typer.Option(help='Path to folder containing training stats')]='data/quality/training/summary.csv',
-    source_tuning: Annotated[Path, typer.Option(help='Path to folder containing training stats')]='data/quality/tuning/column_best.csv',
-    target: Annotated[Path, typer.Option(help='Path to folder to write quality summary to')]='data/quality/summary.xlsx',
+    source_annotations: Annotated[Path, typer.Option(help='Path to folder containing training stats')] = 'data/exports/annotations_20260213.csv',
+    source_quality: Annotated[Path, typer.Option(help='Path to folder containing training stats')] = 'data/quality/training/summary.csv',
+    source_tuning: Annotated[Path, typer.Option(help='Path to folder containing training stats')] = 'data/quality/tuning/column_best.csv',
+    target: Annotated[Path, typer.Option(help='Path to folder to write quality summary to')] = 'data/quality/summary.xlsx',
 ):
     logger = get_logger('classify-train', loglevel='INFO', run_log_init=True)
     df_anno = pd.read_csv(source_annotations)
@@ -35,9 +35,9 @@ def pretty_table(
 
             rows[f'{group.name}:\n{label.name}\n(yes: {(df_anno[label.column] == 1).sum():,}, no: {(df_anno[label.column] == 0).sum():,})'] = {
                 'Classifier': df_tune.loc[label.column, ('model', 'Unnamed: 1_level_1')],
-                'Precision': f'{df_qual.loc[label.column, ('precision_test', 'mean')]:.0%} (σ={df_qual.loc[label.column, ('precision_test', 'std')]:.0%})',
-                'Recall': f'{df_qual.loc[label.column, ('recall_test', 'mean')]:.0%} (σ={df_qual.loc[label.column, ('recall_test', 'std')]:.0%})',
-                'F1-score': f'{df_qual.loc[label.column, ('f1_test', 'mean')]:.0%} (σ={df_qual.loc[label.column, ('f1_test', 'std')]:.0%})',
+                'Precision': f'{df_qual.loc[label.column, ("precision_test", "mean")]:.0%} (σ={df_qual.loc[label.column, ("precision_test", "std")]:.0%})',
+                'Recall': f'{df_qual.loc[label.column, ("recall_test", "mean")]:.0%} (σ={df_qual.loc[label.column, ("recall_test", "std")]:.0%})',
+                'F1-score': f'{df_qual.loc[label.column, ("f1_test", "mean")]:.0%} (σ={df_qual.loc[label.column, ("f1_test", "std")]:.0%})',
             }
     pd.DataFrame(rows).T.to_excel(target)
 

@@ -20,3 +20,7 @@ uv run --extra extract --no-sources-package nacsos_data --prerelease=allow \
     --config="../living-cdr-map/conf/secret.env"
 
 ```
+
+Additional input:
+* https://github.com/mcallaghan/climate-health-impacts/blob/main/3_match_place_grid.ipynb
+* https://gitlab.pik-potsdam.de/mcc-apsis/climate-trend-attribution

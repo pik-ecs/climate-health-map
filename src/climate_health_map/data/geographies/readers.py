@@ -9,6 +9,13 @@ from climate_health_map.shared import read_any_pd
 
 here = Path(__file__).parent.resolve()
 
+HDI_MAP = {
+    'Very High': 'Very High or High',
+    'High': 'Very High or High',
+    'Medium': 'Low or Medium',
+    'Low': 'Low or Medium',
+}
+
 
 def load_country_infos() -> pd.DataFrame:
     return (
@@ -17,6 +24,12 @@ def load_country_infos() -> pd.DataFrame:
         .replace({'': pd.NA, np.nan: pd.NA})
         .astype(
             {'Population (Lancet, 2025)': 'Int32', 'iso_num': 'Int32'},
+        )
+        .assign(
+            **{
+                'Group (HDI-2 2026)': lambda data: data['Group (HDI 2026)'].map(lambda v: HDI_MAP[v] if v in HDI_MAP else pd.NA),
+                'Group (HDI-2 2025)': lambda data: data['Group (HDI 2025)'].map(lambda v: HDI_MAP[v] if v in HDI_MAP else pd.NA),
+            }
         )
     )
 
@@ -34,7 +47,7 @@ def load_grid_data() -> pd.DataFrame:
                 'LAT': 'Float64',
                 'LON': 'Float64',
                 'area': 'Float64',
-                'is_land': 'bool',
+                #'is_land': 'bool',
                 'precip_da': 'Float32',
                 'temp_da': 'Float32',
                 'population': 'Float32',
@@ -49,7 +62,13 @@ def load_grid_data() -> pd.DataFrame:
     df_grid['grid_wetter'] = df_grid['precip_da'].isin([2, 3])
     df_grid['grid_drier'] = df_grid['precip_da'].isin([-2, -3])
     df_grid['grid_attributable'] = df_grid[['grid_cooler', 'grid_warmer', 'grid_wetter', 'grid_drier']].any(axis=1)
-    return df_grid
+
+    df_grid['attribution'] = 0  # no attribution
+    df_grid.loc[df_grid['grid_attributable'], 'attribution'] = 1  # temp or humidity
+    df_grid.loc[df_grid[['grid_cooler', 'grid_warmer']].any(axis=1) & df_grid[['grid_wetter', 'grid_drier']].any(axis=1), 'attribution'] = 2
+
+    df_grid['is_land'] = df_grid['is_land'].map({'True': True, 'False': False})
+    return df_grid.reset_index(names='grid_id')
 
 
 def load_annual_population():
@@ -71,10 +90,8 @@ def load_annual_population():
     )
     ```
     """
-    return (
-        pd.read_csv(here / '_annual_population.csv')
-        .astype({'year': 'Int32', 'Population': 'Int64'})
-    )
+    df_population = pd.read_csv(here / '_annual_population.csv').astype({'year': 'Int32', 'Population': 'Int64'})
+    return df_population[df_population['iso3'].notna() & df_population['Population'].notna()]
 
 
 def _read_places_df(source: Path, index_column: str | None = 'item_id', resolution: float = 2.5, merge_taiwan_china: bool = True) -> pd.DataFrame:
@@ -101,7 +118,7 @@ def _read_places_df(source: Path, index_column: str | None = 'item_id', resoluti
     )
     df_places['LAT'] = df_places['lat'] // resolution * resolution + (resolution / 2)
     df_places['LON'] = df_places['lon'] // resolution * resolution + (resolution / 2)
-
+    df_places['location_id'] = np.arange(df_places.shape[0])
     if merge_taiwan_china:
         df_places.loc[df_places['country_code3'] == 'TWN', 'country_code3'] = 'CHN'
 
@@ -127,7 +144,7 @@ def load_df_places(
     """
     df = _read_places_df(source, index_column=index_column, merge_taiwan_china=merge_taiwan_china)
     df = fix_geographies(df)
-    mask = get_naming_mask(df)
+    mask = get_naming_mask(df) & df['geonameid'].notna()
     return df, mask
 
 

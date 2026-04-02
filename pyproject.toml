@@ -64,7 +64,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "ruff>=0.15.5",
+    "ruff>=0.15.8",
     "mypy[faster-cache]==1.19.1",
 ]
 [tool.ruff]
