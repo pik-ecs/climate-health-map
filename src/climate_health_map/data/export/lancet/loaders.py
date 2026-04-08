@@ -118,5 +118,17 @@ def read_base_data(
         df['incl_region_location'] = df.index.isin(df_locations.index)
         df['incl_region_affiliation'] = df.index.isin(df_affiliations.index)
 
+    df = df.rename(columns={'publication_year': 'Publication year'}).reset_index().set_index('item_id', drop=False)
+    df_locations = (
+        df_locations.reset_index()
+        .set_index('item_id', drop=False)
+        .join(df[['Publication year', 'Climate category', 'incl_major', 'incl_impacts', 'incl_location', 'incl_affiliation']])
+    )
+    df_affiliations = (
+        df_affiliations.reset_index()
+        .set_index('item_id', drop=False)
+        .join(df[['Publication year', 'Climate category', 'incl_major', 'incl_impacts', 'incl_location', 'incl_affiliation']])
+    )
+
     # Return copies to clear memory and fragmentation
     return df.copy(), df_locations.copy(), df_locations_flat.copy(), location_groups, df_affiliations.copy(), df_affiliations_flat.copy(), affiliation_groups

@@ -45,7 +45,16 @@ df1.merge(df2[['iso3', 'EEA sub-region division', 'European sub-region (UN geosc
 
 from .continents import CONTINENT_MAP
 from .variations import country_names as COUNTRY_NORMALISATION
-from .utils import fix_geographies, get_naming_mask, get_publisher_mask, flatten_country_groups, join_shapes, join_grid_shapes, LOCATION_FEATURE_CODES
+from .utils import (
+    fix_geographies,
+    get_naming_mask,
+    get_publisher_mask,
+    flatten_country_groups,
+    join_shapes,
+    join_grid_shapes,
+    LOCATION_FEATURE_CODES,
+    merge_grid_info,
+)
 from .readers import read_places_export, load_df_places, load_grid_data, load_country_infos, load_annual_population
 from .features import FEATURES, FEATURE_LOOKUP
 
@@ -66,4 +75,5 @@ __all__ = [
     'join_shapes',
     'join_grid_shapes',
     'LOCATION_FEATURE_CODES',
+    'merge_grid_info',
 ]
