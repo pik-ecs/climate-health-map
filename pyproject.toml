@@ -5,12 +5,11 @@ description = "Pipeline to keep the climate and health map up-to-date (mainly fo
 requires-python = ">=3.13"
 
 dependencies = [
-    "nacsos_data[utils,scripts] @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git@v0.24.34",
-    "openalex_ingest @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-academic-search.git",
+    "nacsos_data[utils,scripts] @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git@v0.24.43",
     "xlsxwriter==3.2.9",
     "tabulate==0.10.0",
     "tqdm==4.67.3",
-    "matplotlib==3.10.8",
+    "matplotlib==3.11.0rc1",
     "pyarrow==23.0.1",
 ]
 
@@ -19,10 +18,13 @@ classify = [
     "transformers[torch]==4.57.6", #  mordecai3==3.4.0 depends on transformers>=4.2.2,<5.0
     "datasets==4.5.0",
     "evaluate==0.4.6",
-    "accelerate==1.12.0",
+    "accelerate==1.13.0",
     "lightgbm==4.6.0",
-    "optuna==4.7.0",
-    "nltk==3.9.3",
+    "optuna==4.8.0",
+    "nltk==3.9.4",
+]
+gapfill = [
+    "openalex_ingest @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-academic-search.git",
 ]
 scatter = [
     "opentsne==1.0.4",
