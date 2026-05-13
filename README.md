@@ -17,6 +17,34 @@ uv run ruff format
 uv run mypy
 ```
 
+### Windows installation
+```shell
+$env:GIT_SSH_COMMAND = "C:/PROGRA~1/Git/usr/bin/ssh.exe"
+uv sync --no-sources-package="nacsos_data" --no-sources-package="openalex_ingest"
+```
+
+## Create DB user
+```sql
+CREATE USER username WITH PASSWORD '???';
+GRANT CONNECT ON DATABASE nacsos_core TO username;
+GRANT USAGE ON SCHEMA public TO username;
+
+GRANT SELECT ON TABLE project TO username;
+GRANT SELECT ON TABLE item TO username;
+GRANT SELECT ON TABLE academic_item TO username;
+GRANT SELECT ON TABLE academic_item_variant TO username;
+GRANT SELECT ON TABLE bot_annotation_metadata TO username;
+GRANT SELECT ON TABLE bot_annotation TO username;
+GRANT SELECT ON TABLE assignment TO username;
+GRANT SELECT ON TABLE assignment_scope TO username;
+GRANT SELECT ON TABLE annotation_scheme TO username;
+GRANT SELECT ON TABLE annotation TO username;
+GRANT SELECT ON TABLE import TO username;
+GRANT SELECT ON TABLE import_revision TO username;
+GRANT SELECT ON TABLE m2m_import_item TO username;
+GRANT SELECT ON TABLE enhancement TO username;
+```
+
 ## Documentation
 * [Export human annotations](./Documentation/Annotations.md)
 * [Classification workflow](./Documentation/Classification.md)
