@@ -338,7 +338,7 @@ def join_shapes(df_locations: pd.DataFrame, shapes: 'GeoDataFrame', keep_columns
         )
         .reset_index(drop=True)  # drop if switching back to single column
         .sjoin(shapes, how='left', predicate='within')
-        .astype({'index_right': 'Int32', 'GAUL_0': 'Int32'})
+        .astype({'index_right': 'Int32'})
         .rename(columns={'index_right': 'shape_id'})
     )
 
@@ -364,7 +364,7 @@ def join_grid_shapes(df_grid: pd.DataFrame, shapes: 'GeoDataFrame', resolution: 
             crs='EPSG:4326',
         )
         .sjoin(shapes, how='left', predicate='intersects')
-        .astype({'index_right': 'Int32', 'GAUL_0': 'Int32'})
+        .astype({'index_right': 'Int32'})
         .rename(columns={'index_right': 'shape_id', 'index': 'grid_id'})
     )
 
@@ -390,7 +390,7 @@ def merge_grid_info(
 
     # Match df_grid to shapes
     points_grid = join_grid_shapes(df_grid, shapes=shapes, resolution=resolution)
-    # Merge in 2024 population based on ISO code (note, some shape files might not have `ISO_A3`, then you need to edit this
+    # Merge in [reference_year] population based on ISO code (note, some shape files might not have `ISO_A3`, then you need to edit this
     points_grid = points_grid.merge(
         df_population[df_population['year'] == reference_year][['iso3', 'Population']],
         left_on='ISO_A3',

@@ -86,7 +86,7 @@ region_groups: dict[str, RegionInfo] = {
         },
         # For reference, the countries we include are:
         # Mexico, Guatemala, El Salvador, Honduras, Nicaragua, Costa Rica, Panama, Colombia, Venezuela, Ecuador, Peru, Bolivia, Chile, Argentina, Paraguay, Uruguay, and Brazil.
-        'Countries': {'MEX', 'GTM','SLV', 'HND', 'NIC','CRI','PAN', 'COL',  'VEN','ECU','PER','BOL','CHL','ARG', 'PRY', 'URY','BRA' },
+        'Countries': {'MEX', 'GTM', 'SLV', 'HND', 'NIC', 'CRI', 'PAN', 'COL', 'VEN', 'ECU', 'PER', 'BOL', 'CHL', 'ARG', 'PRY', 'URY', 'BRA'},
         # Lancet countdown grouping (+ GUF / French Guiana)
         # 'Countries': {'ARG', 'BOL', 'BRA', 'CHL', 'COL', 'CRI', 'ECU', 'GTM', 'GUF', 'HND', 'MEX', 'NIC', 'PAN', 'PER', 'PRY', 'SLV', 'URY', 'VEN'},
     },
