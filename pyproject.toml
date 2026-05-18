@@ -52,8 +52,8 @@ notebook = [
 prerelease = "allow"
 conflicts = [
     [
-      { group = "extract" },
-      { group = "classify" },
+      { extra = "extract" },
+      { extra = "classify" },
     ],
 ]
 
