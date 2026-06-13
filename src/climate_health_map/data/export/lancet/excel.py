@@ -120,7 +120,7 @@ def annual_counts(
     table = pd.concat([table, table.groupby(level=0).sum().set_index(pd.Index(['Total'] * len(table.groupby(level=0)), name='Publication year'), append=True)])
 
     if len(table.groupby(level=0)) > 1:
-        table.loc[('All groups', 'Total'),:] = pd.Series(totals)
+        table.loc[('All groups', 'Total'), :] = pd.Series(totals)
 
     return table[column_groups]  # table.sort_index(axis=1)[column_groups]
 
@@ -156,30 +156,36 @@ def summary_tables(df: pd.DataFrame, writer: pd.ExcelWriter, sheet_name: str, co
     write_with_fmt(sheet=worksheet, row=row_offset, col=col_offset, data='Totals', fmt=fmt)
     totals = pd.concat(
         [
-            pd.DataFrame({
-                (grp, f'{df_.index.min()}–{df_.index.max()}'): df_.sum(axis=0),
-                (grp, '2006–2015'): df_.loc[2006:2015].sum(axis=0),
-                (grp, '2016–2025'): df_.loc[2016:2025].sum(axis=0),
-                (grp, '2006–2025'): df_.loc[2006:2025].sum(axis=0),
-                (grp, 'CAGR 2006–2015'): (pow(df_.loc[2015] / df_.loc[2006], 1 / 10) - 1) * 100,
-                (grp, 'CAGR 2016–2025'): (pow(df_.loc[2025] / df_.loc[2016], 1 / 10) - 1) * 100,
-                (grp, f'CAGR {df_.index.min()}–{df_.index.max()}'): (pow(df_.iloc[-1] / df_.iloc[0], 1 / df_.shape[0]) - 1) * 100,
-            })
+            pd.DataFrame(
+                {
+                    (grp, f'{df_.index.min()}–{df_.index.max()}'): df_.sum(axis=0),
+                    (grp, '2006–2015'): df_.loc[2006:2015].sum(axis=0),
+                    (grp, '2016–2025'): df_.loc[2016:2025].sum(axis=0),
+                    (grp, '2006–2025'): df_.loc[2006:2025].sum(axis=0),
+                    (grp, 'CAGR 2006–2015'): (pow(df_.loc[2015] / df_.loc[2006], 1 / 10) - 1) * 100,
+                    (grp, 'CAGR 2016–2025'): (pow(df_.loc[2025] / df_.loc[2016], 1 / 10) - 1) * 100,
+                    (grp, f'CAGR {df_.index.min()}–{df_.index.max()}'): (pow(df_.iloc[-1] / df_.iloc[0], 1 / df_.shape[0]) - 1) * 100,
+                }
+            )
             for grp, df_ in (
-            df.drop(index='Total', level=1, errors='ignore')
-            .drop('', level=1, errors='ignore')
-            .drop(np.nan, level=0, errors='ignore')
-            .rename(int, level=1)
-            .reset_index(level=0)
-            .groupby(df.index.names[0])[list(set(df.columns) - {df.index.names[0]})]
-        )], axis=1
+                df.drop(index='Total', level=1, errors='ignore')
+                .drop('', level=1, errors='ignore')
+                .drop(np.nan, level=0, errors='ignore')
+                .rename(int, level=1)
+                .reset_index(level=0)
+                .groupby(df.index.names[0])[list(set(df.columns) - {df.index.names[0]})]
+            )
+        ],
+        axis=1,
     ).T
 
     # No grouping, drop group level from index
     if len(totals.groupby(level=0)) < 2:
         totals = totals.droplevel(level=0)
 
-    totals.sort_index(axis=1).to_excel(writer, sheet_name=sheet_name, startrow=row_offset + 1, startcol=col_offset, header=True, index=True, inf_rep='', float_format='%.2f')
+    totals.sort_index(axis=1).to_excel(
+        writer, sheet_name=sheet_name, startrow=row_offset + 1, startcol=col_offset, header=True, index=True, inf_rep='', float_format='%.2f'
+    )
 
 
 def write_workbook(
@@ -209,12 +215,12 @@ def write_workbook(
                 .nunique(),
                 'Records on impacts with location in attributable cell': df[
                     df['incl_location'] & df['incl_major'] & df['incl_impacts'] & df['grid_attributable']
-                    ]
+                ]
                 .groupby('Publication year')['item_id']
                 .nunique(),
                 'Records on impacts with location in non-attributable cell': df[
                     df['incl_location'] & df['incl_major'] & df['incl_impacts'] & ~df['grid_attributable']
-                    ]
+                ]
                 .groupby('Publication year')['item_id']
                 .nunique(),
             },

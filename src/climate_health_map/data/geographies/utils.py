@@ -338,7 +338,7 @@ def join_shapes(df_locations: pd.DataFrame, shapes: 'GeoDataFrame', keep_columns
         )
         .reset_index(drop=True)  # drop if switching back to single column
         .sjoin(shapes, how='left', predicate='within')
-        .astype({'index_right': 'Int32', 'GAUL_0': 'Int32'})
+        .astype({'index_right': 'Int32'})
         .rename(columns={'index_right': 'shape_id'})
     )
 
@@ -364,7 +364,7 @@ def join_grid_shapes(df_grid: pd.DataFrame, shapes: 'GeoDataFrame', resolution: 
             crs='EPSG:4326',
         )
         .sjoin(shapes, how='left', predicate='intersects')
-        .astype({'index_right': 'Int32', 'GAUL_0': 'Int32'})
+        .astype({'index_right': 'Int32'})
         .rename(columns={'index_right': 'shape_id', 'index': 'grid_id'})
     )
 
@@ -390,7 +390,7 @@ def merge_grid_info(
 
     # Match df_grid to shapes
     points_grid = join_grid_shapes(df_grid, shapes=shapes, resolution=resolution)
-    # Merge in 2024 population based on ISO code (note, some shape files might not have `ISO_A3`, then you need to edit this
+    # Merge in [reference_year] population based on ISO code (note, some shape files might not have `ISO_A3`, then you need to edit this
     points_grid = points_grid.merge(
         df_population[df_population['year'] == reference_year][['iso3', 'Population']],
         left_on='ISO_A3',
@@ -443,17 +443,20 @@ def merge_grid_info(
     )
     counts_direct.drop(columns=['population', 'grid_id'], inplace=True)
     counts_direct.rename_axis('grid_id', inplace=True)
+    logger.info(f'counts_direct.shape={counts_direct.shape}')
 
     # Count number of studies with region/abstracted location per grid cell and normalise by df_population
     counts_abstracted = locations_abstracted.groupby('grid_id')['item_id'].nunique().rename('study_count')
     counts_abstracted = points_grid[['grid_id', 'Population']].set_index('grid_id').join(counts_abstracted)
     counts_abstracted['studies_per_capita'] = counts_abstracted['study_count'] / counts_abstracted['Population']
     counts_abstracted.drop(columns='Population', inplace=True)
+    logger.info(f'counts_abstracted.shape={counts_abstracted.shape}')
 
     # Merge both counts and per capita values
     counts = df_grid.join(counts_direct, how='left').join(counts_abstracted, how='left', lsuffix='_direct', rsuffix='_abstracted')
     counts['study_count'] = (counts['study_count_direct'].fillna(0) + counts['study_count_abstracted'].fillna(0)).replace({0: np.nan})
     counts['studies_per_capita'] = (counts['studies_per_capita_direct'].fillna(0) + counts['studies_per_capita_abstracted'].fillna(0)).replace({0: np.nan})
+    logger.info(f'counts.shape={counts.shape}')
 
     df_locations = df_locations.merge(
         pd.concat([locations_abstracted, locations_direct])
@@ -465,6 +468,7 @@ def merge_grid_info(
         right_on='location_id',
         how='left',
     )
+    logger.info(f'df_locations.shape={df_locations.shape}')
 
     df = df.join(
         pd.concat([locations_abstracted, locations_direct])
@@ -473,5 +477,6 @@ def merge_grid_info(
         .any(),
         how='left',
     )
+    logger.info(f'df.shape={df.shape}')
 
     return df, df_locations, counts

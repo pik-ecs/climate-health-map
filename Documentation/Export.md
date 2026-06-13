@@ -16,6 +16,8 @@ uv run healthmap export lithub --source data/exports/2026 --target data/exports/
 
 # Prepare excel exports for Lancet Countdown
 uv run healthmap export lancet excel --source data/exports/2026/ --target data/exports/lancet
+
+uv run healthmap export lancet excel-regional --source data/exports/2026/ --target data/exports/lancet --year-start 2006
 ```
 
 # Scatterplot preparation
