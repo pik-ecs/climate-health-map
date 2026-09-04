@@ -30,3 +30,4 @@ uv
 
 *.db
 Notebooks
+.jupyter*

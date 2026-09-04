@@ -2,30 +2,29 @@
 name = "climate-health-map"
 version = "0.1.0"
 description = "Pipeline to keep the climate and health map up-to-date (mainly for Lancet Countdown 5.3.1/5.3.2)"
-requires-python = ">=3.13"
+requires-python = ">=3.14,<3.15"
 
 dependencies = [
-    "nacsos_data[utils,scripts] @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git@v0.24.45",
+    "nacsos-data[utils,scripts] @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git@v0.24.55",
     "xlsxwriter==3.2.9",
     "tabulate==0.10.0",
-    "tqdm==4.67.3",
-    "matplotlib==3.11.0rc1",
-    "lithub[export]"
+    "matplotlib==3.11.0",
+    "lithub[export]",
 ]
 
 [project.optional-dependencies]
 classify = [
-    "transformers[torch]==5.8.1",
+    "transformers[torch]==5.12.1",
     "datasets==4.8.5",
     "evaluate==0.4.6",
-    "accelerate==1.13.0",
+    "accelerate==1.14.0",
     "lightgbm==4.6.0",
-    "optuna==4.8.0",
+    "optuna==4.9.0",
     "nltk==3.9.4",
 ]
-gapfill = [
-    "openalex_ingest @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-academic-search.git",
-]
+#gapfill = [
+#    "openalex-ingest @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-academic-search.git",
+#]
 extract = [
     "transformers[torch]==4.57.6", #  mordecai3==3.4.0 depends on transformers>=4.2.2,<5.0
     "mordecai3==3.4.0",
@@ -51,12 +50,20 @@ conflicts = [
       { extra = "classify" },
     ],
 ]
+override-dependencies = [
+    "typer==0.26.8",
+    "pandas[excel]>=3.0.3",
+]
+environments = [
+    "sys_platform == 'darwin'",
+    "sys_platform == 'linux'",
+]
 
 [tool.uv.sources]
 en_core_web_trf = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl" }
 mordecai3 = { git = "git+https://github.com/ahalterman/mordecai3" }
-nacsos_data = { path = "../nacsos_data", editable = true }
-openalex_ingest =  { path = "../nacsos-academic-search", editable = true }
+nacsos-data = { path = "../nacsos-data", editable = true }
+openalex-ingest =  { path = "../nacsos-academic-search", editable = true }
 #lithub = { path = "../literature-hub/packages/lithub", editable = true }
 lithub = { git = "git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/living-evidence-maps/literature-hub.git", subdirectory = "packages/lithub"} # , tag="v..."
 
@@ -70,8 +77,8 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "ruff>=0.15.8",
-    "mypy[faster-cache]==1.19.1",
+    "ruff>=0.15.9",
+    "mypy[faster-cache]==2.1.0",
 ]
 [tool.ruff]
 line-length = 160

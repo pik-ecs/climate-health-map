@@ -33,13 +33,18 @@ df2 = pd.read_csv('src/climate_health_map/data/geographies/tmp.csv')  # , sep='\
 )
 -----------------------
 df1 = pd.read_csv('src/climate_health_map/data/geographies/_countries.csv', keep_default_na=False, dtype=str)
-df2 = pd.read_csv('src/climate_health_map/data/geographies/europe.csv' , keep_default_na=False, sep='\t')
-df1.merge(df2[['iso3', 'EEA sub-region division', 'European sub-region (UN geoscheme)', 'EU', 'EEA ']].rename(columns={
+df2 = pd.read_excel('data/exports/lancet/Europe/2027 Country names and groupings_HK_08042026.xlsx' , keep_default_na=False, skiprows=[0])
+rename = {
+    'incl_lcde': 'incl_lcde',
     'EEA sub-region division': 'Region (EEA sub-division)',
     'European sub-region (UN geoscheme)': 'Region (UN Europe sub-region)',
     'EU': 'EU member (2025)',
-    'EEA ':'EEA member (2025)'
-}), left_on='iso3', right_on='iso3', how='left').to_csv('src/climate_health_map/data/geographies/updated.csv', index=False)
+    'EEA':'EEA member (2025)',
+    'WHO': 'WHO member (2025)',
+    'WB income group (2023)': 'Income group (WorldBank 2023)',
+    'HDI index (2023)': 'Group (HDI 2023)',
+}
+df1.merge(df2[['iso3'] + list(rename.keys())].rename(columns=rename), left_on='iso3', right_on='iso3', how='left').to_csv('src/climate_health_map/data/geographies/updated.csv', index=False)
 ```
 """
 
