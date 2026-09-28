@@ -235,7 +235,7 @@ def prepare_tuning_slurm(
         | {
             'gres': 'gpu:1',  # number of GPUs
             'partition': 'gpu',
-            'qos': 'gpumedium',  # or gpumedium (has MaxJobsPU=None but half priority, see `$ sacctmgr show qos`)
+            'qos': 'gpushort',  # or gpumedium (has MaxJobsPU=None but half priority, see `$ sacctmgr show qos`)
             'cpus-per-task': 5,
             'oversubscribe': None,  # use non-utilized GPUs on busy nodes
         },
@@ -415,7 +415,7 @@ def prepare_classify_slurm(
 
     logger.info('Establishing memory needs')
     pd_mem_size = estimate_pd_memory_needs(source)
-    pd_mem_size_scaling = 2
+    pd_mem_size_scaling = 10
     logger.info(f'Assuming {pd_mem_size:.2f}*{pd_mem_size_scaling:.2f}={pd_mem_size * pd_mem_size_scaling:.2f}GB memory need')
 
     logger.info('Compiling job array...')
@@ -439,7 +439,7 @@ def prepare_classify_slurm(
         | {
             'gres': 'gpu:1',  # number of GPUs
             'partition': 'gpu',
-            'qos': 'gpumedium',  # or gpumedium (has MaxJobsPU=None but half priority, see `$ sacctmgr show qos`)
+            'qos': 'gpushort',  # or gpumedium (has MaxJobsPU=None but half priority, see `$ sacctmgr show qos`)
             'cpus-per-task': 12,
             'oversubscribe': None,  # use non-utilized GPUs on busy nodes
             'mem': f'{int(pd_mem_size * pd_mem_size_scaling)}G',
