@@ -14,7 +14,7 @@ dependencies = [
 
 [project.optional-dependencies]
 classify = [
-    "transformers[torch]==5.12.1",
+    "transformers[torch]==4.57.6",
     "datasets==4.8.5",
     "evaluate==0.4.6",
     "accelerate==1.14.0",
@@ -62,8 +62,8 @@ environments = [
 [tool.uv.sources]
 en_core_web_trf = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl" }
 mordecai3 = { git = "git+https://github.com/ahalterman/mordecai3" }
-nacsos-data = { path = "../nacsos-data", editable = true }
-openalex-ingest =  { path = "../nacsos-academic-search", editable = true }
+#nacsos-data = { path = "../nacsos-data", editable = true }
+#openalex-ingest =  { path = "../nacsos-academic-search", editable = true }
 #lithub = { path = "../literature-hub/packages/lithub", editable = true }
 lithub = { git = "git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/living-evidence-maps/literature-hub.git", subdirectory = "packages/lithub"} # , tag="v..."
 
