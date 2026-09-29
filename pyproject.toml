@@ -2,7 +2,7 @@
 name = "climate-health-map"
 version = "0.1.0"
 description = "Pipeline to keep the climate and health map up-to-date (mainly for Lancet Countdown 5.3.1/5.3.2)"
-requires-python = ">=3.14,<3.15"
+requires-python = ">=3.13,<3.15"
 
 dependencies = [
     "nacsos-data[utils,scripts] @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git@v0.24.55",
@@ -21,6 +21,9 @@ classify = [
     "lightgbm==4.6.0",
     "optuna==4.9.0",
     "nltk==3.9.4",
+]
+scatter= [
+    "umap-learn==0.5.12",
 ]
 #gapfill = [
 #    "openalex-ingest @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-academic-search.git",
