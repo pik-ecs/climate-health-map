@@ -88,14 +88,14 @@ def prepare_lithub_export(
             chunk_size=2000,
         )
 
-    df_scatterplot = read_any_pd(source / 'scatterplot.csv', index_column='item_id')
+    df_scatterplot = read_any_pd(source / 'scatterplot-topics.csv', index_column='item_id')
     logger.info(f'Loaded scatterplot table: {df_scatterplot.shape}')
     df_scatterplot = rescale_projection(df=df_scatterplot, logger=logger)
     logger.info('Rescaled x/y values of scatterplot')
 
-    df_keywords = read_any_pd(source / 'keywords.csv')
-    if (source / 'kws.csv').exists():
-        df_keywords = pd.concat([df_keywords, read_any_pd(source / 'kws.csv')])
+    df_keywords = read_any_pd(source / 'keywords-topics.csv')
+    if (source / 'keywords-text.csv').exists():
+        df_keywords = pd.concat([df_keywords, read_any_pd(source / 'keywords-text.csv')])
     logger.info(f'Loaded keywords table: {df_keywords.shape}')
     df_keywords = rescale_projection(df_keywords, logger=logger)
     logger.info('Rescaled x/y values of keywords')

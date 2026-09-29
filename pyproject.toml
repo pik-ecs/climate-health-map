@@ -10,6 +10,7 @@ dependencies = [
     "tabulate==0.10.0",
     "matplotlib==3.11.0",
     "lithub[export]",
+    "cartopy==0.25.0",
 ]
 
 [project.optional-dependencies]
@@ -34,7 +35,6 @@ extract = [
     "en_core_web_trf",
 ]
 notebook = [
-    "cartopy==0.25.0",
     "seaborn==0.13.2",
     #"rasterio==1.5.0",
     "mpl-sankey==0.1.0",
