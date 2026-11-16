@@ -32,3 +32,5 @@ uv
 *.db
 Notebooks
 .jupyter*
+
+codepile

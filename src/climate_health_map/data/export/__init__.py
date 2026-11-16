@@ -45,6 +45,7 @@ def export(
     filetype: Annotated[str, typer.Option(help='File type override')] = 'csv',
     loglevel: Annotated[str, typer.Option(help='Loglevel')] = 'INFO',
 ) -> None:
+    target.mkdir(exist_ok=True, parents=True)
     if run_items:
         export_items(
             config=config,

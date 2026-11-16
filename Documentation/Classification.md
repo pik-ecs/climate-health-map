@@ -108,7 +108,7 @@ export UV_NO_SOURCES_PACKAGE="nacsos_data openalex_ingest"
 uv run healthmap export items --config config/secret.env --target data/exports/items.csv --label-missing --label-filter "rel_major|1" 
 
 # Transfer to HPC
-scp data/exports/items_20260304.csv foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/climate-health-map/data/exports
+scp data/exports/items_20260304.csv foote:/data/rd5/ecs/Data/LancetCountdown/LivingPipeline/data/exports
 
 # need to replace {group}
 uv run --extra classify --prerelease=allow \

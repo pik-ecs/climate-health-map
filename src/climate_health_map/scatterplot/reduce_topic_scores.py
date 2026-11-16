@@ -28,9 +28,9 @@ def reduce_topic_distribution(
     df_source = df_source[df_source[topic_columns].notna().any(axis=1)]
     logger.info(f'Filtered items down to shape shape {df_source.shape}')
 
+    import umap
     if not model_path.exists():
         logger.info('No reducer found, fitting reducer...')
-        import umap
 
         reducer = umap.UMAP(
             min_dist=0.8,

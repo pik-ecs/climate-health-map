@@ -2,7 +2,7 @@
 name = "climate-health-map"
 version = "0.1.0"
 description = "Pipeline to keep the climate and health map up-to-date (mainly for Lancet Countdown 5.3.1/5.3.2)"
-requires-python = ">=3.14,<3.15"
+requires-python = ">=3.13,<3.15"
 
 dependencies = [
     "nacsos-data[utils,scripts] @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-data.git@v0.24.55",
@@ -15,13 +15,16 @@ dependencies = [
 
 [project.optional-dependencies]
 classify = [
-    "transformers[torch]==5.12.1",
+    "transformers[torch]==4.57.6",
     "datasets==4.8.5",
     "evaluate==0.4.6",
     "accelerate==1.14.0",
     "lightgbm==4.6.0",
     "optuna==4.9.0",
     "nltk==3.9.4",
+]
+scatter= [
+    "umap-learn==0.5.12",
 ]
 #gapfill = [
 #    "openalex-ingest @ git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/nacsos/nacsos-academic-search.git",
@@ -32,7 +35,6 @@ extract = [
     "en_core_web_trf",
 ]
 notebook = [
-    "cartopy==0.25.0",
     "seaborn==0.13.2",
     #"rasterio==1.5.0",
     "mpl-sankey==0.1.0",
@@ -76,9 +78,8 @@ environments = [
 [tool.uv.sources]
 en_core_web_trf = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl" }
 mordecai3 = { git = "git+https://github.com/ahalterman/mordecai3" }
-# Local editable checkouts are the default; portable/CI installs override with --no-sources-package (see README).
-nacsos-data = { path = "../nacsos-data", editable = true }
-openalex-ingest =  { path = "../nacsos-academic-search", editable = true }
+#nacsos-data = { path = "../nacsos-data", editable = true }
+#openalex-ingest =  { path = "../nacsos-academic-search", editable = true }
 #lithub = { path = "../literature-hub/packages/lithub", editable = true }
 lithub = { git = "git+ssh://git@gitlab.pik-potsdam.de/mcc-apsis/living-evidence-maps/literature-hub.git", subdirectory = "packages/lithub"} # , tag="v..."
 
